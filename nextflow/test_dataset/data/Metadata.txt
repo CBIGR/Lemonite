@@ -1,0 +1,75 @@
+Sample_ID	cause_of_death	gender	age_at_diagnosis	progression_or_recurrence	site_of_resection_or_biopsy	diagnosis2	sample_type	diagnosis	rna_wang_cancer_cell_2017
+C3L-00365	Unknown	female	59	not reported	Parietal lobe	GBM	tumor	nmf3	Classical
+C3L-00674	Cancer Related	male	46	yes	Frontal lobe	GBM	tumor	nmf1	Mesenchymal
+C3L-00677	Cancer Related	female	70	no	Frontal lobe	GBM	tumor	nmf1	Proneural
+C3L-01043	Cancer Related	male	59	not reported	Parietal lobe	GBM	tumor	nmf2	Mesenchymal
+C3L-01045	Infection	female	74	not reported	Temporal lobe	GBM	tumor	nmf3	Mesenchymal
+C3L-01048	Blank	male	61	not reported	Temporal lobe	GBM	tumor	nmf3	Classical
+C3L-01049	Blank	male	47	no	Frontal lobe	GBM	tumor	nmf2	Mesenchymal
+C3L-01149	Blank	male	49	not reported	Brain, NOS	GBM	tumor	nmf3	Proneural
+C3L-01157	Blank	female	67	no	Temporal lobe	GBM	tumor	nmf1	Proneural
+C3L-01887	Cancer Related	male	49	yes	Temporal lobe	GBM	tumor	nmf1	Classical
+C3L-02041	Blank	female	52	yes	Temporal lobe	GBM	tumor	IDH mutant	IDH mutant
+C3L-02465	Cancer Related	male	51	no	Frontal lobe	GBM	tumor	nmf2	Mesenchymal
+C3L-02504	Cancer Related	male	72	yes	Occipital lobe	GBM	tumor	nmf3	Proneural
+C3L-02542	Blank	female	59	not reported	Temporal lobe	GBM	tumor	nmf3	Proneural
+C3L-02642	Cancer Related	male	77	not reported	Frontal lobe	GBM	tumor	nmf1	Classical
+C3L-02704	Blank	male	54	not reported	Frontal lobe	GBM	tumor	nmf2	Mesenchymal
+C3L-02705	Blank	male	60	not reported	Frontal lobe	GBM	tumor	nmf2	Mesenchymal
+C3L-02707	Blank	male	58	not reported	Temporal lobe	GBM	tumor	nmf3	Classical
+C3L-02708	Cancer Related	male	44	yes	Parietal lobe	GBM	tumor	IDH mutant	IDH mutant
+C3L-02900	Cancer Related	male	53	no	Occipital lobe	GBM	tumor	IDH mutant	IDH mutant
+C3L-02970	Blank	male	59	no	Temporal lobe	GBM	tumor	nmf3	Proneural
+C3L-02984	Blank	male	34	no	Frontal lobe	GBM	tumor	IDH mutant	IDH mutant
+C3L-03266	Cancer Related	female	62	no	Parietal lobe	GBM	tumor	nmf3	Classical
+C3L-03407	Blank	female	57	no	Frontal lobe	GBM	tumor	nmf2	Mesenchymal
+C3L-03681	Blank	female	63	not reported	Temporal lobe	GBM	tumor	nmf2	Classical
+C3L-03727	Cancer Related	female	71	yes	Parietal lobe	GBM	tumor	nmf3	Mesenchymal
+C3L-03728	Cancer Related	female	80	not reported	Frontal lobe	GBM	tumor	nmf2	Proneural
+C3L-03748	Cancer Related	female	65	yes	Frontal lobe	GBM	tumor	nmf2	Mesenchymal
+C3L-04084	Blank	female	64	not reported	Parietal lobe	GBM	tumor	nmf3	Classical
+C3N-00661	Blank	male	49	yes	Temporal lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-00662	Infection	female	78	not reported	Temporal lobe	GBM	tumor	nmf3	Proneural
+C3N-00663	Surgical Complications	male	40	no	Frontal lobe	GBM	tumor	IDH mutant	IDH mutant
+C3N-00665	Blank	female	66	yes	Frontal lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-01192	Unknown	female	60	no	Frontal lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-01196	Cancer Related	male	67	yes	Frontal lobe	GBM	tumor	nmf3	Classical
+C3N-01334	Cancer Related	female	65	no	Occipital lobe	GBM	tumor	nmf1	Classical
+C3N-01364	Blank	female	34	yes	Temporal lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-01368	Blank	male	66	yes	Frontal lobe	GBM	tumor	nmf3	Classical
+C3N-01369	Unknown	female	58	not reported	Temporal lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-01505	Not Cancer Related	male	74	yes	Parietal lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-01515	Cancer Related	female	74	no	Frontal lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-01517	Blank	male	50	yes	Frontal lobe	GBM	tumor	nmf3	Classical
+C3N-01518	Cancer Related	female	72	yes	Temporal lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-01798	Cancer Related	male	44	not reported	Frontal lobe	GBM	tumor	nmf1	Proneural
+C3N-01814	Blank	female	49	not reported	Brain, NOS	GBM	tumor	nmf1	Proneural
+C3N-01815	Unknown	female	71	not reported	Brain, NOS	GBM	tumor	nmf2	Mesenchymal
+C3N-01816	Cancer Related	female	54	yes	Temporal lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-01818	Unknown	male	61	not reported	Temporal lobe	GBM	tumor	nmf1	Proneural
+C3N-01852	Blank	male	60	not reported	Frontal lobe	GBM	tumor	nmf3	Classical
+C3N-01856	Blank	male	66	yes	Occipital lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-02181	Blank	female	53	no	Temporal lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-02183	Cancer Related	female	64	yes	Temporal lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-02185	Blank	female	62	yes	Frontal lobe	GBM	tumor	nmf1	Proneural
+C3N-02186	Blank	male	53	yes	Frontal lobe	GBM	tumor	nmf1	Proneural
+C3N-02188	Cancer Related	male	59	yes	Temporal lobe	GBM	tumor	nmf3	Mesenchymal
+C3N-02190	Cancer Related	male	54	yes	Occipital lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-02255	Cancer Related	male	89	no	Occipital lobe	GBM	tumor	nmf1	Proneural
+C3N-02256	Cancer Related	male	65	yes	Temporal lobe	GBM	tumor	nmf1	Proneural
+C3N-02769	Cancer Related	male	54	yes	Frontal lobe	GBM	tumor	nmf2	Mesenchymal
+C3N-02770	Cancer Related	male	71	yes	Frontal lobe	GBM	tumor	nmf1	Proneural
+C3N-02782	Blank	female	48	yes	Parietal lobe	GBM	tumor	nmf3	Classical
+C3N-02783	Blank	female	24	no	Brain, NOS	GBM	tumor	nmf1	Proneural
+C3N-02784	Cancer Related	male	37	yes	Brain, NOS	GBM	tumor	nmf2	Mesenchymal
+C3N-02785	Cancer Related	male	69	yes	Brain, NOS	GBM	tumor	nmf1	Proneural
+C3N-02786	Blank	female	40	no	Brain, NOS	GBM	tumor	nmf2	Mesenchymal
+C3N-02788	Cancer Related	male	65	yes	Temporal lobe	GBM	tumor	nmf1	Proneural
+C3N-03070	Blank	female	66	no	Temporal lobe	GBM	tumor	IDH mutant	IDH mutant
+C3N-03088	Unknown	female	32	no	Occipital lobe	GBM	tumor	nmf1	Proneural
+C3N-03180	Cancer Related	male	53	not reported	Brain, NOS	GBM	tumor	nmf1	Mesenchymal
+C3N-03182	Blank	male	48	no	Brain, NOS	GBM	tumor	nmf2	Mesenchymal
+C3N-03183	Cancer Related	male	54	not reported	Brain, NOS	GBM	tumor	nmf2	Mesenchymal
+C3N-03184	Blank	male	35	no	Brain, NOS	GBM	tumor	nmf3	Classical
+C3N-03186	Cancer Related	female	55	yes	Brain, NOS	GBM	tumor	nmf1	Proneural
+C3N-03188	Cancer Related	male	54	no	Brain, NOS	GBM	tumor	nmf1	Classical

@@ -1,0 +1,210 @@
+Bootstrap: docker
+From: rocker/r-ver:4.3.0
+
+%labels
+    Author Boris Vandemoortele
+    Description Lemonite multi-omics analysis pipeline
+
+%help
+    This container provides the complete environment for running the Lemonite pipeline.
+    
+    Usage:
+    singularity exec lemontree-pipeline.sif Rscript /path/to/script.R
+    singularity exec lemontree-pipeline.sif python3 /path/to/script.py
+
+%post
+    # Set environment for non-interactive installs
+    export DEBIAN_FRONTEND=noninteractive
+    
+    # Update and install system dependencies including GLPK
+    apt-get update && apt-get install -y --no-install-recommends \
+        wget \
+        curl \
+        build-essential \
+        gfortran \
+        libblas-dev \
+        liblapack-dev \
+        openjdk-17-jdk \
+        python3 \
+        python3-pip \
+        python3-dev \
+        libxml2-dev \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        libharfbuzz-dev \
+        libfribidi-dev \
+        libfreetype6-dev \
+        libpng-dev \
+        libtiff5-dev \
+        libjpeg-dev \
+        libglpk-dev \
+        libglpk40 \
+        glpk-utils \
+        libgmp-dev \
+        libmpfr-dev \
+        libudunits2-dev \
+        libgdal-dev \
+        libproj-dev \
+        && rm -rf /var/lib/apt/lists/* \
+        && apt-get clean
+        
+    # Ensure GLPK libraries are findable
+    ldconfig
+    
+    # Create symlinks if needed
+    ln -sf /usr/lib/x86_64-linux-gnu/libglpk.so.40 /usr/lib/libglpk.so.40 || true
+
+    # Install Python packages
+    pip3 install --no-cache-dir \
+        pandas==1.5.3 \
+        numpy==1.24.3 \
+        scipy==1.10.1 \
+        matplotlib==3.7.1 \
+        seaborn==0.12.2 \
+        networkx==3.1 \
+        scikit-learn==1.2.2 \
+        statsmodels==0.14.0 \
+        plotly==5.14.1 \
+        megago \
+        argparse
+
+    # Install BiocManager first
+    R -e "install.packages('BiocManager', repos='https://cran.rstudio.com')"
+    
+    # Install CRAN packages (without igraph first)
+    R -e "install.packages(c( \
+        'optparse', \
+        'data.table', \
+        'tidyverse', \
+        'dplyr', \
+        'ggplot2', \
+        'pheatmap', \
+        'stringr', \
+        'parallel', \
+        'ggrepel', \
+        'enrichR', \
+        'future.apply', \
+        'future', \
+        'doParallel', \
+        'httr', \
+        'jsonlite', \
+        'plotly', \
+        'htmlwidgets', \
+        'DT', \
+        'RColorBrewer', \
+        'devtools', \
+        'Hmisc', \
+        'foreach' \
+    ), repos='https://cran.rstudio.com', dependencies=TRUE, force=TRUE)"
+    
+    # Install igraph first (needed by many packages)
+    R -e "install.packages('igraph', repos='https://cran.rstudio.com', dependencies=TRUE)"
+    
+    # Install Bioconductor packages in dependency order
+    R -e "BiocManager::install(c( \
+        'BiocGenerics', \
+        'S4Vectors', \
+        'IRanges', \
+        'GenomeInfoDb', \
+        'GenomicRanges', \
+        'Biobase', \
+        'SummarizedExperiment', \
+        'DESeq2', \
+        'biomaRt', \
+        'decoupleR', \
+        'OmnipathR', \
+        'AnnotationDbi', \
+        'org.Hs.eg.db', \
+        'org.Mm.eg.db', \
+        'BiocParallel', \
+        'impute', \
+        'preprocessCore', \
+        'GO.db', \
+        'KEGG.db', \
+        'limma', \
+        'edgeR', \
+        'GSVA' \
+    ), ask=FALSE, force=TRUE)"
+    
+    # Install WGCNA separately (it has special dependencies)
+    R -e "BiocManager::install('WGCNA', ask=FALSE, force=TRUE)"
+    R -e "library(WGCNA); cat('WGCNA loaded successfully\\n')"
+    
+    # Download CollecTRI network during build to avoid runtime download issues on HPC
+    mkdir -p /opt/lemonite_data
+    R -e "library(decoupleR); \
+      cat('Downloading CollecTRI network for offline use...\\n'); \
+      net <- tryCatch({ \
+        get_collectri(organism='human', split_complexes=FALSE) \
+      }, error = function(e) { \
+        cat('Error downloading CollecTRI:', e\$message, '\\n'); \
+        return(NULL); \
+      }); \
+      if (!is.null(net)) { \
+        saveRDS(net, '/opt/lemonite_data/collectri_network.rds'); \
+        cat('CollecTRI network saved with', nrow(net), 'interactions\\n'); \
+      } else { \
+        cat('WARNING: CollecTRI network download failed during build\\n'); \
+      }"
+    
+    # Install packages needed for clusterProfiler ecosystem
+    R -e "install.packages(c('tidytree', 'yulab.utils', 'aplot', 'ggfun', 'gson'), repos='https://cran.rstudio.com', dependencies=TRUE)"
+    
+    # Install GOSemSim first (dependency for DOSE)
+    R -e "BiocManager::install('GOSemSim', ask=FALSE, force=TRUE)"
+    
+    # Install fgsea
+    R -e "BiocManager::install('fgsea', ask=FALSE, force=TRUE)"
+    
+    # Install DOSE (dependency for enrichplot and clusterProfiler)
+    R -e "BiocManager::install('DOSE', ask=FALSE, force=TRUE)"
+    
+    # Install ggtree (dependency for enrichplot)
+    R -e "BiocManager::install('ggtree', ask=FALSE, force=TRUE)"
+    
+    # Install enrichplot
+    R -e "BiocManager::install('enrichplot', ask=FALSE, force=TRUE)"
+    
+    # Install ReactomePA
+    R -e "BiocManager::install('ReactomePA', ask=FALSE, force=TRUE)"
+    
+    # Install clusterProfiler
+    R -e "BiocManager::install('clusterProfiler', ask=FALSE, force=TRUE)"
+    
+    # Install remaining packages
+    R -e "BiocManager::install('dorothea', ask=FALSE, force=TRUE)"
+
+    # Test core installations
+    R -e "library(DESeq2); library(decoupleR); library(OmnipathR); cat('Core R packages loaded successfully\\n')"
+    R -e "if (require('clusterProfiler', quietly=TRUE)) { cat('clusterProfiler loaded successfully\\n') } else { cat('Warning: clusterProfiler not available\\n') }" || true
+    python3 -c "import pandas, numpy, networkx; print('Python packages loaded successfully')"
+    
+    # Create directories matching Docker structure
+    mkdir -p /app /data /results
+
+%files
+    # Copy LemonTree JAR and dependencies from the nextflow directory
+    LemonTree/* /opt/lemontree/
+    
+    # Copy PKN files
+    PKN/* /opt/PKN/
+    
+    # Copy scripts to match Docker path structure
+    scripts/* /app/scripts/
+    
+    # Copy pipeline files
+    main.nf /app/
+    nextflow.config /app/
+    modules/* /app/modules/
+
+%environment
+    export LC_ALL=C
+    export PATH=/usr/local/bin:$PATH
+    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+    export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH
+    export LEMONTREE_JAR=/opt/lemontree/lemontree_v3.1.1.jar
+
+%runscript
+    echo "Lemonite Analysis Pipeline Container"
+    echo "Use 'singularity exec' to run specific commands"
+    exec "$@"

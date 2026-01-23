@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  lemontree-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lemontree-pipeline:latest
+    container_name: lemontree-analysis
+    volumes:
+      # Mount your data directory
+      - /home/borisvdm/Documents/PhD/gut_brain/IBD/Lloyd-Price2019_test_LemonIte:/data:ro
+      # Mount output directory
+      - ./results:/results
+      # Mount pipeline directory (for development)
+      - .:/app
+    environment:
+      - NEXTFLOW_ENABLE_SECRETS=true
+      - NXF_WORK=/tmp/nextflow-work
+    working_dir: /app
+    # Uncomment for interactive mode
+    # stdin_open: true
+    # tty: true
+    command: >
+      nextflow run main.nf
+        --input_dir /data
+        --output_dir /results
+        --lemontree_jar /opt/lemontree/lemontree_v3.1.1.jar
+        -profile docker
+
+  # Optional: separate service for development/testing
+  lemontree-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lemontree-pipeline:latest
+    container_name: lemontree-dev
+    volumes:
+      - /home/borisvdm/Documents/PhD/gut_brain/IBD/Lloyd-Price2019_test_LemonIte:/data:ro
+      - ./results:/results
+      - .:/app
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    command: bash
+    profiles:
+      - dev

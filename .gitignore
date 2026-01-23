@@ -1,0 +1,5 @@
+# Ignore large correlation table that exceeds GitHub's file size limit
+web_app/data/AML/Enrichment/PCC_protein_protein/PCC_protein_protein_correlation_table.txt
+# OmniPathR log files
+omnipathr-log/
+nextflow/PKN/cache/

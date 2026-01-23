@@ -1,0 +1,26 @@
+#!/bin/bash
+#PBS -N tight
+#PBS -m abe
+#PBS -M boris.vandemoortele@ugent.be
+#PBS -l nodes=1:ppn=1,walltime=3:00:00
+
+cd $PBS_O_WORKDIR
+
+module load Java/1.8.0_311
+#java -jar lemontree_v3.0.5.jar -task ganesh -data_file logcpmFischer_11072genes -output_file Lemon_results/cluster1
+
+java -jar /scratch/gent/vo/000/gvo00027/projects/CBIGR/software/lemontree/lemontree_v3.1.1.jar \
+-task tight_clusters -data_file LemonPreprocessed_expression.txt \
+-cluster_file clusterfile -output_file tight_clusters.txt -node_clustering true
+
+java -jar /scratch/gent/vo/000/gvo00027/projects/CBIGR/software/lemontree/lemontree_v3.1.1.jar \
+-task regulators -data_file LemonPreprocessed_complete.txt -reg_file lovering_TFs.txt \
+-cluster_file tight_clusters.txt -output_file Lovering
+
+java -jar /scratch/gent/vo/000/gvo00027/projects/CBIGR/software/lemontree/lemontree_v3.1.1.jar \
+-task regulators -data_file LemonPreprocessed_complete.txt -reg_file metabolites.txt \
+-cluster_file tight_clusters.txt -output_file Metabolites
+
+
+# Convert files to pdf format -> Does not work on the HPC
+#for f in *.eps; do epstopdf $f; done

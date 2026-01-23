@@ -1,0 +1,129 @@
+process PKN_EVALUATION {
+    tag "PKN evaluation"
+    publishDir "${params.output_di    python3 ${baseDir}/scripts/evaluate_against_PKN.py \\
+        --workdir . \\
+        --network_file "\$network_file" \\
+        --pkn_file "\$pkn_file" \\
+        --metabolite_interactions_file "\$metabolite_interactions_file" \\
+        --metabolite_mapping_file "\$metabolite_mapping_file" \\
+        --tf_regulator_file "\$tf_regulator_file" \\
+        --metabolite_regulator_file "\$metabolite_regulator_file" \\
+        --cluster_file "\$cluster_file" \\
+        --fold ${fold} \\
+        --cores ${task.cpus}
+    
+    # Copy the generated MVF file to the viewer_files directory so MODULE_VIEWER_HEATMAPS can find it
+    if [ -f "ModuleViewer_files/metabolite_LemoniteKG_interactions.mvf" ]; then
+        echo "Copying metabolite_LemoniteKG_interactions.mvf to viewer_files directory..."
+        cp ModuleViewer_files/metabolite_LemoniteKG_interactions.mvf ${viewer_files}/
+        echo "MVF file copied successfully"
+    else
+        echo "Warning: metabolite_LemoniteKG_interactions.mvf not found in ModuleViewer_files/"
+        ls -la ModuleViewer_files/ || echo "ModuleViewer_files directory not found"
+    fi
+    
+    echo "PKN evaluation completed"omputed_run_id}/LemonTree", mode: 'copy'
+
+    input:
+    path networks
+    path viewer_files
+    path data_dir
+    val run_id
+
+    output:
+    path "PKN_Evaluation/*", emit: pkn_results, optional: true
+
+    script:
+    def fold = params.fold ?: 2
+    
+    """
+    # Create working directory structure
+    mkdir -p PKN_Evaluation
+    workdir=\$(pwd)
+    
+    # Find required files - try multiple patterns
+    network_file=\$(find . -name "LemonNetwork_*.txt" | head -1)
+    if [ -z "\$network_file" ]; then
+        network_file=\$(find . -name "Metabolites2targets_*.txt" | head -1)
+        echo "Using metabolite targets file: \$network_file"
+    else
+        echo "Found LemonNetwork file: \$network_file"
+    fi
+    
+    if [ -z "\$network_file" ]; then
+        echo "Error: No network file found"
+        echo "Available .txt files:"
+        find . -name "*.txt" -type f
+        exit 1
+    fi
+    
+    # Find regulator files - try multiple patterns to handle both 2 and 2.0 formats
+    tf_regulator_file=\$(find . -name "Lovering.fold${fold}_list.txt" -o -name "Lovering.fold${fold}.0_list.txt" | head -1)
+    metabolite_regulator_file=\$(find . -name "Metabolite.fold${fold}_list.txt" -o -name "Metabolite.fold${fold}.0_list.txt" | head -1)
+    cluster_file=\$(find . -name "clusters_list.txt" | head -1)
+    
+    # PKN files (available in the container)
+    pkn_file="/opt/PKN/Lemonite_PKN.tsv"
+    metabolite_interactions_file="/opt/PKN/HMDB_metabolites_gene_interactions.tsv"
+    
+    # Look for metabolite mapping file in data directory and current directory
+    metabolite_mapping_file=""
+    for name in name_map.csv metabolite_mapping.csv compound_mapping.csv; do
+        if [ -f "data/\$name" ]; then
+            metabolite_mapping_file="data/\$name"
+            break
+        elif [ -f "\$name" ]; then
+            metabolite_mapping_file="\$name"
+            break
+        fi
+    done
+    
+    if [ -z "\$metabolite_mapping_file" ]; then
+        echo "Warning: Metabolite mapping file not found, creating minimal placeholder"
+        echo "Query,HMDB" > /tmp/name_map.csv
+        echo "dummy,HMDB0000001" >> /tmp/name_map.csv
+        metabolite_mapping_file="/tmp/name_map.csv"
+    fi
+    
+    echo "Running PKN evaluation..."
+    echo "Network file: \$network_file"
+    echo "TF regulator file: \$tf_regulator_file"
+    echo "Metabolite regulator file: \$metabolite_regulator_file"
+    echo "Cluster file: \$cluster_file"
+    echo "Metabolite mapping file: \$metabolite_mapping_file"
+    
+    # Check if files exist and show their sizes
+    if [ -f "\$metabolite_regulator_file" ]; then
+        LINECOUNT=\$(wc -l < "\$metabolite_regulator_file")
+        echo "Metabolite regulator file found (\$LINECOUNT lines)"
+        echo "First few lines:"
+        head -3 "\$metabolite_regulator_file"
+    else
+        echo "ERROR: Metabolite regulator file not found!"
+        echo "Available metabolite files:"
+        find . -name "*etabolite*" -type f
+    fi
+    
+    python3 ${baseDir}/scripts/evaluate_against_PKN.py \\
+        --workdir "\$workdir" \\
+        --network_file "\$network_file" \\
+        --pkn_file "\$pkn_file" \\
+        --metabolite_interactions_file "\$metabolite_interactions_file" \\
+        --metabolite_mapping_file "\$metabolite_mapping_file" \\
+        --tf_regulator_file "\$tf_regulator_file" \\
+        --metabolite_regulator_file "\$metabolite_regulator_file" \\
+        --cluster_file "\$cluster_file" \\
+        --fold ${fold} \\
+        --cores ${task.cpus}
+    
+    echo "PKN evaluation completed"
+    """
+
+    stub:
+    """
+    mkdir -p PKN_Evaluation
+    touch PKN_Evaluation/evaluation_results.txt
+    touch PKN_Evaluation/evaluation_summary.txt
+    touch PKN_Evaluation/metabolite_LemoniteKG_interactions.mvf
+    """
+}

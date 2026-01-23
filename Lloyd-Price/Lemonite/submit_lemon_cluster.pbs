@@ -1,0 +1,16 @@
+#!/bin/bash -l
+#PBS -l nodes=2:ppn=12
+#PBS -l walltime=12:00:00
+
+#PBS -m abe
+
+#module load Java/1.8.0_311
+
+cd $PBS_O_WORKDIR
+INPUT_FILE="input_${PBS_ARRAYID}.dat"
+OUTPUT_FILE="cluster_${PBS_ARRAYID}"
+./lemon_cluster.pbs ${PBS_ARRAYID} -input ./LemonPreprocessed_expression.txt -output ${OUTPUT_FILE}
+
+#submit job as follows:
+#qsub -t 1-50 submit_lemon_cluster.sh
+

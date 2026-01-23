@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd $PBS_O_WORKDIR
+
+module load Java/1.8.0_311
+java -jar /scratch/gent/vo/000/gvo00027/projects/CBIGR/software/lemontree/lemontree_v3.1.1.jar -task ganesh -data_file $3 -output_file ./Lemon_results_2/$5

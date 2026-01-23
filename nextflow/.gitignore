@@ -1,0 +1,4 @@
+*.sif
+.singularity/
+.nextflow/cache/
+.nextflow/log.*
