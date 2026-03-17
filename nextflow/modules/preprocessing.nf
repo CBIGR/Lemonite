@@ -10,6 +10,7 @@ process PREPROCESSING_TFA {
     output:
     path "LemonTree/Preprocessing/LemonPreprocessed_expression.txt", emit: preprocessed_data
     path "LemonTree/Preprocessing/LemonPreprocessed_complete.txt", emit: complete_data
+    path "LemonTree/Preprocessing/LemonPreprocessed_*.txt", emit: omics_preprocessed
     path "LemonTree/Preprocessing/*.txt", emit: regulator_files
     path "LemonTree/Preprocessing/DESeq_groups.txt", emit: metadata
     path "LemonTree/Preprocessing/PCA_*.pdf", emit: pca_plots, optional: true
@@ -22,8 +23,11 @@ process PREPROCESSING_TFA {
     # Find the required input files in the data directory
     EXPRESSION_FILE=\$(find data/ -name "*host_tx_counts.tsv" -o -name "*expression*.tsv" -o -name "*counts*.tsv" -o -name "Counts.tsv" | head -1)
     METADATA_FILE=\$(find data/ -name "*metadata*.txt" -o -name "*Metadata*.txt" | head -1)
-    PRIOR_NETWORK=\$(find data/ -name "*CollecTRI*.txt" -o -name "*network*.txt" | head -1)
-
+    PRIOR_NETWORK=\$(find data/ -name "*CollecTRI*.txt" -o -name "*network*.txt" | head -1)    # if nothing found in data, fall back to bundled PKN directory
+    if [ -z "\$PRIOR_NETWORK" ] && [ -f "${projectDir}/PKN/CollecTRI_network.txt" ]; then
+        PRIOR_NETWORK="${projectDir}/PKN/CollecTRI_network.txt"
+        echo "Using bundled network from projectDir: \$PRIOR_NETWORK"
+    fi
     # Check if required files exist
     if [ -z "\$EXPRESSION_FILE" ]; then
         echo "Error: Expression file not found"

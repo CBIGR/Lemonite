@@ -1,0 +1,4 @@
+task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
+1	7f/bba60b	2362624	PREPROCESSING_TFA (Preprocessing and TFA analysis)	FAILED	0	2026-02-06 15:21:50.422	2m 22s	2m 20s	650.4%	1.9 GB	3.7 GB	51.2 MB	8.4 MB
+2	a6/8aa343	2365459	LOG_PARAMETERS (Logging pipeline parameters)	COMPLETED	0	2026-02-06 15:24:11.955	1.2s	20ms	4.9%	0	0	84.9 KB	7 KB
+3	0c/a27299	2365631	PREPROCESSING_TFA (Preprocessing and TFA analysis)	ABORTED	-	2026-02-06 15:24:13.189	-	-	-	-	-	-	-

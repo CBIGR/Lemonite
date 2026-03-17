@@ -102,9 +102,31 @@ process PKN_EVALUATION {
         fi
     done
     
-    # PKN files (available in the container)
-    pkn_file="/opt/PKN/Lemonite_PKN.tsv"
-    metabolite_interactions_file="/opt/PKN/HMDB_metabolites_gene_interactions.tsv"
+    # PKN files - try bind-mounted path first (development mode), then container path
+    pkn_file=""
+    for candidate in "${projectDir}/PKN/Lemonite_PKN.tsv" "/opt/PKN/Lemonite_PKN.tsv"; do
+        if [ -f "\$candidate" ]; then
+            pkn_file="\$candidate"
+            echo "Found PKN file: \$pkn_file"
+            break
+        fi
+    done
+    if [ -z "\$pkn_file" ]; then
+        echo "ERROR: Lemonite_PKN.tsv not found in any expected location"
+        echo "  Tried: ${projectDir}/PKN/Lemonite_PKN.tsv, /opt/PKN/Lemonite_PKN.tsv"
+    fi
+
+    metabolite_interactions_file=""
+    for candidate in "${projectDir}/PKN/metabolite_gene_PKN.tsv" "${projectDir}/PKN/HMDB_metabolites_gene_interactions.tsv" "/opt/PKN/HMDB_metabolites_gene_interactions.tsv" "/opt/PKN/metabolite_gene_PKN.tsv"; do
+        if [ -f "\$candidate" ]; then
+            metabolite_interactions_file="\$candidate"
+            echo "Found metabolite interactions file: \$metabolite_interactions_file"
+            break
+        fi
+    done
+    if [ -z "\$metabolite_interactions_file" ]; then
+        echo "WARNING: Metabolite interactions file not found in any expected location"
+    fi
     
     # Look for metabolite mapping file in data directory and current directory
     metabolite_mapping_file=""
@@ -193,8 +215,9 @@ process PKN_EVALUATION {
     done
 
     # Copy results back to the expected output location for Nextflow
+    # Use -rL to dereference any symlinks for HPC/Singularity compatibility
     mkdir -p ModuleViewer_files
-    cp -r results/ModuleViewer_files/* ModuleViewer_files/ || true
+    cp -rL results/ModuleViewer_files/* ModuleViewer_files/ || true
 
     # Check for generated MVF and report/copy if found in other locations
     if [ -f "\$workdir/results/ModuleViewer_files/metabolite_LemoniteKG_interactions.mvf" ]; then

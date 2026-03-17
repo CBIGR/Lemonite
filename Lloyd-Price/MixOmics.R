@@ -673,10 +673,12 @@ loadings_matrix <- do.call(rbind, loadings_list)
 
 # --- 2. Convert to long format ---
 df_long <- as.data.frame(loadings_matrix) %>%
-  mutate(Feature = feature_names,
-         Block = blocks) %>%
+  mutate(
+    Feature = feature_names,
+    Block = blocks
+  ) %>%
   pivot_longer(
-    cols = starts_with("comp"),
+    cols = starts_with("Comp"),
     names_to = "Component",
     values_to = "Loading"
   )
@@ -700,51 +702,52 @@ df_top <- df_top %>%
   mutate(Feature_plot = factor(Feature, levels = Feature[order(abs(Loading))])) %>%
   ungroup()
 
-# --- 6. Create separate plots per Component (matching Wang_GBM colors) ---
+# --- 6. Create plots per Component ---
 plots <- lapply(unique(df_top$Component), function(comp) {
-  df_sub <- df_top %>% filter(Component == comp)
   
-  # Extract the component number from 'comp1', 'comp2', etc.
-  comp_num <- gsub("comp", "", comp)
+  df_sub <- df_top %>% filter(Component == comp)
+  comp_num <- gsub("Comp|comp", "", comp)
   
   ggplot(df_sub, aes(x = Feature_plot, y = Loading, fill = Block)) +
-    geom_col(width = 0.8) +
-    coord_flip() +
-    scale_x_discrete(position = "top") +
+    geom_col(width = 0.8, color = "black", size = 0.5) +
+    scale_x_discrete(
+      labels = function(x)
+        ifelse(nchar(x) > 20, paste0(substr(x, 1, 20), "..."), x)
+    ) +
     scale_fill_manual(
       values = c("Transcriptomics" = "#00BA38", "Metabolomics" = "#619CFF"),
       name = "Omics Type"
     ) +
     theme_bw() +
     theme(
-      axis.text.x = element_text(size = 8, margin = margin(l = 15)),
-      axis.title.x = element_text(margin = margin(l = 15)),
-      plot.margin = margin(5, 20, 5, 40),
-      legend.position = "right",
-      legend.title = element_text(size = 10, face = "bold"),
-      legend.text = element_text(size = 9)
+      axis.title.x = element_blank(),
+      axis.text.x = element_text(
+        angle = 45,
+        hjust = 1,
+        vjust = 1,
+        size = 11,
+        margin = margin(t = 10)
+      ),
+      plot.margin = margin(10, 20, 80, 20),
+      plot.title = element_text(hjust = 0.5, face = "bold"),
+      legend.position = "right"
     ) +
     labs(
-      y = "Feature",
-      x = "Feature Loading",
+      y = "Feature Loading",
       title = paste("Component", comp_num)
     )
 })
 
-# Arrange plots in a single column with shared legend
-final_plot <- wrap_plots(plots, ncol = 1, guides = "collect") + 
-  plot_annotation(title = "Top 5 DIABLO Features per Component and Block") &
-  theme(legend.position = "right")
+# --- 7. Arrange side-by-side with shared legend ---
+final_plot <- wrap_plots(
+  plots,
+  ncol = length(plots),
+  guides = "collect"
+) +
+  plot_annotation(title = "Top 5 DIABLO Features per Component and Block")
 
-# Display plot
+# --- 8. Display ---
 final_plot
 
-ggsave(paste0(base_dir, 'results/MixOmics/Top_DIABLO_features_per_component_withlegend.png'),
-       plot = final_plot,
-       width = 10, height = 12)
-
-cat("\n=== Top DIABLO Features Visualization Created ===\n")
-cat(sprintf("Saved: %s\n", paste0(base_dir, 'results/MixOmics/Top_DIABLO_features_per_component_withlegend.png')))
-cat("Colors: Transcriptomics (green), Metabolomics (blue)\n")
-
-
+ggsave(paste0(base_dir, 'results/MixOmics/Top_DIABLO_features_per_component.png'),
+       width = 18, height = 7)

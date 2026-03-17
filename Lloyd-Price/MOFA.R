@@ -316,38 +316,30 @@ ggsave('Factor_correlation.png')
 
 
 
+
+
 #### Heatmaps with top weight features across factors
 
-# ==============================
-# Set parameters
-# ==============================
+library(ComplexHeatmap)
+library(circlize)
 
 views <- c("Transcriptomics", "Metabolomics")
 factors <- 1:8
 top_n <- 3
 
-output_file_expression <- "./heatmaps/combined_top3_factors1-8_expression.pdf"
-output_file_weights    <- "./heatmaps/combined_top3_factors1-8_weights.pdf"
+output_file_expression <- "./heatmaps/combined_top3_factors1-8_expression_horizontal.pdf"
+output_file_weights    <- "./heatmaps/combined_top3_factors1-8_weights_horizontal.pdf"
 
 dir.create("./heatmaps", showWarnings = FALSE, recursive = TRUE)
 
 # ==============================
-# Color-blind friendly palettes
+# Heatmap colors
 # ==============================
-okabe_ito <- c(
-  "#E69F00", "#56B4E9", "#009E73",
-  "#F0E442", "#0072B2", "#D55E00",
-  "#CC79A7", "#999999"
-)
-
-factor_labels <- paste0("F", factors)
-factor_colors <- setNames(okabe_ito[seq_along(factor_labels)], factor_labels)
-
-# Heatmap colors (same as example)
 col_fun_expression <- colorRamp2(
   c(-2, 0, 2),
   c("#2166AC", "#F7F7F7", "#B35806")
 )
+
 col_fun_weights <- colorRamp2(
   c(-1, 0, 1),
   c("#2166AC", "#F7F7F7", "#B35806")
@@ -359,26 +351,20 @@ col_fun_weights <- colorRamp2(
 all_weights <- get_weights(model, views = "all", factors = "all")
 
 all_data <- list()
-row_view_annotation   <- c()
-row_factor_annotation <- c()
+feature_view_annotation <- c()
 
 # ==============================
-# Build heatmap data (top N features per factor, assign factor by strongest weight)
+# Build heatmap data
 # ==============================
 for (view in views) {
+  
   weight_mat <- all_weights[[view]][, factors, drop = FALSE]
   
   top_features_per_factor <- lapply(factors, function(f) {
     names(sort(abs(weight_mat[, f]), decreasing = TRUE))[1:top_n]
   })
-  names(top_features_per_factor) <- paste0("F", factors)
   
   all_features <- unique(unlist(top_features_per_factor))
-  
-  assigned_factor <- sapply(all_features, function(feat) {
-    f <- which.max(abs(weight_mat[feat, ]))
-    paste0("F", factors[f])
-  })
   
   data_matrix <- get_data(model, views = view)[[view]][[1]]
   data_matrix <- as.matrix(data_matrix)
@@ -387,26 +373,23 @@ for (view in views) {
   heatmap_data <- t(scale(t(heatmap_data)))
   
   all_data[[view]] <- heatmap_data
-  row_view_annotation   <- c(row_view_annotation, rep(view, length(all_features)))
-  row_factor_annotation <- c(row_factor_annotation, assigned_factor)
+  feature_view_annotation <- c(feature_view_annotation,
+                               rep(view, length(all_features)))
 }
 
 combined_data <- do.call(rbind, all_data)
 
-# ==============================
-# Row annotation (Factor only)
-# ==============================
-ha_row <- rowAnnotation(
-  Factor = row_factor_annotation,
-  col = list(Factor = factor_colors)
-)
+# =========================================================
+# HORIZONTAL ORIENTATION → transpose matrices
+# =========================================================
+combined_data_t <- t(combined_data)
 
 # ==============================
-# Column annotation
+# Row annotation (samples ONLY)
 # ==============================
-sample_metadata <- DESeq_groups[colnames(combined_data), ]
+sample_metadata <- DESeq_groups[rownames(combined_data_t), ]
 
-ha_col <- HeatmapAnnotation(
+ha_row_samples <- rowAnnotation(
   Sex       = sample_metadata$sex,
   Diagnosis = sample_metadata$diagnosis,
   Biopsy    = sample_metadata$biopsy_location,
@@ -419,25 +402,35 @@ ha_col <- HeatmapAnnotation(
 )
 
 # ==============================
-# Expression heatmap
+# Column split by view (optional grouping of features)
 # ==============================
-pdf(output_file_expression, width = 10, height = 14)
+column_split_factor <- factor(feature_view_annotation, levels = views)
+
+# ==============================
+# Expression heatmap (HORIZONTAL)
+# ==============================
+pdf(output_file_expression, width = 14, height = 10)
+
 ht_expression <- Heatmap(
-  combined_data,
+  combined_data_t,
   name = "Z-score\n(Expression)",
   col = col_fun_expression,
   cluster_rows = TRUE,
   cluster_columns = TRUE,
-  cluster_row_slices = FALSE,
   show_row_names = TRUE,
-  show_column_names = FALSE,
-  left_annotation = ha_row,
-  top_annotation  = ha_col,
-  row_split = factor(row_view_annotation, levels = views),
-  row_gap = unit(2, "mm"),
-  row_names_gp = gpar(fontsize = 8)
+  row_names_side = "left",       # ← FORCE row names to the left
+  show_column_names = TRUE,
+  left_annotation = ha_row_samples,
+  column_split = column_split_factor,
+  column_gap = unit(2, "mm"),
+  column_names_rot = 45,
+  column_names_gp = gpar(fontsize = 8)
 )
-draw(ht_expression, heatmap_legend_side = "bottom", annotation_legend_side = "bottom")
+
+draw(ht_expression,
+     heatmap_legend_side = "bottom",
+     annotation_legend_side = "bottom")
+
 dev.off()
 message("Expression heatmap saved to ", output_file_expression)
 
@@ -447,36 +440,41 @@ message("Expression heatmap saved to ", output_file_expression)
 weights_data <- matrix(
   nrow = nrow(combined_data),
   ncol = length(factors),
-  dimnames = list(rownames(combined_data), paste0("F", factors))
+  dimnames = list(rownames(combined_data), paste0("Factor", factors))
 )
 
 for (i in seq_len(nrow(weights_data))) {
   feat <- rownames(weights_data)[i]
-  view <- row_view_annotation[i]
+  view <- feature_view_annotation[i]
   weights_data[i, ] <- all_weights[[view]][feat, factors]
 }
 
-ha_row_weights <- rowAnnotation(
-  Factor = row_factor_annotation,
-  col = list(Factor = factor_colors)
-)
+# transpose for horizontal layout
+weights_data_t <- t(weights_data)
 
-pdf(output_file_weights, width = 6, height = 14)
+pdf(output_file_weights, width = 12, height = 6)
+
 ht_weights <- Heatmap(
-  weights_data,
+  weights_data_t,
   name = "Feature\nWeight",
   col = col_fun_weights,
-  cluster_rows = TRUE,
-  cluster_columns = FALSE,
-  cluster_row_slices = FALSE,
+  cluster_rows = FALSE,
+  cluster_columns = TRUE,
   show_row_names = TRUE,
-  left_annotation = ha_row_weights,
-  row_split = factor(row_view_annotation, levels = views),
-  row_gap = unit(2, "mm"),
-  row_names_gp = gpar(fontsize = 10),
-  column_names_rot = 45
+  row_names_side = "left",        # ← FORCE row names to the left
+  show_column_names = TRUE,
+  column_split = column_split_factor,
+  column_gap = unit(2, "mm"),
+  column_names_rot = 45,
+  column_names_gp = gpar(fontsize = 9)
 )
-draw(ht_weights, heatmap_legend_side = "bottom", annotation_legend_side = "bottom")
+
+draw(
+  ht_weights,
+  heatmap_legend_side = "bottom",
+  padding = unit(c(5, 20, 5, 5), "mm")
+)
+
 dev.off()
 message("Weights heatmap saved to ", output_file_weights)
 
@@ -716,6 +714,8 @@ cat(sprintf("  - %s\n", "./Supplementary_MOFA_metabolomics_feature_weights_all_f
 #### Follow-up analysis with COSMOS (for all factors)
 #######################################################################################################################
 
+setwd('./To_COSMOS')
+
 library(cosmosR)
 library(liana)
 #BiocManager::install("saezlab/decoupleR")
@@ -732,20 +732,28 @@ library(ggfortify)
 library(pheatmap)
 library(gridExtra)
 library(RColorBrewer)
+library(ggvenn)
 
 weights <- get_weights(model, views = "all", factors = "all")
-
 # Get the number of factors
 n_factors <- model@dimensions$K
 
-setwd('./To_COSMOS_0.2')
-
-
+# Preload the COSMOS meta-network once for reuse across factors
+data("meta_network")
+meta_network_metab <- meta_network[grepl("HMDB", meta_network$source) | grepl("HMDB", meta_network$target), ]
+meta_network_metab$source <- gsub("Metab__", "", meta_network_metab$source)
+meta_network_metab$target <- gsub("Metab__", "", meta_network_metab$target)
+meta_network_metab$source <- gsub("_.*", "", meta_network_metab$source)
+meta_network_metab$target <- gsub("_.*", "", meta_network_metab$target)
+meta_network_metabs <- unique(c(meta_network_metab$source, meta_network_metab$target))
+meta_network_metabs[is.na(meta_network_metabs)] <- "No_HMDB_unknown"
+# Summary table for COSMOS metabolite counts
+cosmos_summary <- data.frame(
+  Factor = integer(0),
+  total_metabolites = integer(0),
+  overlap_metabolites = integer(0)
+)
 for (fact in 1:n_factors) {
-  
-  
-  #fact <- 3
-  
   
   cat(sprintf("\n=== Processing COSMOS for Factor %d ===\n", fact))
   
@@ -757,7 +765,7 @@ for (fact in 1:n_factors) {
   metab_inputs <- weights$Metabolomics[, fact]
   
   # Read mapping table from metabolite to HMDB
-  metab_to_hmdb <- fread('/home/borisvdm/Documents/PhD/gut_brain/IBD/Lloyd-Price2019/data/name_map.txt')
+  metab_to_hmdb <- fread('/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum/Preprocessing/name_map.csv')
   
   # Keep only metabolites present in the data
   metab_to_hmdb <- metab_to_hmdb[metab_to_hmdb$Query %in% names(metab_inputs), ]
@@ -769,26 +777,11 @@ for (fact in 1:n_factors) {
   common_metabs <- intersect(names(metab_inputs), metab_to_hmdb$Query)
   names(metab_inputs)[match(common_metabs, names(metab_inputs))] <- metab_to_hmdb$HMDB[match(common_metabs, metab_to_hmdb$Query)]
   
-  # Load meta-network
-  data("meta_network")
-  
-  # Filter network to metabolites only
-  meta_network_metab <- meta_network[grepl("HMDB", meta_network$source) | grepl("HMDB", meta_network$target), ]
-  
-  # Clean source and target names
-  meta_network_metab$source <- gsub("Metab__", "", meta_network_metab$source)
-  meta_network_metab$target <- gsub("Metab__", "", meta_network_metab$target)
-  meta_network_metab$source <- gsub("_.*", "", meta_network_metab$source)
-  meta_network_metab$target <- gsub("_.*", "", meta_network_metab$target)
-  
-  # Unique metabolites in network
-  meta_network_metabs <- unique(c(meta_network_metab$source, meta_network_metab$target))
-  
-  # Replace NAs in network (if any) with placeholders
-  meta_network_metabs[is.na(meta_network_metabs)] <- "No_HMDB_unknown"
-  
   # Filter metabolites with weight > 0.2
-  metab_inputs_toCosmos <- metab_inputs[abs(metab_inputs) > 0.2]
+  metab_inputs_toCosmos <- metab_inputs[abs(metab_inputs) > 0.1]
+  total_metabs <- length(metab_inputs_toCosmos)
+  overlap_metabs <- sum(names(metab_inputs_toCosmos) %in% meta_network_metabs)
+  cosmos_summary <- rbind(cosmos_summary, data.frame(Factor = fact, total_metabolites = total_metabs, overlap_metabolites = overlap_metabs))
   
   # Prepare Venn diagram list
   venn_list <- list(
@@ -796,9 +789,6 @@ for (fact in 1:n_factors) {
     "Metabolites with weight > 0.2" = names(metab_inputs_toCosmos),
     "Metabolites in dataset" = names(metab_inputs)
   )
-  
-  # Load ggvenn for plotting
-  library(ggvenn)
   
   # Colorblind-friendly palette
   cb_colors <- c("#E69F00", "#56B4E9", "#009E73")
@@ -819,6 +809,50 @@ for (fact in 1:n_factors) {
   cat(sprintf("Saved Venn diagram for Factor %d in %s\n", fact, fact_dir))
 }
 
+# Create a summary barplot with stacked bars showing overlap vs non-overlap
+cosmos_summary <- cosmos_summary %>%
+  mutate(
+    Factor = factor(Factor, levels = seq_len(n_factors)),
+    non_overlap_metabolites = total_metabolites - overlap_metabolites
+  )
 
+# Reshape data for stacked barplot
+cosmos_summary_long <- cosmos_summary %>%
+  pivot_longer(
+    cols = c(overlap_metabolites, non_overlap_metabolites),
+    names_to = "category",
+    values_to = "count"
+  ) %>%
+  mutate(
+    category = factor(category, 
+                      levels = c("non_overlap_metabolites", "overlap_metabolites"),
+                      labels = c("Not in COSMOS+", "In COSMOS+"))
+  )
 
+cosmos_barplot <- ggplot(cosmos_summary_long, aes(x = Factor, y = count, fill = category)) +
+  geom_col(color = "black", width = 0.7) +
+  scale_fill_manual(
+    values = c("Not in COSMOS+" = "#FEE0D2", "In COSMOS+" = "#A50F15"),
+    name = "Metabolite\nCategory"
+  ) +
+  geom_text(
+    data = cosmos_summary,
+    aes(x = Factor, y = total_metabolites, label = total_metabolites, fill = NULL),
+    vjust = -0.5, size = 3.5, inherit.aes = FALSE
+  ) +
+  labs(
+    title = "Metabolites with |weight| > 0.2 per factor",
+    x = "Factor",
+    y = "Metabolites with |weight| > 0.2"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "right"
+  )
 
+cosmos_barplot
+
+ggsave(file.path("./", "COSMOS_metabolite_counts_by_factor.png"), plot = cosmos_barplot, width = 8, height = 5)
+cat("Saved COSMOS metabolite count summary plot in ./COSMOS_metabolite_counts_by_factor.png\n")

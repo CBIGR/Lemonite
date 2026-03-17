@@ -4,9 +4,7 @@ process ENRICHMENT_ANALYSIS {
 
     input:
     path filtered_modules
-    path metabolites_targets
-    path tf_targets
-    path lipids_targets
+    path all_regulator_targets
     path network_files
     path viewer_files
     path preprocessed_data
@@ -25,8 +23,8 @@ process ENRICHMENT_ANALYSIS {
     # Create Networks directory and copy network files
     mkdir -p Networks
     
-    # Copy target files to Networks directory
-    for f in ${metabolites_targets} ${tf_targets} ${lipids_targets}; do
+    # Copy all regulator target files to Networks directory (dynamically derived from --regulator_types)
+    for f in ${all_regulator_targets}; do
         if [ -f "\$f" ]; then
             cp "\$f" Networks/
         fi

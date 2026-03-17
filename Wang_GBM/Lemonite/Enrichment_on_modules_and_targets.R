@@ -357,7 +357,10 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
           
           if (nrow(sig_results) > 0) {
             # Take top 10 results
-            top_results <- head(sig_results[order(sig_results$Adjusted.P.value), ], 10)
+            # top_results <- head(sig_results[order(sig_results$Adjusted.P.value), ], 10)
+            
+            # Take all results
+            top_results <- sig_results[order(sig_results$Adjusted.P.value), ]
             
             # Add metadata
             top_results$Module <- cluster
@@ -391,9 +394,9 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
   }
   
   # Save EnrichR results in GSEA-compatible format
-  fwrite(enrichr_up_results, file.path(enrichr_output_dir, "Enrichr_top_10_enriched_pathways_up_per_module.csv"))
+  fwrite(enrichr_up_results, file.path(enrichr_output_dir, "Enrichr_all_enriched_pathways_up_per_module.csv"))
   # Create empty down-regulated file for consistency
-  fwrite(data.frame(), file.path(enrichr_output_dir, "Enrichr_top_10_enriched_pathways_down_per_module.csv"))
+  fwrite(data.frame(), file.path(enrichr_output_dir, "Enrichr_all_enriched_pathways_down_per_module.csv"))
   
   cat("EnrichR Analysis completed!\n")
   cat("Results saved to:", enrichr_output_dir, "\n")

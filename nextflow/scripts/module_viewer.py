@@ -16,16 +16,134 @@ Usage:
 import os
 import sys
 import argparse
+import re
 import pandas as pd
 import numpy as np
+
+# NB: some older numpy releases (including system packages) lack the
+# ``numpy._typing`` module which is required indirectly by scikit-learn.
+# When the pipeline is run on a host with an outdated numpy the import
+# of ``sklearn`` will fail with ``ModuleNotFoundError: No module named
+# 'numpy._typing'``.  This caused repeated failures of the
+# ``MODULE_VIEWER_HEATMAPS`` step.  The following block checks the numpy
+# version early and either upgrades it (if pip is available) or aborts
+# with a clear error message so that the user can correct the
+# environment.
+
+# perform a minimal version check before we start importing heavy libs
+min_numpy_version = (1, 24, 0)
+version_tuple = tuple(int(x) for x in np.__version__.split('.')[:3] if x.isdigit())
+if version_tuple < min_numpy_version:
+    sys.stderr.write(
+        f"ERROR: numpy >= {'.'.join(str(x) for x in min_numpy_version)} "
+        f"is required by module_viewer.py (found {np.__version__}).\n"
+    )
+    sys.stderr.write(
+        "Please install or upgrade numpy in the environment used by the pipeline,\n"
+        "e.g. `pip install --user 'numpy>=1.24'` or update the container image.\n"
+    )
+    sys.exit(1)
+
+# attempt to import sklearn PCA; fall back gracefully if it's not
+try:
+    from sklearn.decomposition import PCA
+except ImportError:
+    PCA = None
+    sys.stderr.write(
+        "Warning: scikit-learn PCA could not be imported. "
+        "Heatmap sample ordering will be less sophisticated.\n"
+    )
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib import gridspec
 from matplotlib.patches import Patch
-from sklearn.decomposition import PCA
 import warnings
 warnings.filterwarnings('ignore')
+
+def is_control_diagnosis(diagnosis_value):
+    """
+    Check if a diagnosis value represents a control/healthy sample.
+    Detects: Control, control, Healthy, healthy, Normal, normal, WT, wt, etc.
+    """
+    if not diagnosis_value or not isinstance(diagnosis_value, str):
+        return False
+    
+    # Convert to lowercase for comparison
+    val = diagnosis_value.strip().lower()
+    
+    # Patterns for control samples
+    control_patterns = [
+        r'^control$',
+        r'^ctrl$',
+        r'^healthy$',
+        r'^normal$',
+        r'^wild.?type$',
+        r'^wt$',
+        r'^baseline$',
+        r'^unaffected$',
+        r'^untreated$',
+    ]
+    
+    for pattern in control_patterns:
+        if re.match(pattern, val):
+            return True
+    
+    return False
+
+def apply_control_coloring(legend_dict, sample_color_dict, metadata_type='diagnosis'):
+    """
+    Apply green coloring to control samples based on diagnosis values.
+    
+    For 'diagnosis' metadata, identifies control-like diagnosis values and
+    updates both the legend and sample color mapping to use green for controls.
+    
+    Parameters:
+    -----------
+    legend_dict : dict
+        Maps diagnosis values to colors (e.g., {'Control': 'red', 'Sepsis': 'blue'})
+    sample_color_dict : dict
+        Maps sample names to colors (e.g., {'S1': 'red', 'S2': 'blue'})
+    metadata_type : str
+        The metadata type being processed (only apply to 'diagnosis')
+    
+    Returns:
+    --------
+    tuple: (updated_legend_dict, updated_sample_color_dict)
+    """
+    # Only apply control coloring to diagnosis/clinical annotation
+    if metadata_type.lower() not in ['diagnosis', 'clinical']:
+        return legend_dict, sample_color_dict
+    
+    # Build a mapping of color -> diagnosis values
+    color_to_diagnoses = {}
+    for diagnosis_val, color in legend_dict.items():
+        if color not in color_to_diagnoses:
+            color_to_diagnoses[color] = []
+        color_to_diagnoses[color].append(diagnosis_val)
+    
+    # Identify control diagnoses and build old_color -> new_color mapping
+    old_color_to_new = {}
+    updated_legend = dict(legend_dict)
+    
+    for diagnosis_val, color in legend_dict.items():
+        if is_control_diagnosis(diagnosis_val):
+            if color != 'green':
+                old_color_to_new[color] = 'green'
+                updated_legend[diagnosis_val] = 'green'
+                print(f"  Control sample detected: '{diagnosis_val}' -> coloring green (was {color})")
+    
+    # Update sample color mapping: replace old control colors with green
+    updated_samples = {}
+    for sample_name, color in sample_color_dict.items():
+        if color in old_color_to_new:
+            updated_samples[sample_name] = old_color_to_new[color]
+        else:
+            updated_samples[sample_name] = color
+    
+    return updated_legend, updated_samples
+
 
 def load_sample_mapping(folder, filename):
     """Load sample mapping and legend from .mvf file
@@ -84,9 +202,14 @@ def load_sample_mapping(folder, filename):
                             sample_color_dict[sample.strip()] = color.strip().lower()
             
             if metadata_type and legend_dict and sample_color_dict:
+                # Apply control-sample green coloring for diagnosis/clinical metadata
+                updated_legend, updated_samples = apply_control_coloring(
+                    legend_dict, sample_color_dict, metadata_type
+                )
+                
                 metadata_dict[metadata_type] = {
-                    'legend': legend_dict,
-                    'samples': sample_color_dict,
+                    'legend': updated_legend,
+                    'samples': updated_samples,
                     'label': label
                 }
         
@@ -132,11 +255,16 @@ def load_sample_mapping(folder, filename):
         legend_parts = legend_line.split('\t')
         label = legend_parts[1].strip() if len(legend_parts) > 1 else 'Clinical Status'
         
+        # Apply control-sample green coloring for diagnosis annotation
+        updated_legend, updated_samples = apply_control_coloring(
+            legend_dict, sample_color_dict, 'diagnosis'
+        )
+        
         # Return in new format for consistency
         return {
             'diagnosis': {
-                'legend': legend_dict,
-                'samples': sample_color_dict,
+                'legend': updated_legend,
+                'samples': updated_samples,
                 'label': label
             }
         }
@@ -211,8 +339,8 @@ def create_subset_with_scores(main_df, module, cluster_data, score_data=None, ge
     new_symbols = []
     for symbol in subset['symbol']:
         if symbol in score_mapping:
-            score = score_mapping[symbol]
-            new_symbols.append(f"{symbol} ({score:.2f})")
+            score = int(score_mapping[symbol])
+            new_symbols.append(f"{symbol} ({score})")
         else:
             new_symbols.append(symbol)
     
@@ -296,6 +424,8 @@ def parse_args():
     parser.add_argument('--viewer_files_dir', help='(deprecated) Directory containing ModuleViewer files (ignored)')
     parser.add_argument('--expression_file', default='LemonPreprocessed_expression.txt', help='Expression data file for main heatmap')
     parser.add_argument('--complete_file', default='LemonPreprocessed_complete.txt', help='Complete omics data file for regulator blocks')
+    parser.add_argument('--regulator_types', default=None,
+                       help='Original regulator_types string (format: Type:DataFile.txt,...) used to derive omics-specific preprocessed filenames')
     parser.add_argument('--show_regulator_scores', action='store_true', help='Show regulator scores in labels')
     parser.add_argument('--dpi', type=int, default=300, help='DPI for output figures')
     parser.add_argument('--modules', help='Comma-separated list of specific modules to process')
@@ -339,6 +469,25 @@ def main():
     
     print(f"Found regulator types: {list(regulator_configs.keys())}")
     
+    # Build mapping from regulator type name to the original data file basename.
+    # The preprocessing R script creates LemonPreprocessed_{data_file_basename}.txt
+    # where data_file_basename is derived from the original data filename (e.g.
+    # Proteins:proteomics.txt -> LemonPreprocessed_proteomics.txt).
+    # We need this mapping so the viewer loads the correct omics-specific file
+    # instead of falling back to LemonPreprocessed_complete.txt (which may have
+    # duplicate symbols when gene and protein/metabolite names overlap).
+    regtype_to_datafile_basename = {}
+    if args.regulator_types:
+        for entry in args.regulator_types.split(','):
+            entry = entry.strip()
+            if ':' in entry:
+                rtype, rfile = entry.split(':', 1)
+                rtype = rtype.strip()
+                # Mirror R preprocessing logic: tolower(file_path_sans_ext(basename(...)))
+                basename_no_ext = os.path.splitext(os.path.basename(rfile.strip()))[0].lower()
+                regtype_to_datafile_basename[rtype] = basename_no_ext
+        print(f"Regulator type -> data file basename mapping: {regtype_to_datafile_basename}")
+    
     # Define regulators dynamically
     REGULATORS = []
     for reg_type, reg_path in regulator_configs.items():
@@ -346,11 +495,10 @@ def main():
         reg_filename = os.path.basename(reg_path)
         
         # Determine score file based on regulator type prefix
-        # The score files from LemonTree are: <prefix>.topreg.txt, <prefix>.allreg.txt, <prefix>.randomreg.txt
-        # Extract prefix from the list file (e.g., TFs.selected_regs_list.txt -> TFs)
-        # Or Metabolites.selected_regs_list.txt -> Metabolites
+        # lemontree_to_network.py copies the selected regulator scores to
+        # ModuleViewer_files/{prefix}.selected_regulators_scores.txt
         prefix = reg_filename.split('.')[0]  # Get first part before dot
-        score_file = f"{prefix}.topreg.txt"  # LemonTree generates .topreg.txt for selected regulators
+        score_file = f"{prefix}.selected_regulators_scores.txt"
         
         # Determine column name based on regulator type
         if reg_type.lower() in ['metabolite', 'lipid']:
@@ -358,17 +506,21 @@ def main():
         else:
             column_name = 'genes'
         
+        # Store the data file basename for omics-specific file lookup
+        data_file_basename = regtype_to_datafile_basename.get(reg_type, reg_type.lower())
+        
         REGULATORS.append({
             "name": reg_type,
             "file": reg_filename,
             "score_file": score_file,
-            "column": column_name
+            "column": column_name,
+            "data_file_basename": data_file_basename
         })
     
     print(f"Configured {len(REGULATORS)} regulator types: {[r['name'] for r in REGULATORS]}")
     
     # Helper function to find file in multiple locations
-    def find_data_file(filename, file_description):
+    def find_data_file(filename, file_description, required=True):
         locations = [
             os.path.join(viewer_files_dir, '..', 'Preprocessing', filename),
             os.path.join(input_dir, filename),
@@ -386,19 +538,24 @@ def main():
         if potential_paths:
             return potential_paths[0]
         
-        print(f"Error: {file_description} file not found: {filename}")
-        print(f"Searched in: {viewer_files_dir}/../Preprocessing/, {input_dir}/, {input_dir}/Preprocessing/, {input_dir}/results/*/LemonTree/Preprocessing/")
-        sys.exit(1)
+        msg = f"{file_description} file not found: {filename}"
+        search_msg = f"Searched in: {viewer_files_dir}/../Preprocessing/, {input_dir}/, {input_dir}/Preprocessing/, {input_dir}/results/*/LemonTree/Preprocessing/"
+        if required:
+            print(f"Error: {msg}")
+            print(search_msg)
+            sys.exit(1)
+        else:
+            print(f"Warning: {msg}")
+            return None
     
     # Load expression data for main heatmap (gene expression only, no other omics)
     expression_file = find_data_file(args.expression_file, 'Expression data')
     print(f"Loading expression data from: {expression_file}")
     expression_data = pd.read_csv(expression_file, sep='\t')
     
-    # Load complete omics data for regulator blocks (includes metabolomics, proteomics, etc.)
-    complete_file = find_data_file(args.complete_file, 'Complete omics data')
-    print(f"Loading complete omics data from: {complete_file}")
-    complete_data = pd.read_csv(complete_file, sep='\t')
+    # Note: omics-specific preprocessed files (e.g. LemonPreprocessed_proteins.txt) are loaded
+    # per-regulator below, instead of loading LemonPreprocessed_complete.txt which can have
+    # duplicate symbols when gene and protein names overlap.
     
     # Load cluster data
     cluster_file = os.path.join(viewer_files_dir, 'clusters_list.txt')
@@ -434,9 +591,9 @@ def main():
     
     # Filter for specific modules if requested
     if args.modules:
-        requested_modules = [m.strip() for m in args.modules.split(',')]
+        requested_modules = [m.strip() for m in args.modules.split(',') if m.strip()]
         if cluster['module'].dtype != 'object':
-            requested_modules = [int(m) if m.isdigit() else m for m in requested_modules]
+            requested_modules = [int(m) for m in requested_modules if m.isdigit()]
         cluster = cluster[cluster['module'].isin(requested_modules)]
         print(f"Processing only requested modules: {requested_modules}")
     
@@ -450,12 +607,12 @@ def main():
             reg['data'] = df
             
             # Load score data if available
-            # Try multiple locations for score files
+            # lemontree_to_network.py copies scores to ModuleViewer_files/{prefix}.selected_regulators_scores.txt
             score_file_locations = [
-                os.path.join(input_dir, 'Lemon_out', reg['score_file']),
-                os.path.join(viewer_files_dir, '..', 'Lemon_out', reg['score_file']),
+                os.path.join(viewer_files_dir, reg['score_file']),
                 os.path.join(input_dir, reg['score_file']),
-                os.path.join(viewer_files_dir, reg['score_file'])
+                os.path.join(input_dir, 'Lemon_out', reg['score_file']),
+                os.path.join(viewer_files_dir, '..', 'Lemon_out', reg['score_file'])
             ]
             
             score_file_path = None
@@ -473,6 +630,38 @@ def main():
                 reg['score_data'] = None
                 if SHOW_REGULATOR_SCORES:
                     print(f"Warning: Score file not found for {reg['name']} in any location")
+            
+            # Load omics-specific preprocessed data for this regulator type.
+            # Preprocessing creates LemonPreprocessed_{data_file_basename}.txt for each non-TF omics
+            # type, where data_file_basename comes from the original data filename (e.g.
+            # Proteins:proteomics.txt -> LemonPreprocessed_proteomics.txt).
+            # Using these instead of LemonPreprocessed_complete.txt avoids duplicate symbols
+            # when gene and protein/metabolite names overlap.
+            reg_type_lower = reg['name'].lower()
+            is_tf_type = 'tf' in reg_type_lower or reg_type_lower in ['tfs', 'transcription_factors']
+            
+            if is_tf_type:
+                # TF regulators are genes — use expression data (no separate preprocessed file)
+                reg['omics_data'] = expression_data
+                print(f"Using expression data for {reg['name']} regulators")
+            else:
+                # Try to load omics-specific file using the data file basename
+                # (derived from --regulator_types, matching the preprocessing R script logic)
+                data_basename = reg.get('data_file_basename', reg_type_lower)
+                omics_filename = f'LemonPreprocessed_{data_basename}.txt'
+                omics_file_path = find_data_file(omics_filename, f'{reg["name"]} omics data', required=False)
+                if omics_file_path:
+                    reg['omics_data'] = pd.read_csv(omics_file_path, sep='\t')
+                    print(f"Loaded omics-specific data for {reg['name']} from {omics_file_path}")
+                else:
+                    # Fall back to complete data
+                    print(f"Falling back to complete data for {reg['name']}")
+                    complete_path = find_data_file(args.complete_file, 'Complete omics data (fallback)', required=False)
+                    if complete_path:
+                        reg['omics_data'] = pd.read_csv(complete_path, sep='\t')
+                    else:
+                        print(f"Warning: No omics data available for {reg['name']}, using expression data")
+                        reg['omics_data'] = expression_data
             
             loaded_regulators.append(reg)
         else:
@@ -549,12 +738,13 @@ def main():
             
             sorted_samples = eigengene_series.sort_values().index.tolist()
             
-            # Prepare subsets for all regulators (use complete_data for metabolomics, proteomics, etc.)
+            # Prepare subsets for all regulators (use omics-specific data per regulator type)
             subsets = []
             titles = []
             for reg in loaded_regulators:
                 try:
-                    subset = create_subset_with_scores(complete_data, module_number, reg['data'], 
+                    reg_omics_data = reg.get('omics_data', expression_data)
+                    subset = create_subset_with_scores(reg_omics_data, module_number, reg['data'], 
                                                      score_data=reg.get('score_data'), 
                                                      gene_column=reg['column'],
                                                      show_scores=SHOW_REGULATOR_SCORES)
@@ -616,7 +806,7 @@ def main():
                 row_height_points = (ax_height_inches * 72) / len(labels)
                 optimal_fontsize = max(6, min(row_height_points * 0.9, 14))
                 
-                ax.set_xticklabels(ax.get_xticklabels(), rotation=90, fontsize=6)
+                ax.set_xticklabels(ax.get_xticklabels(), rotation=90, fontsize=8, fontweight='bold')
                 ax.yaxis.tick_right()
                 ax.yaxis.set_label_position('right')
                 ax.set_yticklabels(labels, rotation=0, va='center', 

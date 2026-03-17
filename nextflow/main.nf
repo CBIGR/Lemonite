@@ -111,6 +111,7 @@ include { PKN_EVALUATION } from './modules/evaluation.nf'
 include { MODULE_VIEWER_HEATMAPS } from './modules/viewer_heatmaps.nf'
 include { ENRICHMENT_ANALYSIS } from './modules/enrichment.nf'
 include { MODULE_OVERVIEW_INTERACTIVE } from './modules/overview.nf'
+include { SUMMARY_REPORT } from './modules/summary_report.nf'
 
 workflow {
     // Create channels for input data
@@ -120,6 +121,9 @@ workflow {
     data_dir = "${params.input_dir}/data"
     data_ch = Channel.fromPath(data_dir, type: 'dir')
     name_map_ch = file("${data_dir}/name_map.csv").exists() ? Channel.fromPath("${data_dir}/name_map.csv") : Channel.empty()
+    
+    // PKN file for edge categorization in module overview
+    pkn_ch = file(params.pkn_network).exists() ? Channel.fromPath(params.pkn_network) : Channel.empty()
     
     // Create channel for run_id
     run_id_ch = Channel.value(params.computed_run_id)
@@ -170,7 +174,9 @@ workflow {
         PKN_EVALUATION.out.viewer_files.ifEmpty(NETWORK_GENERATION.out.viewer_files),
         NETWORK_GENERATION.out.filtered_modules,
         input_ch,
+        PREPROCESSING_TFA.out.preprocessed_data,   // expression file
         PREPROCESSING_TFA.out.complete_data,
+        PREPROCESSING_TFA.out.omics_preprocessed.collect(),   // omics-specific preprocessed files
         run_id_ch,
         params.regulator_types
     )
@@ -178,9 +184,7 @@ workflow {
     // Step 6: Enrichment analysis
     ENRICHMENT_ANALYSIS(
         NETWORK_GENERATION.out.filtered_modules,
-        NETWORK_GENERATION.out.metabolites_targets.ifEmpty([]),
-        NETWORK_GENERATION.out.tf_targets.ifEmpty([]),
-        NETWORK_GENERATION.out.lipids_targets.ifEmpty([]),
+        NETWORK_GENERATION.out.all_regulator_targets,
         NETWORK_GENERATION.out.network_files,
         PKN_EVALUATION.out.viewer_files.ifEmpty(NETWORK_GENERATION.out.viewer_files),
         PREPROCESSING_TFA.out.preprocessed_data,
@@ -195,6 +199,24 @@ workflow {
         ENRICHMENT_ANALYSIS.out.enrichment_results,
         PREPROCESSING_TFA.out.preprocessed_data,
         PREPROCESSING_TFA.out.metadata,
+        pkn_ch.ifEmpty([]),
+        name_map_ch.ifEmpty([]),
+        run_id_ch,
+        params.regulator_types
+    )
+    
+    // Step 8: Generate comprehensive HTML summary report
+    SUMMARY_REPORT(
+        PKN_EVALUATION.out.viewer_files.ifEmpty(NETWORK_GENERATION.out.viewer_files),
+        NETWORK_GENERATION.out.filtered_modules,
+        NETWORK_GENERATION.out.network_files,
+        NETWORK_GENERATION.out.coherence_scores,
+        ENRICHMENT_ANALYSIS.out.enrichment_results,
+        PKN_EVALUATION.out.pkn_results.ifEmpty([]),
+        PREPROCESSING_TFA.out.preprocessing_results,
+        CLUSTERING.out.clusters.collect(),
+        MODULE_OVERVIEW_INTERACTIVE.out.overview_results,
+        LOG_PARAMETERS.out.parameters_log,
         run_id_ch,
         params.regulator_types
     )

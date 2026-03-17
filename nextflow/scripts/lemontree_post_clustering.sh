@@ -111,20 +111,28 @@ fi
 # Step 2: Generate regulators for each regulator type dynamically
 echo "Generating regulators for all regulator types..."
 
-# Parse regulator_types parameter (format: "Prefix1:File1,Prefix2:File2,...")
+# Parse regulator_types parameter (format: "Prefix1:File1[:DataType1],Prefix2:File2[:DataType2],...")
+# DataType is optional: 'c' for continuous (default), 'd' for discrete/binary
 IFS=',' read -ra REGULATOR_PAIRS <<< "$REGULATOR_TYPES"
 
 for pair in "${REGULATOR_PAIRS[@]}"; do
     PREFIX=$(echo "$pair" | cut -d':' -f1 | xargs)  # xargs trims whitespace
     FILENAME=$(echo "$pair" | cut -d':' -f2 | xargs)
+    DATA_TYPE=$(echo "$pair" | cut -d':' -f3 | xargs 2>/dev/null)
+    if [ -z "$DATA_TYPE" ]; then
+        DATA_TYPE="c"
+    fi
     
     # Convert prefix to lowercase for regulator list file and search multiple candidate locations
     PREFIX_LOWER=$(echo "$PREFIX" | tr '[:upper:]' '[:lower:]')
     
     # Determine if this is a TF list (contains "TF" in prefix or is a _list.txt file)
+    # Discrete regulators are never TF lists — they contain abundance data
     IS_TF_LIST=false
-    if [[ "$PREFIX" =~ [Tt][Ff] ]] || [[ "$FILENAME" =~ _list\.txt$ ]]; then
-        IS_TF_LIST=true
+    if [ "$DATA_TYPE" != "d" ]; then
+        if [[ "$PREFIX" =~ [Tt][Ff] ]] || [[ "$FILENAME" =~ _list\.txt$ ]]; then
+            IS_TF_LIST=true
+        fi
     fi
     
     # TF lists: check data/ first (user override), then PKN/ (default)
@@ -158,6 +166,7 @@ for pair in "${REGULATOR_PAIRS[@]}"; do
         echo ""
         echo "Processing $PREFIX regulators..."
         echo "  Regulator list: $REG_LIST_FILE" 
+        echo "  Data type: $DATA_TYPE (c=continuous, d=discrete)"
         echo "  Output prefix: Lemon_out/$PREFIX"
 
         java -cp ${CLASSPATH} lemontree.modulenetwork.RunCli \

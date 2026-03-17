@@ -71,6 +71,10 @@ From: rocker/r-ver:4.3.0
     # Install BiocManager first
     R -e "install.packages('BiocManager', repos='https://cran.rstudio.com')"
     
+    # Update BiocManager to get latest packages
+    R -e "BiocManager::version()"
+    R -e "tryCatch(BiocManager::install(version='auto', ask=FALSE), error=function(e) cat('BiocManager update skipped\\n'))"
+    
     # Install CRAN packages (without igraph first)
     R -e "install.packages(c( \
         'optparse', \
@@ -148,8 +152,17 @@ From: rocker/r-ver:4.3.0
       }"
     
     # Install packages needed for clusterProfiler ecosystem
-    R -e "install.packages(c('tidytree', 'yulab.utils', 'aplot', 'ggfun', 'gson'), repos='https://cran.rstudio.com', dependencies=TRUE)"
+    R -e "install.packages(c('tidytree', 'yulab.utils', 'aplot', 'ggfun', 'gson', 'rlang', 'vctrs', 'withr', 'ape'), repos='https://cran.rstudio.com', dependencies=TRUE)"
+
+    # Install qvalue (required hard dependency for clusterProfiler)
+    R -e "BiocManager::install('qvalue', ask=FALSE, force=TRUE)"
+
+    # Install treeio first (critical dependency for ggtree)
+    R -e "BiocManager::install('treeio', ask=FALSE, force=TRUE)"
     
+    # Test treeio loads correctly
+    R -e "library(treeio); cat('treeio loaded successfully\\n')"
+
     # Install GOSemSim first (dependency for DOSE)
     R -e "BiocManager::install('GOSemSim', ask=FALSE, force=TRUE)"
     
@@ -159,24 +172,37 @@ From: rocker/r-ver:4.3.0
     # Install DOSE (dependency for enrichplot and clusterProfiler)
     R -e "BiocManager::install('DOSE', ask=FALSE, force=TRUE)"
     
-    # Install ggtree (dependency for enrichplot)
+    # Install ggtree (dependency for enrichplot) - now that treeio is installed
     R -e "BiocManager::install('ggtree', ask=FALSE, force=TRUE)"
+    R -e "library(ggtree); cat('ggtree loaded successfully\\n')"
     
     # Install enrichplot
     R -e "BiocManager::install('enrichplot', ask=FALSE, force=TRUE)"
+    R -e "library(enrichplot); cat('enrichplot loaded successfully\\n')"
     
     # Install ReactomePA
     R -e "BiocManager::install('ReactomePA', ask=FALSE, force=TRUE)"
     
-    # Install clusterProfiler
-    R -e "BiocManager::install('clusterProfiler', ask=FALSE, force=TRUE)"
-    
+    # Install clusterProfiler - retry on failure
+    R -e " \
+        for (attempt in 1:3) { \
+            tryCatch({ \
+                BiocManager::install('clusterProfiler', ask=FALSE, force=TRUE, update=FALSE); \
+                library(clusterProfiler); \
+                cat('clusterProfiler installed and loaded successfully on attempt', attempt, '\\n'); \
+                break; \
+            }, error = function(e) { \
+                cat('Attempt', attempt, 'failed:', e\$message, '\\n'); \
+                if (attempt == 3) stop('clusterProfiler installation failed after 3 attempts'); \
+            }); \
+        }"
+
     # Install remaining packages
     R -e "BiocManager::install('dorothea', ask=FALSE, force=TRUE)"
 
     # Test core installations
     R -e "library(DESeq2); library(decoupleR); library(OmnipathR); cat('Core R packages loaded successfully\\n')"
-    R -e "if (require('clusterProfiler', quietly=TRUE)) { cat('clusterProfiler loaded successfully\\n') } else { cat('Warning: clusterProfiler not available\\n') }" || true
+    R -e "library(clusterProfiler); cat('clusterProfiler loaded successfully\\n')"
     python3 -c "import pandas, numpy, networkx; print('Python packages loaded successfully')"
     
     # Create directories matching Docker structure

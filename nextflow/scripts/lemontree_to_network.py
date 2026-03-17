@@ -23,15 +23,17 @@ import networkx as nx
 
 class RegulatorConfig:
     """Class to hold regulator type configuration"""
-    def __init__(self, prefix, data_file):
+    def __init__(self, prefix, data_file, data_type='c'):
         """
         Args:
             prefix: Prefix used for LemonTree output files (e.g., 'TFs', 'Metabolites', 'Proteins')
             data_file: Original input data filename (stored for reference, not used in network generation)
+            data_type: Data type - 'c' for continuous (default), 'd' for discrete/binary
         """
         self.type = prefix  # Used as edge type in network (e.g., 'TFs-gene')
         self.prefix = prefix  # Used for finding LemonTree output files
         self.data_file = data_file  # Store for reference/logging
+        self.data_type = data_type  # 'c' for continuous, 'd' for discrete/binary
         self.allreg = None
         self.randomreg = None
         self.selected_file = None
@@ -65,15 +67,17 @@ class RegulatorConfig:
                 self.randomreg is not None and os.path.exists(self.randomreg))
     
     def __repr__(self):
-        return f"RegulatorConfig(prefix='{self.prefix}', data_file='{self.data_file}')"
+        return f"RegulatorConfig(prefix='{self.prefix}', data_file='{self.data_file}', data_type='{self.data_type}')"
 
 
 def parse_regulator_types(regulator_types_str):
     """
     Parse regulator types string into RegulatorConfig objects
     
-    Format: 'Prefix1:DataFile1,Prefix2:DataFile2'
-    Example: 'TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt,Lipids:Lipidomics.txt'
+    Format: 'Prefix1:DataFile1[:DataType1],Prefix2:DataFile2[:DataType2]'
+    Example: 'TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt,ClinicalParams:clinical.txt:d'
+    
+    DataType is optional: 'c' for continuous (default), 'd' for discrete/binary.
     
     Note: DataFile is stored for reference but not used in network generation.
           The prefix is used to find LemonTree output files (e.g., TFs.allreg.txt)
@@ -82,11 +86,17 @@ def parse_regulator_types(regulator_types_str):
     for config_str in regulator_types_str.split(','):
         config_str = config_str.strip()
         if ':' not in config_str:
-            print(f"Warning: Invalid regulator config format: '{config_str}' (expected Prefix:DataFile)")
+            print(f"Warning: Invalid regulator config format: '{config_str}' (expected Prefix:DataFile[:DataType])")
             continue
         
-        prefix, data_file = config_str.split(':', 1)
-        configs.append(RegulatorConfig(prefix.strip(), data_file.strip()))
+        parts = config_str.split(':')
+        prefix = parts[0].strip()
+        data_file = parts[1].strip() if len(parts) > 1 else ''
+        data_type = parts[2].strip().lower() if len(parts) > 2 else 'c'
+        if data_type not in ('c', 'd'):
+            print(f"Warning: Invalid data type '{data_type}' for {prefix} - using 'c' (continuous). Valid: 'c' or 'd'")
+            data_type = 'c'
+        configs.append(RegulatorConfig(prefix.strip(), data_file, data_type))
     
     return configs
 
@@ -134,7 +144,9 @@ def main():
     os.makedirs('Networks', exist_ok=True)
     
     # Define file paths
-    expression_location = os.path.join(args.input_dir, 'Preprocessing', 'LemonPreprocessed_expression.txt')
+    # file used for module coherence (must not contain duplicate symbols)
+    expression_dataset = os.path.join(args.input_dir, 'Preprocessing', 'LemonPreprocessed_expression.txt')
+    # full omics dataset used elsewhere (not for coherence)
     expression_complete = os.path.join(args.input_dir, 'Preprocessing', 'LemonPreprocessed_complete.txt')
     DESeq_groups = os.path.join(args.input_dir, 'Preprocessing', 'DESeq_groups.txt')
     clusterfile = os.path.join(args.input_dir, 'Lemon_out', 'tight_clusters.txt')
@@ -220,16 +232,17 @@ def main():
         
         reg_files.append(config.selected_file)
     
-    # Step 3: Normalize selected regulator scores (Z-score normalization)
+    # Step 3: Normalize selected regulator scores (global sum normalization)
     print(f"\n{'='*80}")
-    print(f"STEP 3: NORMALIZING SELECTED REGULATOR SCORES (Z-SCORE)")
-    print("Z-scores make scores comparable across regulator types for visualization")
+    print(f"STEP 3: NORMALIZING SELECTED REGULATOR SCORES (SUM NORMALIZATION)")
+    print("Global sum normalization divides scores by the TOTAL sum of selected regulator scores,")
+    print("then scales by 100 to make numbers more interpretable")
     print("Normalized scores OVERWRITE original selection files for downstream use")
     print(f"{'='*80}")
     
     for config in available_configs:
         print(f"\nNormalizing selected {config.type} regulators ({config.prefix})...")
-        normalize_selected_regulators_zscore(config.selected_file)
+        normalize_selected_regulators_sum(config.selected_file)
     
     # Step 4: Create list files and distribution plots for selected regulators
     print(f"\n{'='*80}")
@@ -244,13 +257,12 @@ def main():
     print(f"{'='*80}")
     createListFile(clusterfile, './ModuleViewer_files/clusters_list.txt')
     
-    # Create list files for topreg (original LemonTree top regulators)
-    # NOTE: topreg files are obsolete - only selected_regs files are used downstream
-    # for config in available_configs:
-    #     if os.path.exists(config.topreg):
-    #         topreg_list = f'./ModuleViewer_files/{config.prefix}.topreg_list.txt'
-    #         createListFile(config.topreg, topreg_list)
-    #         print(f"  Created {topreg_list}")
+    # Copy selected regulator score files to ModuleViewer_files for downstream use
+    for config in available_configs:
+        if config.selected_file and os.path.exists(config.selected_file):
+            dest = f'./ModuleViewer_files/{config.prefix}.selected_regulators_scores.txt'
+            shutil.copy2(config.selected_file, dest)
+            print(f"  Copied selected regulator scores: {dest}")
     
     # Step 6: Read clusters and create cluster2gene mapping
     print(f"\n{'='*80}")
@@ -266,8 +278,9 @@ def main():
     print("STEP 7: Calculating module coherence")
     print(f"{'='*80}")
     if not skip_coherence_filtering:
+        # use expression-only file for coherence calculation
         low_coherence_modules, coherence_scores, module_eigengenes = calculate_module_coherence(
-            expression_complete, cluster2gene, coherence_threshold
+            expression_dataset, cluster2gene, coherence_threshold
         )
         
         # Filter cluster2gene dictionary
@@ -279,7 +292,7 @@ def main():
         print(f"Skipping coherence filtering - using all {len(cluster2gene)} modules")
         # Still calculate coherence scores for informational purposes, but don't filter
         low_coherence_modules, coherence_scores, module_eigengenes = calculate_module_coherence(
-            expression_complete, cluster2gene, coherence_threshold
+            expression_dataset, cluster2gene, coherence_threshold
         )
         # Keep all modules (no filtering)
         low_coherence_modules = []
@@ -530,46 +543,56 @@ def selectregulators_scorecutoff_permodule(allregfile, randomregfile, fold_cutof
         handle3.write(out)
 
 
-def normalize_selected_regulators_zscore(selected_file):
+def normalize_selected_regulators_sum(selected_file):
     """
-    Normalize already-selected regulator scores using Z-score normalization: (x - mean) / std.
+    Normalize already-selected regulator scores by dividing by the total sum of scores
+    across all modules, then scale by 100.
     This is applied AFTER selection to make scores comparable across regulator types.
     
-    Z-scores represent "how many standard deviations above/below the mean":
-    - Z-score of 0 = mean score
-    - Z-score of 1 = 1 std above mean (better than ~84% of scores)
-    - Z-score of 2 = 2 std above mean (better than ~97.7% of scores)
+    Global sum normalization converts scores to percentages that sum to ~100 across all modules:
+    - Each score represents its proportion of the total regulatory activity across all modules
+    - Scores across all modules sum to ~100
+    - Preserves relative differences between regulators across modules
+    - Values are in [0, 100] range
     
     Parameters:
     - selected_file: path to selected regulator file (4 columns: Regulator, Target, Score, Overall_rank)
+    
+    Returns:
+    - normalized_df
     
     The normalized scores OVERWRITE the original file so all downstream steps use normalized scores.
     """
     # Read the selected regulator file
     selected = pd.read_csv(selected_file, sep='\t')
     
-    # Get mean and std from selected scores
-    mean_score = selected['Score'].mean()
-    std_score = selected['Score'].std()
-    
     # Store original score range for reporting
     orig_min = selected['Score'].min()
     orig_max = selected['Score'].max()
+    orig_sum = selected['Score'].sum()
     
-    # Apply Z-score normalization: (x - mean) / std
-    if std_score > 0:
-        selected['Score'] = (selected['Score'] - mean_score) / std_score
+    # Apply GLOBAL sum normalization: divide by total sum across all modules and scale by 100
+    total_sum = selected['Score'].sum()
+    if total_sum > 0:
+        selected['Score'] = selected['Score'] / total_sum * 1000.0
+        # round to nearest integer
+        selected['Score'] = selected['Score'].round()
     else:
-        # If all scores are the same, set to 0
-        selected['Score'] = 0.0
+        # Edge case: if total sum is zero, distribute 100 equally across entries
+        selected['Score'] = 1000.0 / len(selected)
     
     # Save normalized scores back to the SAME file
     selected.to_csv(selected_file, sep='\t', index=False)
     
-    print(f"  Normalized {len(selected)} regulator-module pairs")
+    print(f"  Normalized {len(selected)} selected regulator-module pairs")
     print(f"  Original range: [{orig_min:.4f}, {orig_max:.4f}]")
-    print(f"  Original mean: {mean_score:.4f}, std: {std_score:.4f}")
-    print(f"  Z-score range: [{selected['Score'].min():.2f}, {selected['Score'].max():.2f}]")
+    print(f"  Original sum (all modules): {orig_sum:.4f}")
+    print(f"  Normalized sum (all modules): {selected['Score'].sum():.4f} (scaled to sum=1000 across all modules)")
+    print(f"  Normalized range: [{selected['Score'].min():.6f}, {selected['Score'].max():.6f}]")
+    print(f"  Note: Scores now sum to ~100 across all modules (global normalization and scaling)")
+    print(f"  Overwritten: {selected_file}")
+    
+    return selected
 
 
 def selectregulators_percentage(allregfile, randomregfile, outfile, percentage, ensemble_to_symbol=False):
@@ -773,7 +796,14 @@ def create_reg_distribution(reg_file_list):
         print(f"Warning: Could not create distribution plot for {reg_file_list}: {e}")
 
 def calculate_module_coherence(expression_file, clusters_dict, coherence_threshold=0.6):
-    """Calculate eigengenes, kME, and module coherence scores - Cell 9 from notebook"""
+    """Calculate eigengenes, kME, and module coherence scores
+
+    The input should be the *expression-only* dataset (LemonPreprocessed_expression.txt)
+    rather than the complete file, because the complete version may include duplicate
+    gene symbols (one row per omics data type).  Using the expression file avoids
+    pandas returning multiple rows for a single symbol (which led to mismatched
+    vector lengths during Pearson correlation).
+    """
     
     # Load expression data
     expression_data = pd.read_csv(expression_file, sep='\t')
@@ -781,10 +811,21 @@ def calculate_module_coherence(expression_file, clusters_dict, coherence_thresho
     
     # Set gene symbols as index for easier subsetting
     expression_data_indexed = expression_data.set_index('symbol')
+    # drop any duplicated symbols (should not happen for expression-only file)
+    if expression_data_indexed.index.duplicated().any():
+        dupes = expression_data_indexed.index[expression_data_indexed.index.duplicated()]
+        print(f"Warning: {len(dupes)} duplicated gene symbols in expression file - keeping first occurrence")
+        expression_data_indexed = expression_data_indexed[~expression_data_indexed.index.duplicated()]
     
     # Remove non-numeric columns (keep only sample columns)
     numeric_cols = expression_data_indexed.select_dtypes(include=[np.number]).columns
     expression_matrix = expression_data_indexed[numeric_cols]
+    
+    # collapse duplicates in expression matrix by averaging, since pearsonr fails otherwise
+    if expression_matrix.index.duplicated().any():
+        n_dups = expression_matrix.index.duplicated().sum()
+        print(f"Warning: {n_dups} duplicated gene symbols found in expression data; collapsing by mean")
+        expression_matrix = expression_matrix.groupby(expression_matrix.index).mean()
     
     coherence_scores = {}
     eigengenes = {}
@@ -1086,11 +1127,11 @@ def createCytoscapeFiles(modules_to_use=None, reg_files=None, method_suffix='top
                             if regulator in reg_dict.keys():
                                 # Extract type name (e.g., 'TF-gene' -> 'TF')
                                 type_name = reg_type.replace('-gene', '')
-                                handle2.write(regulator + '\t' + type_name + '\n')
+                                handle2.write(str(regulator) + '\t' + type_name + '\n')
                                 reg_type_found = True
                                 break
                     if not reg_type_found:
-                        handle2.write(regulator + '\t' + 'Unknown' + '\n')
+                        handle2.write(str(regulator) + '\t' + 'Unknown' + '\n')
                 
                 # Write module types
                 for target in targets:

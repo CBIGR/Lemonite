@@ -44,9 +44,23 @@ def load_metabolite_mapping(mapping_file):
         print(f"Warning: Metabolite mapping file {mapping_file} not found")
         return {}
     
-    metabolite_mapping = pd.read_csv(mapping_file, sep=',')
-    metabolite_mapping = metabolite_mapping.set_index('Query')['HMDB'].dropna().to_dict()
-    return metabolite_mapping
+    try:
+        metabolite_mapping = pd.read_csv(mapping_file, sep=',')
+        print(f"Metabolite mapping file columns: {list(metabolite_mapping.columns)}")
+        
+        # Check if required columns exist
+        if 'Query' not in metabolite_mapping.columns:
+            print(f"Error: 'Query' column not found in metabolite mapping file. Available columns: {list(metabolite_mapping.columns)}")
+            return {}
+        if 'HMDB' not in metabolite_mapping.columns:
+            print(f"Error: 'HMDB' column not found in metabolite mapping file. Available columns: {list(metabolite_mapping.columns)}")
+            return {}
+        
+        metabolite_mapping = metabolite_mapping.set_index('Query')['HMDB'].dropna().to_dict()
+        return metabolite_mapping
+    except Exception as e:
+        print(f"Error loading metabolite mapping: {e}")
+        return {}
 
 def draw_subnetwork(module, target_genes, regulators_dict, PKN, name_to_hmdb):
     """
@@ -291,6 +305,334 @@ def draw_subnetwork(module, target_genes, regulators_dict, PKN, name_to_hmdb):
     
     print(f'Graph with {to_draw.number_of_nodes()} nodes and {to_draw.number_of_edges()} edges')
 
+def calculate_ppi_enrichment(module2genes, PKN_graph, all_module_genes):
+    """
+    Calculate PPI enrichment for each module using hypergeometric test.
+    
+    Parameters:
+    -----------
+    module2genes : dict
+        Dictionary mapping module IDs to lists of genes
+    PKN_graph : nx.Graph
+        NetworkX graph representing the PKN
+    all_module_genes : set
+        Set of all genes across all modules
+    
+    Returns:
+    --------
+    pd.DataFrame : DataFrame with enrichment results containing columns:
+        Module, N_genes, N_PPIs_observed, N_PPIs_expected, Fold_enrichment, P_value, FDR, PPI_density
+    """
+    print("\n" + "=" * 60)
+    print("Calculating PPI enrichment for modules...")
+    print("=" * 60)
+    
+    # Get all genes that are in any module
+    all_genes_in_modules = list(all_module_genes)
+    N_total_genes = len(all_genes_in_modules)
+    
+    # Count total possible PPIs among genes in modules
+    total_possible_ppis = (N_total_genes * (N_total_genes - 1)) // 2
+    
+    # Create a set of PPI pairs for O(1) lookup (store both directions)
+    ppi_set = set()
+    for edge in PKN_graph.edges():
+        node1, node2 = edge[0], edge[1]
+        # Only include if both nodes are genes in modules (not metabolites/lipids)
+        # Skip edges containing HMDB IDs (metabolites)
+        if ('HMDB' not in str(node1) and 'HMDB' not in str(node2) and 
+            node1 in all_module_genes and node2 in all_module_genes):
+            # Add both directions (undirected graph)
+            ppi_set.add((node1, node2))
+            ppi_set.add((node2, node1))
+    
+    # Count total observed PPIs in the PKN among module genes
+    total_observed_ppis = len(ppi_set) // 2  # Divide by 2 because we stored both directions
+    
+    print(f"Total genes in modules: {N_total_genes}")
+    print(f"Total possible gene pairs: {total_possible_ppis}")
+    print(f"Total PPIs in PKN among module genes: {total_observed_ppis}")
+    
+    if total_possible_ppis > 0:
+        print(f"Overall PPI density: {total_observed_ppis / total_possible_ppis:.4f}")
+    else:
+        print("Overall PPI density: N/A (no gene pairs)")
+    
+    # Calculate enrichment for each module
+    enrichment_results = []
+    
+    for module in module2genes.keys():
+        module_genes = module2genes[module]
+        n_genes = len(module_genes)
+        
+        if n_genes < 2:
+            continue  # Skip modules with less than 2 genes
+        
+        # Count PPIs in this module
+        n_ppis_in_module = 0
+        for i, gene1 in enumerate(module_genes):
+            for gene2 in module_genes[i+1:]:
+                if (gene1, gene2) in ppi_set:
+                    n_ppis_in_module += 1
+        
+        # Hypergeometric test:
+        # Population: all possible gene pairs in all modules
+        # Success in population: gene pairs that have a PPI
+        # Sample: all possible pairs in this module
+        # Observed successes: PPIs in this module
+        
+        n_possible_pairs_in_module = (n_genes * (n_genes - 1)) // 2
+        
+        # Calculate expected number of PPIs
+        expected_ppis = n_possible_pairs_in_module * (total_observed_ppis / total_possible_ppis) if total_possible_ppis > 0 else 0
+        
+        # Fold enrichment
+        fold_enrichment = n_ppis_in_module / expected_ppis if expected_ppis > 0 else 0
+        
+        # Hypergeometric p-value (probability of seeing this many or more PPIs by chance)
+        # Using survival function (1 - CDF) to get upper tail probability
+        if total_possible_ppis > 0 and n_possible_pairs_in_module > 0:
+            p_value = hypergeom.sf(
+                n_ppis_in_module - 1,  # -1 because sf is P(X >= k), we want P(X > k-1) = P(X >= k)
+                M=total_possible_ppis,  # Total possible pairs
+                n=total_observed_ppis,  # Total pairs with PPIs
+                N=n_possible_pairs_in_module  # Pairs in module
+            )
+        else:
+            p_value = 1.0
+        
+        enrichment_results.append({
+            'Module': module,
+            'N_genes': n_genes,
+            'N_PPIs_observed': n_ppis_in_module,
+            'N_PPIs_expected': expected_ppis,
+            'Fold_enrichment': fold_enrichment,
+            'P_value': p_value,
+            'PPI_density': n_ppis_in_module / n_possible_pairs_in_module if n_possible_pairs_in_module > 0 else 0
+        })
+    
+    # Convert to DataFrame
+    enrichment_df = pd.DataFrame(enrichment_results)
+    
+    if len(enrichment_df) == 0:
+        print("No modules with >= 2 genes found for enrichment analysis")
+        return enrichment_df
+    
+    # Add FDR correction using Benjamini-Hochberg
+    try:
+        # Try scipy's newer false_discovery_control function (scipy >= 1.9.0)
+        from scipy.stats import false_discovery_control
+        enrichment_df['FDR'] = false_discovery_control(enrichment_df['P_value'].values, method='bh')
+    except ImportError:
+        # Fallback to manual Benjamini-Hochberg correction
+        from scipy.stats import rankdata
+        p_values = enrichment_df['P_value'].values
+        ranked = rankdata(p_values)
+        n = len(p_values)
+        enrichment_df['FDR'] = np.minimum(p_values * n / ranked, 1.0)
+    
+    # Sort by p-value
+    enrichment_df = enrichment_df.sort_values('P_value')
+    
+    print(f"\nPPI Enrichment Results (top 10 most enriched modules):")
+    print(enrichment_df.head(10).to_string())
+    
+    # Summary statistics
+    n_significant = (enrichment_df['FDR'] < 0.05).sum()
+    print(f"\nNumber of modules significantly enriched for PPIs (FDR < 0.05): {n_significant} / {len(enrichment_df)}")
+    if len(enrichment_df) > 0:
+        print(f"Mean fold enrichment: {enrichment_df['Fold_enrichment'].mean():.2f}")
+        print(f"Median fold enrichment: {enrichment_df['Fold_enrichment'].median():.2f}")
+    
+    return enrichment_df
+
+def calculate_metabolite_gene_enrichment(module2genes, module2mets, module2lipids, interactions, metabolite_mapping, PKN_graph, all_module_genes):
+    """
+    Calculate metabolite-gene interaction enrichment for each module using hypergeometric test.
+    
+    Tests whether a module's metabolite regulators have more known interactions with the
+    module's target genes than expected by chance.
+    
+    Parameters:
+    -----------
+    module2genes : dict
+        Dictionary mapping module IDs to lists of genes
+    module2mets : dict
+        Dictionary mapping module IDs to lists of metabolite regulators
+    module2lipids : dict
+        Dictionary mapping module IDs to lists of lipid regulators
+    interactions : pd.DataFrame
+        DataFrame with columns 'HMDB' and 'All_interactions' (pipe-separated gene names)
+    metabolite_mapping : dict
+        Dictionary mapping metabolite names to HMDB IDs
+    PKN_graph : nx.Graph
+        NetworkX graph representing the PKN (used for lipid-gene interactions)
+    all_module_genes : set
+        Set of all genes across all modules
+    
+    Returns:
+    --------
+    pd.DataFrame : DataFrame with enrichment results
+    """
+    print("\n" + "=" * 60)
+    print("Calculating metabolite-gene interaction enrichment for modules...")
+    print("=" * 60)
+    
+    # Build set of known metabolite/lipid-gene interactions from PKN
+    known_interactions = set()  # (metabolite_hmdb_or_lipid, gene) pairs
+    
+    # From interactions file (HMDB metabolites)
+    if len(interactions) > 0 and 'HMDB' in interactions.columns and 'All_interactions' in interactions.columns:
+        for _, row in interactions.iterrows():
+            hmdb = row['HMDB']
+            if pd.notna(row.get('All_interactions')):
+                for gene in str(row['All_interactions']).split('|'):
+                    gene = gene.strip()
+                    if gene:
+                        known_interactions.add((hmdb, gene))
+    
+    # From PKN graph: metabolite nodes (HMDB IDs) and their gene neighbors
+    for node in PKN_graph.nodes():
+        if 'HMDB' in str(node):
+            for neighbor in PKN_graph.neighbors(node):
+                if 'HMDB' not in str(neighbor):
+                    known_interactions.add((str(node), str(neighbor)))
+    
+    # Also include lipid-gene interactions from PKN
+    all_lipids_in_modules = set()
+    for lipids in module2lipids.values():
+        all_lipids_in_modules.update(lipids)
+    
+    for lipid in all_lipids_in_modules:
+        if lipid in PKN_graph.nodes():
+            for neighbor in PKN_graph.neighbors(lipid):
+                if lipid != neighbor:
+                    known_interactions.add((lipid, str(neighbor)))
+    
+    print(f"Total known metabolite/lipid-gene interactions in PKN: {len(known_interactions)}")
+    
+    # Collect all metabolite/lipid IDs across all modules
+    all_regulator_ids = set()
+    module_regulator_ids = {}  # module -> list of metabolite/lipid IDs
+    
+    for module in set(list(module2mets.keys()) + list(module2lipids.keys())):
+        mod_ids = []
+        
+        # Metabolite regulators -> map to HMDB
+        for met in module2mets.get(module, []):
+            hmdb = metabolite_mapping.get(met)
+            if hmdb:
+                mod_ids.append(hmdb)
+                all_regulator_ids.add(hmdb)
+        
+        # Lipid regulators -> use directly
+        for lipid in module2lipids.get(module, []):
+            mod_ids.append(lipid)
+            all_regulator_ids.add(lipid)
+        
+        module_regulator_ids[module] = mod_ids
+    
+    total_regulators = len(all_regulator_ids)
+    total_genes = len(all_module_genes)
+    total_possible_pairs = total_regulators * total_genes
+    
+    # Count total known interactions among module regulators and module genes
+    total_known = 0
+    for reg_id in all_regulator_ids:
+        for gene in all_module_genes:
+            if (reg_id, gene) in known_interactions:
+                total_known += 1
+    
+    print(f"Total metabolite/lipid regulators across modules: {total_regulators}")
+    print(f"Total genes across modules: {total_genes}")
+    print(f"Total possible regulator-gene pairs: {total_possible_pairs}")
+    print(f"Total known interactions among module regulators and genes: {total_known}")
+    
+    if total_possible_pairs > 0:
+        print(f"Overall interaction density: {total_known / total_possible_pairs:.6f}")
+    
+    # Calculate enrichment for each module
+    enrichment_results = []
+    
+    for module in module2genes.keys():
+        module_genes = module2genes[module]
+        mod_regs = module_regulator_ids.get(module, [])
+        
+        if not mod_regs or not module_genes:
+            continue
+        
+        # Count observed interactions
+        n_observed = 0
+        for reg_id in mod_regs:
+            for gene in module_genes:
+                if (reg_id, gene) in known_interactions:
+                    n_observed += 1
+        
+        # Possible pairs in this module
+        n_possible = len(mod_regs) * len(module_genes)
+        
+        if n_possible == 0 or total_possible_pairs == 0:
+            continue
+        
+        # Expected number of interactions
+        expected = n_possible * (total_known / total_possible_pairs) if total_possible_pairs > 0 else 0
+        
+        # Fold enrichment
+        fold_enrichment = n_observed / expected if expected > 0 else 0
+        
+        # Hypergeometric p-value
+        if total_possible_pairs > 0 and n_possible > 0 and total_known > 0:
+            p_value = hypergeom.sf(
+                n_observed - 1,
+                M=total_possible_pairs,
+                n=total_known,
+                N=n_possible
+            )
+        else:
+            p_value = 1.0
+        
+        enrichment_results.append({
+            'Module': module,
+            'N_metabolites': len(mod_regs),
+            'N_genes': len(module_genes),
+            'N_interactions_observed': n_observed,
+            'N_interactions_expected': expected,
+            'Fold_enrichment': fold_enrichment,
+            'P_value': p_value,
+            'Interaction_density': n_observed / n_possible if n_possible > 0 else 0
+        })
+    
+    enrichment_df = pd.DataFrame(enrichment_results)
+    
+    if len(enrichment_df) == 0:
+        print("No modules with metabolite regulators and genes found for enrichment analysis")
+        return enrichment_df
+    
+    # Add FDR correction using Benjamini-Hochberg
+    try:
+        from scipy.stats import false_discovery_control
+        enrichment_df['FDR'] = false_discovery_control(enrichment_df['P_value'].values, method='bh')
+    except ImportError:
+        from scipy.stats import rankdata
+        p_values = enrichment_df['P_value'].values
+        ranked = rankdata(p_values)
+        n = len(p_values)
+        enrichment_df['FDR'] = np.minimum(p_values * n / ranked, 1.0)
+    
+    # Sort by p-value
+    enrichment_df = enrichment_df.sort_values('P_value')
+    
+    print(f"\nMetabolite-Gene Interaction Enrichment Results (top 10):")
+    print(enrichment_df.head(10).to_string())
+    
+    n_significant = (enrichment_df['FDR'] < 0.05).sum()
+    print(f"\nModules significantly enriched (FDR < 0.05): {n_significant} / {len(enrichment_df)}")
+    if len(enrichment_df) > 0:
+        print(f"Mean fold enrichment: {enrichment_df['Fold_enrichment'].mean():.2f}")
+        print(f"Median fold enrichment: {enrichment_df['Fold_enrichment'].median():.2f}")
+    
+    return enrichment_df
+
 def evaluate_network_against_pkn(args):
     """Main evaluation function"""
     
@@ -466,6 +808,24 @@ def evaluate_network_against_pkn(args):
     else:
         interactions = pd.read_csv(metabolite_interactions_file, sep='\t')
         print(f"Loaded {len(interactions)} PKN interactions")
+        print(f"Metabolite interactions file columns: {list(interactions.columns)}")
+        
+        # Handle different file formats
+        if 'HMDB' not in interactions.columns and 'Metabolite' in interactions.columns:
+            # Format: Metabolite | Gene | Source
+            # Convert to: HMDB | All_interactions
+            print("Converting metabolite interactions format from Metabolite-Gene to HMDB-based format...")
+            
+            # Extract HMDB ID from metabolite name (e.g., "1-Methylhistidine_HMDB0000001" -> "HMDB0000001")
+            interactions['HMDB'] = interactions['Metabolite'].str.extract(r'(HMDB\d+)')
+            
+            # Group by HMDB (or Metabolite if extraction failed) and collect all genes
+            grouped = interactions.groupby('HMDB')['Gene'].apply(lambda x: '|'.join(x)).reset_index()
+            grouped.columns = ['HMDB', 'All_interactions']
+            interactions = grouped
+            print(f"Converted to {len(interactions)} unique HMDB entries with gene interactions")
+        elif 'HMDB' not in interactions.columns and 'All_interactions' not in interactions.columns:
+            print(f"Warning: Unexpected column format. Expected 'HMDB' or 'Metabolite' columns. Found: {list(interactions.columns)}")
     
     # Load metabolite mapping
     metabolite_mapping = load_metabolite_mapping(annotated_mets)
@@ -520,13 +880,18 @@ def evaluate_network_against_pkn(args):
         metabolites_hmdb = list(metabolite_mapping.values())
         print(f'{len(metabolites_hmdb)} metabolites in this dataset are mapped to a HMDB id')
         
-        # How many metabolites_hmdb are in the interactions file?
-        metabolites_in_interactions = interactions['HMDB'].isin(metabolites_hmdb)
-        print(f'{metabolites_in_interactions.sum()} metabolites in the interactions file are in the dataset')
-        
-        # How many metabolites in the dataset are in the interactions file?
-        metabolites_in_dataset = pd.Series(list(metabolites_hmdb)).isin(interactions['HMDB'])
-        print(f'{metabolites_in_dataset.sum()} metabolites in the dataset are in the interactions file')
+        # Check if 'HMDB' column exists in interactions DataFrame
+        if 'HMDB' in interactions.columns:
+            # How many metabolites_hmdb are in the interactions file?
+            metabolites_in_interactions = interactions['HMDB'].isin(metabolites_hmdb)
+            print(f'{metabolites_in_interactions.sum()} metabolites in the interactions file are in the dataset')
+            
+            # How many metabolites in the dataset are in the interactions file?
+            metabolites_in_dataset = pd.Series(list(metabolites_hmdb)).isin(interactions['HMDB'])
+            print(f'{metabolites_in_dataset.sum()} metabolites in the dataset are in the interactions file')
+        else:
+            print(f"Warning: 'HMDB' column not found in interactions file. Available columns: {list(interactions.columns)}")
+            print("Skipping metabolite interaction contextualization check")
     
     # Create output directory in ./ModuleViewer_files
     moduleviewer_dir = os.path.join(workdir, 'ModuleViewer_files')
@@ -571,6 +936,11 @@ def evaluate_network_against_pkn(args):
                     
                 if len(interactions) == 0:
                     print(f"    Metabolite {met}: No PKN interactions available")
+                    continue
+                
+                # Check if 'HMDB' column exists in interactions
+                if 'HMDB' not in interactions.columns:
+                    print(f"    Metabolite {met}: 'HMDB' column not found in PKN interactions file (columns: {list(interactions.columns)})")
                     continue
                     
                 met_interactions = interactions[interactions['HMDB'] == met_hmdb]
@@ -725,6 +1095,41 @@ def evaluate_network_against_pkn(args):
     else:
         print(f"PPI MVF file successfully created with size: {os.path.getsize(ppi_mvf_file)} bytes")
     
+    # ========================================
+    # Calculate PPI enrichment for modules
+    # ========================================
+    ppi_enrichment_df = calculate_ppi_enrichment(module2genes, PKN_graph, all_module_genes)
+    
+    # Save PPI enrichment results
+    if len(ppi_enrichment_df) > 0:
+        ppi_enrichment_file = os.path.join(moduleviewer_dir, 'PPI_enrichment_results.csv')
+        ppi_enrichment_df.to_csv(ppi_enrichment_file, index=False)
+        print(f"\nPPI enrichment results saved to: {ppi_enrichment_file}")
+        print(f"  - Total modules analyzed: {len(ppi_enrichment_df)}")
+        n_significant = (ppi_enrichment_df['FDR'] < 0.05).sum()
+        print(f"  - Significantly enriched modules (FDR < 0.05): {n_significant}")
+    else:
+        print("\nNo PPI enrichment results to save (no modules with >= 2 genes)")
+    
+    # ========================================
+    # Calculate metabolite-gene interaction enrichment for modules
+    # ========================================
+    metgene_enrichment_df = calculate_metabolite_gene_enrichment(
+        module2genes, module2mets, module2lipids, interactions,
+        metabolite_mapping, PKN_graph, all_module_genes
+    )
+    
+    # Save metabolite-gene enrichment results
+    if len(metgene_enrichment_df) > 0:
+        metgene_enrichment_file = os.path.join(moduleviewer_dir, 'Metabolite_Gene_enrichment_results.csv')
+        metgene_enrichment_df.to_csv(metgene_enrichment_file, index=False)
+        print(f"\nMetabolite-gene enrichment results saved to: {metgene_enrichment_file}")
+        print(f"  - Total modules analyzed: {len(metgene_enrichment_df)}")
+        n_significant = (metgene_enrichment_df['FDR'] < 0.05).sum()
+        print(f"  - Significantly enriched modules (FDR < 0.05): {n_significant}")
+    else:
+        print("\nNo metabolite-gene enrichment results to save")
+    
     # Ensure sample_mapping.mvf is available in ModuleViewer_files for downstream viewer
     def find_and_copy_sample_mapping(dest_dir):
         # common locations to search: current directory (staged files), work/*/results/ModuleViewer_files and results/ModuleViewer_files
@@ -828,6 +1233,12 @@ def evaluate_network_against_pkn(args):
         f.write(f"PPI MVF file created: {ppi_mvf_file}\n")
         f.write(f"Total PPIs in modules: {total_ppis_written}\n")
         f.write(f"Modules with PPIs: {modules_with_ppis}/{len(module2genes)}\n")
+        if len(ppi_enrichment_df) > 0:
+            n_ppi_sig = int((ppi_enrichment_df['FDR'] < 0.05).sum())
+            f.write(f"PPI enrichment: {n_ppi_sig} modules significantly enriched (FDR < 0.05)\n")
+        if len(metgene_enrichment_df) > 0:
+            n_metgene_sig = int((metgene_enrichment_df['FDR'] < 0.05).sum())
+            f.write(f"Metabolite-gene enrichment: {n_metgene_sig} modules significantly enriched (FDR < 0.05)\n")
         f.write(f"Subnetworks generated: {modules_with_subnetworks}/{modules_processed}\n")
         f.write(f"Subnetworks directory: {subnetworks_dir}\n")
         if len(metabolite_mapping) > 0:

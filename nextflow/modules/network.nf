@@ -18,9 +18,11 @@ process POST_CLUSTERING {
     
     # Copy cluster results to Lemon_results subdirectory
     # Note: cluster files can be either files or directories depending on LemonTree output
+    # Use cp -rL to dereference symlinks so downstream processes (which may not
+    # have the CLUSTERING work dirs bind-mounted) get actual file contents.
     for cluster_item in Lemon_results/cluster_*; do
         if [ -e "\$cluster_item" ]; then
-            cp -r "\$cluster_item" Lemon_out/Lemon_results/
+            cp -rL "\$cluster_item" Lemon_out/Lemon_results/
         fi
     done
     
@@ -88,6 +90,7 @@ process NETWORK_GENERATION {
     path "Networks/Metabolites2targets*.txt", emit: metabolites_targets, optional: true
     path "Networks/TFs2targets*.txt", emit: tf_targets, optional: true
     path "Networks/Lipids2targets*.txt", emit: lipids_targets, optional: true
+    path "Networks/Proteins2targets*.txt", emit: proteins_targets, optional: true
     path "Networks/*2targets*.txt", emit: all_regulator_targets
     path "Networks/LemonNetwork_*.txt", emit: main_network
     path "Networks/Cytoscape_*.txt", emit: network_files
@@ -119,8 +122,8 @@ process NETWORK_GENERATION {
             # If it's a regular file, copy it directly
             cp "\$file" ./Lemon_out/
         elif [ -d "\$file" ]; then
-            # If it's a directory, copy it recursively
-            cp -r "\$file" ./Lemon_out/
+            # If it's a directory, copy it recursively (dereference symlinks for HPC compatibility)
+            cp -rL "\$file" ./Lemon_out/
         fi
     done
     

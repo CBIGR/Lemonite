@@ -98,6 +98,380 @@ def get_regulators(regfile):
     
     return regs
 
+
+def load_regulator_scores(score_file):
+    """
+    Load selected regulator score file (TSV with header: Regulator, Target, Score, Overall_rank).
+    
+    Parameters:
+    score_file (str): Path to the selected regulators score file
+    
+    Returns:
+    pd.DataFrame: DataFrame with columns [Regulator, Module, Score, Overall_rank]
+    """
+    try:
+        df = pd.read_csv(score_file, sep='\t')
+        # Standardize column names
+        rename_map = {}
+        if 'Target' in df.columns:
+            rename_map['Target'] = 'Module'
+        df = df.rename(columns=rename_map)
+        df['Module'] = df['Module'].astype(str)
+        return df
+    except FileNotFoundError:
+        print(f"Warning: Score file {score_file} not found.")
+        return pd.DataFrame(columns=['Regulator', 'Module', 'Score', 'Overall_rank'])
+    except Exception as e:
+        print(f"Error reading score file {score_file}: {e}")
+        return pd.DataFrame(columns=['Regulator', 'Module', 'Score', 'Overall_rank'])
+ 
+
+def generate_regulator_tables_html(regulator_scores_dict, output_dir):
+    """
+    Generate an HTML file with regulator ranking tables.
+    
+    For each regulator type, creates:
+    1. A table of regulator-module pairs ranked by score
+    2. A summary table per regulator (total score, number of target modules, list of modules)
+    
+    Parameters:
+    regulator_scores_dict (dict): {type_name: pd.DataFrame} with score data
+    output_dir (str): Directory to save the HTML file
+    
+    Returns:
+    str: Path to the generated HTML file
+    """
+    if not regulator_scores_dict:
+        print("No regulator score data available — skipping regulator tables.")
+        return None
+
+    html_parts = []
+    html_parts.append("""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regulator Rankings</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background: #f8f9fa; color: #333; }
+  h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+  h2 { color: #2c3e50; margin-top: 40px; }
+  h3 { color: #34495e; margin-top: 25px; }
+  .table-container { overflow-x: auto; margin: 15px 0; }
+  table { border-collapse: collapse; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+  th { background: #3498db; color: white; padding: 10px 14px; text-align: left; font-weight: 600;
+       position: sticky; top: 0; cursor: pointer; user-select: none; white-space: nowrap; }
+  th:hover { background: #2980b9; }
+  th .sort-icon { font-size: 0.7em; margin-left: 4px; opacity: 0.7; }
+  td { padding: 8px 14px; border-bottom: 1px solid #ecf0f1; }
+  tr:hover { background: #ebf5fb; }
+  tr:nth-child(even) { background: #f9f9f9; }
+  tr:nth-child(even):hover { background: #ebf5fb; }
+  .positive { color: #27ae60; font-weight: 600; }
+  .negative { color: #e74c3c; }
+  .module-list { font-size: 0.9em; max-width: 500px; word-wrap: break-word; }
+  .section { margin-bottom: 50px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .toc { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px; }
+  .toc a { color: #3498db; text-decoration: none; display: block; padding: 4px 0; }
+  .toc a:hover { text-decoration: underline; }
+  .search-box { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 300px; margin: 10px 0; font-size: 14px; }
+  .search-box:focus { outline: none; border-color: #3498db; box-shadow: 0 0 3px rgba(52,152,219,0.3); }
+</style>
+</head>
+<body>
+<h1>Regulator Rankings</h1>
+""")
+
+    # Table of contents
+    html_parts.append('<div class="toc"><strong>Contents</strong>')
+    for reg_type in regulator_scores_dict:
+        safe_id = reg_type.replace(' ', '_')
+        html_parts.append(f'<a href="#{safe_id}_pairs">{reg_type} — Regulator-Module Pairs</a>')
+        html_parts.append(f'<a href="#{safe_id}_summary">{reg_type} — Regulator Summary</a>')
+    html_parts.append('</div>')
+
+    for reg_type, df in regulator_scores_dict.items():
+        if df.empty:
+            continue
+
+        safe_id = reg_type.replace(' ', '_')
+
+        html_parts.append(f'<div class="section">')
+        html_parts.append(f'<h2>{reg_type}</h2>')
+
+        # --- Table 1: Regulator-Module pairs ranked by score ---
+        html_parts.append(f'<h3 id="{safe_id}_pairs">Regulator–Module Pairs (ranked by score)</h3>')
+        html_parts.append(f'<input type="text" class="search-box" id="search_{safe_id}_pairs" '
+                          f'onkeyup="filterTable(\'{safe_id}_pairs_table\', this.value)" '
+                          f'placeholder="Search regulators or modules...">')
+        html_parts.append('<div class="table-container">')
+
+        pairs_df = df.sort_values('Score', ascending=False).reset_index(drop=True)
+        html_parts.append(f'<table id="{safe_id}_pairs_table">')
+        html_parts.append('<thead><tr>'
+                          '<th onclick="sortTable(\'{safe_id}_pairs_table\', 0)">Rank <span class="sort-icon">&#x25B2;&#x25BC;</span></th>'
+                          f'<th onclick="sortTable(\'{safe_id}_pairs_table\', 1)">Regulator <span class="sort-icon">&#x25B2;&#x25BC;</span></th>'
+                          f'<th onclick="sortTable(\'{safe_id}_pairs_table\', 2)">Module <span class="sort-icon">&#x25B2;&#x25BC;</span></th>'
+                          f'<th onclick="sortTable(\'{safe_id}_pairs_table\', 3)">Score <span class="sort-icon">&#x25B2;&#x25BC;</span></th>'
+                          f'<th onclick="sortTable(\'{safe_id}_pairs_table\', 4)">Overall Rank <span class="sort-icon">&#x25B2;&#x25BC;</span></th>'
+                          '</tr></thead><tbody>')
+
+        for rank, (_, row) in enumerate(pairs_df.iterrows(), 1):
+            score = row['Score']
+            score_class = 'positive' if score > 0 else 'negative'
+            overall_rank = row.get('Overall_rank', 'NA')
+            html_parts.append(
+                f'<tr><td>{rank}</td>'
+                f'<td>{row["Regulator"]}</td>'
+                f'<td>{row["Module"]}</td>'
+                f'<td class="{score_class}">{score:.4f}</td>'
+                f'<td>{overall_rank}</td></tr>'
+            )
+
+        html_parts.append('</tbody></table></div>')
+
+        # --- Table 2: Regulator summary ---
+        html_parts.append(f'<h3 id="{safe_id}_summary">Regulator Summary</h3>')
+        html_parts.append(f'<input type="text" class="search-box" id="search_{safe_id}_summary" '
+                          f'onkeyup="filterTable(\'{safe_id}_summary_table\', this.value)" '
+                          f'placeholder="Search regulators...">')
+        html_parts.append('<div class="table-container">')
+
+        summary_rows = []
+        for reg_name, grp in df.groupby('Regulator'):
+            total_score = grp['Score'].sum()
+            n_modules = grp['Module'].nunique()
+            module_list = ', '.join(sorted(grp['Module'].unique(), key=lambda x: int(x) if x.isdigit() else x))
+            summary_rows.append({
+                'Regulator': reg_name,
+                'Total_Score': total_score,
+                'N_Modules': n_modules,
+                'Target_Modules': module_list,
+            })
+        summary_df = pd.DataFrame(summary_rows).sort_values('Total_Score', ascending=False).reset_index(drop=True)
+
+        html_parts.append(f'<table id="{safe_id}_summary_table">')
+        html_parts.append('<thead><tr>'
+                          f'<th onclick="sortTable(\'{safe_id}_summary_table\', 0)">Rank <span class="sort-icon">&#x25B2;&#x25BC;</span></th>'
+                          f'<th onclick="sortTable(\'{safe_id}_summary_table\', 1)">Regulator <span class="sort-icon">&#x25B2;&#x25BC;</span></th>'
+                          f'<th onclick="sortTable(\'{safe_id}_summary_table\', 2)">Sum of Scores <span class="sort-icon">&#x25B2;&#x25BC;</span></th>'
+                          f'<th onclick="sortTable(\'{safe_id}_summary_table\', 3)">N Target Modules <span class="sort-icon">&#x25B2;&#x25BC;</span></th>'
+                          f'<th onclick="sortTable(\'{safe_id}_summary_table\', 4)">Target Modules <span class="sort-icon">&#x25B2;&#x25BC;</span></th>'
+                          '</tr></thead><tbody>')
+
+        for rank, (_, row) in enumerate(summary_df.iterrows(), 1):
+            score_class = 'positive' if row['Total_Score'] > 0 else 'negative'
+            html_parts.append(
+                f'<tr><td>{rank}</td>'
+                f'<td>{row["Regulator"]}</td>'
+                f'<td class="{score_class}">{row["Total_Score"]:.4f}</td>'
+                f'<td>{row["N_Modules"]}</td>'
+                f'<td class="module-list">{row["Target_Modules"]}</td></tr>'
+            )
+
+        html_parts.append('</tbody></table></div>')
+        html_parts.append('</div>')  # close section
+
+    # JavaScript for sorting and filtering
+    html_parts.append("""
+<script>
+function sortTable(tableId, colIdx) {
+  var table = document.getElementById(tableId);
+  var tbody = table.querySelector('tbody');
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  var asc = table.getAttribute('data-sort-col') == colIdx && table.getAttribute('data-sort-dir') == 'asc';
+  var dir = asc ? 'desc' : 'asc';
+  table.setAttribute('data-sort-col', colIdx);
+  table.setAttribute('data-sort-dir', dir);
+  rows.sort(function(a, b) {
+    var aVal = a.cells[colIdx].textContent.trim();
+    var bVal = b.cells[colIdx].textContent.trim();
+    var aNum = parseFloat(aVal);
+    var bNum = parseFloat(bVal);
+    if (!isNaN(aNum) && !isNaN(bNum)) {
+      return dir === 'asc' ? aNum - bNum : bNum - aNum;
+    }
+    return dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+  });
+  rows.forEach(function(row) { tbody.appendChild(row); });
+}
+function filterTable(tableId, query) {
+  var table = document.getElementById(tableId);
+  var rows = table.querySelectorAll('tbody tr');
+  var q = query.toLowerCase();
+  rows.forEach(function(row) {
+    row.style.display = row.textContent.toLowerCase().indexOf(q) > -1 ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>""")
+
+    output_file = os.path.join(output_dir, 'regulator_rankings.html')
+    with open(output_file, 'w') as f:
+        f.write('\n'.join(html_parts))
+    print(f"Regulator rankings HTML saved to: {output_file}")
+    return output_file
+
+
+def create_comprehensive_html_report(regulator_tables_html_path, network_html_path, output_dir):
+    """
+    Create comprehensive HTML report combining network visualization and regulator rankings
+    
+    Parameters:
+    regulator_tables_html_path (str): Path to regulator rankings HTML file
+    network_html_path (str): Path to network visualization HTML file
+    output_dir (str): Output directory
+    
+    Returns:
+    str: Path to the comprehensive HTML report
+    """
+    print("\nCreating comprehensive HTML report...")
+    
+    # Read regulator tables HTML
+    regulator_content = ""
+    if regulator_tables_html_path and os.path.exists(regulator_tables_html_path):
+        try:
+            with open(regulator_tables_html_path, 'r') as f:
+                regulator_html = f.read()
+            # Extract body content
+            import re
+            body_match = re.search(r'<body>(.*?)</body>', regulator_html, re.DOTALL)
+            if body_match:
+                regulator_content = body_match.group(1)
+        except Exception as e:
+            print(f"Warning: Could not read regulator rankings file: {e}")
+            regulator_content = f'<p>Regulator rankings available in: <a href="{os.path.basename(regulator_tables_html_path)}">{os.path.basename(regulator_tables_html_path)}</a></p>'
+    
+    # Read network visualization HTML
+    network_iframe = ""
+    if network_html_path and os.path.exists(network_html_path):
+        network_iframe = f'<iframe src="{os.path.basename(network_html_path)}" width="100%" height="800px" frameborder="0"></iframe>'
+    
+    # Create comprehensive HTML
+    html_content = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lemonite Module Overview - Comprehensive Report</title>
+    <style>
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            color: #333;
+        }}
+        .header {{
+            background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }}
+        .header h1 {{
+            font-size: 2.5rem;
+            margin: 0 0 0.5rem 0;
+        }}
+        .header .subtitle {{
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }}
+        .nav {{
+            background: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }}
+        .nav a {{
+            color: #2E7D32;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }}
+        .nav a:hover {{
+            background: #81C784;
+            color: white;
+        }}
+        .container {{
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }}
+        .section {{
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }}
+        .section h2 {{
+            color: #2E7D32;
+            border-bottom: 2px solid #81C784;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }}
+        .footer {{
+            text-align: center;
+            padding: 2rem;
+            background: #2E7D32;
+            color: white;
+            margin-top: 3rem;
+        }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍋🌳 Lemonite Module Overview</h1>
+        <div class="subtitle">Comprehensive Multi-Omics Integration & Network Analysis</div>
+    </div>
+    
+    <nav class="nav">
+        <a href="#network-section">📊 Network Visualization</a>
+        <a href="#regulator-section">🔬 Regulator Rankings</a>
+    </nav>
+    
+    <div class="container">
+        <section class="section" id="network-section">
+            <h2>📊 Interactive Module Network Visualization</h2>
+            <p>Explore the module-regulator network. Hover over nodes for details, zoom and pan to navigate.</p>
+            {network_iframe}
+        </section>
+        
+        <section class="section" id="regulator-section">
+            <h2>🔬 Regulator-Module Rankings</h2>
+            <p>Regulator-module pairs ranked by association scores. Higher scores indicate stronger predicted regulatory relationships.</p>
+            {regulator_content}
+        </section>
+    </div>
+    
+    <div class="footer">
+        <p>🍋🌳 <strong>Lemonite Pipeline</strong> | Module Overview Report</p>
+        <p>Interactive analysis of regulatory modules and multi-omics integration</p>
+    </div>
+</body>
+</html>'''
+    
+    # Save comprehensive report
+    output_file = os.path.join(output_dir, 'Module_Overview_Comprehensive.html')
+    with open(output_file, 'w') as f:
+        f.write(html_content)
+    
+    print(f"✓ Comprehensive HTML report created: {output_file}")
+    print(f"  This report includes both network visualization and regulator rankings")
+    
+    return output_file
+
+
 def load_enrichment_data(enrichment_dir, method='EnrichR'):
     """
     Load pathway enrichment results from either EnrichR or GSEA methods
@@ -168,103 +542,99 @@ def load_enrichment_data(enrichment_dir, method='EnrichR'):
                 df['Module'] = df['Module'].astype(str).str.strip()
             return df
 
-        # If user-provided EnrichR combined files exist, load them (preferred)
-        up_name = 'enrichr_top_10_enriched_pathways_up_per_module.csv'
-        down_name = 'enrichr_top_10_enriched_pathways_down_per_module.csv'
-        # Also check for capitalized versions
-        up_name_cap = 'Enrichr_top_10_enriched_pathways_up_per_module.csv'
-        down_name_cap = 'Enrichr_top_10_enriched_pathways_down_per_module.csv'
-        
-        # Look for files that match the expected pattern
-        up_candidates = [p for p in csv_files if 'enrichr' in os.path.basename(p).lower() and 'up' in os.path.basename(p).lower() and 'per_module' in os.path.basename(p).lower()]
-        down_candidates = [p for p in csv_files if 'enrichr' in os.path.basename(p).lower() and 'down' in os.path.basename(p).lower() and 'per_module' in os.path.basename(p).lower()]
-        
-        # If we have multiple candidates, try to find the one that matches current module count
-        up_path = None
-        down_path = None
-        
-        if up_candidates:
-            if len(up_candidates) == 1:
-                up_path = up_candidates[0]
-            else:
-                print(f"Multiple up enrichment files found ({len(up_candidates)}), trying to match module count...")
-                # Try to determine current module count from other files if possible
-                current_module_count = None
-                # Look for module assignment files or other indicators
-                for root, dirs, files in os.walk(os.path.dirname(enrichment_dir)):
-                    for f in files:
-                        if 'module' in f.lower() and f.endswith('.txt'):
-                            try:
-                                with open(os.path.join(root, f), 'r') as file:
-                                    lines = file.readlines()
-                                    if lines:
-                                        # Count unique module IDs
-                                        modules = set()
-                                        for line in lines[1:]:  # Skip header
-                                            parts = line.strip().split('\t')
-                                            if len(parts) >= 2:
-                                                modules.add(parts[1])  # Assuming module ID is in second column
-                                        if modules:
-                                            current_module_count = len(modules)
-                                            print(f"Detected {current_module_count} modules from {f}")
-                                            break
-                            except:
-                                continue
-                
-                if current_module_count:
-                    # Find file that contains the module count in filename
-                    for candidate in up_candidates:
-                        basename = os.path.basename(candidate)
-                        if str(current_module_count) in basename:
-                            up_path = candidate
-                            print(f"Selected up file matching {current_module_count} modules: {basename}")
-                            break
-                
-                if not up_path:
-                    up_path = up_candidates[0]  # Fallback to first file
-                    print(f"Using first up file as fallback: {os.path.basename(up_path)}")
-        
-        if down_candidates:
-            if len(down_candidates) == 1:
-                down_path = down_candidates[0]
-            else:
-                print(f"Multiple down enrichment files found ({len(down_candidates)}), trying to match module count...")
-                if 'current_module_count' in locals() and current_module_count:
-                    # Find file that contains the module count in filename
-                    for candidate in down_candidates:
-                        basename = os.path.basename(candidate)
-                        if str(current_module_count) in basename:
-                            down_path = candidate
-                            print(f"Selected down file matching {current_module_count} modules: {basename}")
-                            break
-                
-                if not down_path:
-                    down_path = down_candidates[0]  # Fallback to first file
-                    print(f"Using first down file as fallback: {os.path.basename(down_path)}")
-        
-        # Fallback to original method if no candidates found
-        if not up_path:
-            up_path = next((p for p in csv_files if os.path.basename(p).lower() == up_name or os.path.basename(p).lower() == up_name_cap.lower()), None)
-        if not down_path:
-            down_path = next((p for p in csv_files if os.path.basename(p).lower() == down_name or os.path.basename(p).lower() == down_name_cap.lower()), None)
+        # Look for enrichment combined files (both EnrichR and GSEA patterns)
+        up_candidates = [p for p in csv_files
+                        if ('enrichr' in os.path.basename(p).lower() or 'gsea' in os.path.basename(p).lower())
+                        and 'up' in os.path.basename(p).lower()
+                        and 'per_module' in os.path.basename(p).lower()]
+        down_candidates = [p for p in csv_files
+                          if ('enrichr' in os.path.basename(p).lower() or 'gsea' in os.path.basename(p).lower())
+                          and 'down' in os.path.basename(p).lower()
+                          and 'per_module' in os.path.basename(p).lower()]
 
-        if up_path or down_path:
+        # Also check exact filename fallbacks (both EnrichR and GSEA)
+        for pattern in ['enrichr_top_10_enriched_pathways_up_per_module.csv',
+                        'gsea_top_10_enriched_pathways_up_per_module.csv']:
+            fallback = next((p for p in csv_files if os.path.basename(p).lower() == pattern), None)
+            if fallback and fallback not in up_candidates:
+                up_candidates.append(fallback)
+        for pattern in ['enrichr_top_10_enriched_pathways_down_per_module.csv',
+                        'gsea_top_10_enriched_pathways_down_per_module.csv']:
+            fallback = next((p for p in csv_files if os.path.basename(p).lower() == pattern), None)
+            if fallback and fallback not in down_candidates:
+                down_candidates.append(fallback)
+
+        # When multiple candidates exist per method+direction (e.g. from different runs),
+        # try to select the best match per method using module count
+        def _select_best_per_method(candidates, module_count=None):
+            """Group candidates by method and select best file per method."""
+            by_method = {}
+            for c in candidates:
+                bn = os.path.basename(c).lower()
+                m = 'enrichr' if 'enrichr' in bn else ('gsea' if 'gsea' in bn else 'other')
+                by_method.setdefault(m, []).append(c)
+
+            selected = []
+            for m, method_cands in by_method.items():
+                if len(method_cands) == 1:
+                    selected.append(method_cands[0])
+                elif module_count:
+                    matched = [c for c in method_cands if str(module_count) in os.path.basename(c)]
+                    selected.append(matched[0] if matched else method_cands[0])
+                else:
+                    selected.append(method_cands[0])
+            return selected
+
+        # Determine module count for disambiguation if needed (>1 file per method)
+        current_module_count = None
+        needs_disambiguation = any(
+            sum(1 for c in cands if kw in os.path.basename(c).lower()) > 1
+            for cands in [up_candidates, down_candidates]
+            for kw in ['enrichr', 'gsea']
+        )
+        if needs_disambiguation:
+            for root, dirs, files in os.walk(os.path.dirname(enrichment_dir)):
+                for f in files:
+                    if 'module' in f.lower() and f.endswith('.txt'):
+                        try:
+                            with open(os.path.join(root, f), 'r') as file:
+                                lines = file.readlines()
+                                if lines:
+                                    modules = set()
+                                    for line in lines[1:]:
+                                        parts_line = line.strip().split('\t')
+                                        if len(parts_line) >= 2:
+                                            modules.add(parts_line[1])
+                                    if modules:
+                                        current_module_count = len(modules)
+                                        print(f"Detected {current_module_count} modules from {f}")
+                                        break
+                        except:
+                            continue
+
+            up_candidates = _select_best_per_method(up_candidates, current_module_count)
+            down_candidates = _select_best_per_method(down_candidates, current_module_count)
+
+        # Deduplicate and load all enrichment files (EnrichR + GSEA, up + down)
+        all_enrichment_paths = list(dict.fromkeys(up_candidates + down_candidates))
+
+        if all_enrichment_paths:
             parts = []
-            for pth in (up_path, down_path):
-                if pth:
-                    try:
-                        df = pd.read_csv(pth)
-                        # Set direction based on filename
-                        filename = os.path.basename(pth).lower()
-                        if 'up' in filename:
-                            df['__direction__'] = 'Up'
-                        elif 'down' in filename:
-                            df['__direction__'] = 'Down'
-                        else:
-                            df['__direction__'] = 'Up'  # Default to up if unclear
-                        parts.append(df)
-                    except Exception as e:
-                        print(f"Warning: could not read enrichment file {pth}: {e}")
+            for pth in all_enrichment_paths:
+                try:
+                    df = pd.read_csv(pth)
+                    # Set direction based on filename
+                    filename = os.path.basename(pth).lower()
+                    if 'up' in filename:
+                        df['__direction__'] = 'Up'
+                    elif 'down' in filename:
+                        df['__direction__'] = 'Down'
+                    else:
+                        df['__direction__'] = 'Up'  # Default to up if unclear
+                    parts.append(df)
+                    print(f"Loaded enrichment file: {os.path.basename(pth)} ({len(df)} rows)")
+                except Exception as e:
+                    print(f"Warning: could not read enrichment file {pth}: {e}")
 
             if parts:
                 combined = pd.concat(parts, ignore_index=True)
@@ -384,6 +754,391 @@ def load_enrichment_data(enrichment_dir, method='EnrichR'):
         print(f"Error loading enrichment data: {e}")
 
     return enrichment_data
+
+def categorize_modules_by_keywords(enrichment_data):
+    """
+    Naive heuristic to assign each module to a broad GO category based on keyword
+    matching in its enriched Biological Process terms.
+    
+    Parameters:
+    enrichment_data (dict): Enrichment data dictionary (key 'bp' has BP DataFrame)
+    
+    Returns:
+    dict: Mapping module id (string) -> broad GO category string
+    """
+    go_categories = {
+        'Immune': ['immune', 'inflammatory', 'cytokine', 'interferon', 'lymphocyte',
+                   'leukocyte', 'antigen', 'defense', 'innate immunity', 'adaptive immunity',
+                   'inflammation'],
+        'Metabolic': ['metabolic', 'metabolism', 'biosynthetic', 'catabolic',
+                      'glycolysis', 'oxidation', 'fatty acid', 'lipid metabolism',
+                      'glucose', 'ATP'],
+        'Cell Cycle': ['cell cycle', 'mitotic', 'division', 'proliferation',
+                       'DNA replication', 'chromosome', 'cytokinesis', 'G1/S', 'G2/M'],
+        'Signaling': ['signal transduction', 'signaling', 'receptor', 'kinase',
+                      'phosphorylation', 'MAPK', 'cascade', 'pathway', 'GTPase'],
+        'Development': ['development', 'differentiation', 'morphogenesis',
+                        'embryonic', 'organogenesis', 'pattern specification'],
+        'Apoptosis': ['apoptosis', 'cell death', 'programmed cell death',
+                      'caspase'],
+        'Adhesion_Migration': ['cell adhesion', 'migration', 'motility',
+                               'locomotion', 'extracellular matrix', 'integrin'],
+        'Transcription': ['transcription', 'RNA processing', 'gene expression',
+                          'chromatin', 'histone', 'epigenetic'],
+        'Transport': ['transport', 'localization', 'secretion', 'export',
+                      'import', 'vesicle'],
+        'Stress_Response': ['stress', 'response to stimulus', 'oxidative stress',
+                            'DNA damage', 'hypoxia', 'heat shock']
+    }
+
+    module_categories = {}
+
+    if 'bp' not in enrichment_data or enrichment_data['bp'].empty:
+        print("No BP enrichment data available for keyword clustering")
+        return module_categories
+
+    bp_df = enrichment_data['bp']
+    term_col = 'Term' if 'Term' in bp_df.columns else None
+    mod_col = 'Module' if 'Module' in bp_df.columns else None
+    if term_col is None or mod_col is None:
+        return module_categories
+
+    for module in bp_df[mod_col].unique():
+        mod_df = bp_df[bp_df[mod_col] == module]
+        bp_terms = mod_df[term_col].tolist()
+        if not bp_terms:
+            module_categories[str(module)] = 'Other'
+            continue
+
+        scores = {cat: 0 for cat in go_categories}
+        for term in bp_terms:
+            if not isinstance(term, str):
+                continue
+            tl = term.lower()
+            for cat, kws in go_categories.items():
+                for kw in kws:
+                    if kw in tl:
+                        scores[cat] += 1
+
+        if max(scores.values()) > 0:
+            module_categories[str(module)] = max(scores, key=scores.get)
+        else:
+            module_categories[str(module)] = 'Other'
+
+    print(f"Keyword clustering assigned {len(module_categories)} modules to {len(set(module_categories.values()))} categories")
+    return module_categories
+
+
+def rand_index_from_labels(lbl1, lbl2):
+    """Compute the Rand Index between two label vectors."""
+    n = len(lbl1)
+    assert n == len(lbl2)
+    agreements = 0
+    total = 0
+    for i in range(n):
+        for j in range(i + 1, n):
+            same1 = lbl1[i] == lbl1[j]
+            same2 = lbl2[i] == lbl2[j]
+            if same1 == same2:
+                agreements += 1
+            total += 1
+    return agreements / total if total else 0.0
+
+
+def load_pkn_data(pkn_file, metabolite_mapping_file=None):
+    """
+    Load PKN and metabolite mapping to build a lookup dictionary for edge categorization.
+    
+    Parameters:
+    pkn_file (str): Path to PKN TSV file (Lemonite_PKN.tsv)
+    metabolite_mapping_file (str): Path to name_map.csv (Query -> HMDB mapping)
+    
+    Returns:
+    tuple: (pkn_lookup dict, name_to_hmdb dict)
+    """
+    pkn_lookup = {}
+    name_to_hmdb = {}
+
+    try:
+        pkn_df = pd.read_csv(pkn_file, sep='\t', header=0)
+        pkn_df['Node1'] = pkn_df['Node1'].astype(str).str.split('_').str[-1]
+        pkn_df['Node2'] = pkn_df['Node2'].astype(str).str.split('_').str[-1]
+
+        for _, r in pkn_df.iterrows():
+            n1 = r['Node1']
+            n2 = r['Node2']
+            source = r.get('Source', '')
+            edge_type = r.get('Type', '')
+
+            # Classify edge
+            if edge_type == 'metabolite-gene':
+                causal_sources = ['LINCS', 'chEMBL']
+                metabolic_sources = ['Human1_GEM_dist1', 'Human1_GEM_dist2']
+                if source in causal_sources:
+                    cat = 'Causal'
+                elif source in metabolic_sources:
+                    cat = 'Metabolic_pathway'
+                else:
+                    cat = 'Other'
+            else:
+                cat = 'PPI'
+
+            pkn_lookup.setdefault((n1, n2), []).append(cat)
+            pkn_lookup.setdefault((n2, n1), []).append(cat)
+
+        print(f"Loaded PKN with {len(pkn_df)} edges, {len(pkn_lookup)} lookup entries")
+    except Exception as e:
+        print(f"Warning: Could not load PKN file: {e}")
+
+    if metabolite_mapping_file and os.path.exists(metabolite_mapping_file):
+        try:
+            mapping_df = pd.read_csv(metabolite_mapping_file, sep=',')
+            name_to_hmdb = mapping_df.set_index('Query')['HMDB'].dropna().to_dict()
+            print(f"Loaded metabolite mapping with {len(name_to_hmdb)} entries")
+        except Exception as e:
+            print(f"Warning: Could not load metabolite mapping: {e}")
+
+    return pkn_lookup, name_to_hmdb
+
+
+def categorize_regulator_module_edge(regulator, module_id, pkn_lookup, name_to_hmdb, module_genes_map):
+    """
+    Determine the best interaction category between a metabolite regulator and a module's
+    genes via PKN lookup. Priority: Causal > Metabolic_pathway > Other.
+    """
+    hmdb = name_to_hmdb.get(regulator, regulator)
+    best = 'Other'
+    for gene in module_genes_map.get(str(module_id), []):
+        cats = pkn_lookup.get((hmdb, gene), [])
+        if not cats:
+            cats = pkn_lookup.get((gene, hmdb), [])
+        for c in cats:
+            if c == 'Causal':
+                return 'Causal'
+            elif c == 'Metabolic_pathway' and best != 'Causal':
+                best = 'Metabolic_pathway'
+    return best
+
+
+def annotate_edges_with_category(edges, pkn_lookup, name_to_hmdb, module_genes_map):
+    """
+    Annotate each edge in the edge list with an interaction category
+    (Causal / Metabolic_pathway / Other) based on PKN data.
+    Only metabolite edges get PKN-based annotation; TF edges are always 'Other'.
+    """
+    _cache = {}
+    for edge in edges:
+        if edge['type'].startswith('metabolite') or edge['type'].startswith('Metabolite') or edge['type'].startswith('Lipid') or edge['type'].startswith('lipid'):
+            key = (edge['source'], edge['target'])
+            if key in _cache:
+                edge['category'] = _cache[key]
+            else:
+                reg = edge['source']
+                mod = edge['target'].replace('Module_', '')
+                cat = categorize_regulator_module_edge(reg, mod, pkn_lookup, name_to_hmdb, module_genes_map)
+                edge['category'] = cat
+                _cache[key] = cat
+        else:
+            edge['category'] = 'Other'
+    return edges
+
+
+def build_enriched_hover_text(module_id, module_overview_df, enrichment_all_df, edges):
+    """
+    Build rich hover text for a module node including expression info,
+    regulators (up to 10), and top 3 pathways per database with p-values.
+    
+    Parameters:
+    module_id (str): Module ID
+    module_overview_df (pd.DataFrame): Module overview DataFrame
+    enrichment_all_df (pd.DataFrame or None): Combined enrichment DataFrame with Database column
+    edges (list): Edge list for extracting connected regulators
+    
+    Returns:
+    str: HTML-formatted hover text
+    """
+    hover_text = f"<b>Module {module_id}</b><br>"
+
+    row = None
+    if module_overview_df is not None and not module_overview_df.empty:
+        matches = module_overview_df[module_overview_df['Module'].astype(str) == str(module_id)]
+        if len(matches) > 0:
+            row = matches.iloc[0]
+
+    if row is not None:
+        # Expression analysis
+        expr_p = row.get('Expression_adjusted_pval', 'NA')
+        if expr_p != 'NA' and pd.notna(expr_p):
+            try:
+                hover_text += f"<b>Expression Analysis:</b><br>"
+                hover_text += f"  \u2022 adj. p-value: {float(expr_p):.2e}<br>"
+                expr_rank = row.get('Expression_rank', 'NA')
+                hover_text += f"  \u2022 Rank: {expr_rank}<br>"
+                expr_sig = 'Yes' if isinstance(expr_p, (int, float)) and float(expr_p) < 0.05 else 'No'
+                hover_text += f"  \u2022 Significant: {expr_sig}<br><br>"
+            except (ValueError, TypeError):
+                pass
+
+        # Gene count
+        genes_val = row.get('Module_genes', 'NA')
+        if genes_val != 'NA' and pd.notna(genes_val):
+            gene_count = len(str(genes_val).split('|'))
+            hover_text += f"<b>Genes:</b> {gene_count} genes<br><br>"
+
+    # Regulators per type from edges
+    module_target = f"Module_{module_id}"
+    reg_type_labels = {}
+    for e in edges:
+        if e['target'] == module_target:
+            rtype = e.get('type', '').replace('_regulation', '').replace('_to_module', '')
+            reg_type_labels.setdefault(rtype, set()).add(e['source'])
+
+    for reg_type in sorted(reg_type_labels.keys()):
+        regs = sorted(reg_type_labels[reg_type])
+        if regs:
+            hover_text += f"<b>{reg_type.capitalize()} ({len(regs)}):</b> "
+            hover_text += ', '.join(regs[:10])
+            if len(regs) > 10:
+                hover_text += f", ... (+{len(regs) - 10} more)"
+            hover_text += '<br>'
+    hover_text += '<br>'
+
+    # Top enriched pathways from ALL databases (BP, MF, CC, KEGG, Reactome)
+    if enrichment_all_df is not None and not enrichment_all_df.empty:
+        mod_col = 'Module' if 'Module' in enrichment_all_df.columns else None
+        db_col = next((c for c in enrichment_all_df.columns if c.lower() in ('database', 'db', 'source')), None)
+        padj_col = 'p.adjust' if 'p.adjust' in enrichment_all_df.columns else None
+
+        if mod_col and db_col and padj_col:
+            mod_enrich = enrichment_all_df[enrichment_all_df[mod_col].astype(str) == str(module_id)]
+            for db in ['BP', 'MF', 'CC', 'KEGG', 'Reactome']:
+                db_enrich = mod_enrich[mod_enrich[db_col].str.upper() == db.upper()]
+                if db_enrich.empty:
+                    # Try case-insensitive partial match
+                    db_enrich = mod_enrich[mod_enrich[db_col].str.lower().str.contains(db.lower(), na=False)]
+                db_enrich = db_enrich.sort_values(padj_col).head(3)
+                if len(db_enrich) > 0:
+                    hover_text += f"<b>Top {db}:</b><br>"
+                    for _, erow in db_enrich.iterrows():
+                        term = str(erow.get('Term', ''))
+                        if len(term) > 55:
+                            term = term[:52] + '...'
+                        p_val = erow[padj_col]
+                        try:
+                            hover_text += f"  \u2022 {term} (p={float(p_val):.1e})<br>"
+                        except (ValueError, TypeError):
+                            hover_text += f"  \u2022 {term}<br>"
+
+    return hover_text
+
+
+def adjust_positions_to_avoid_overlap(pos, min_dist=60):
+    """
+    Iteratively push module nodes apart until every pair is at least min_dist apart.
+    Only adjusts nodes whose ID starts with 'Module_'.
+    """
+    import random
+    moved = True
+    max_iterations = 100
+    iteration = 0
+    while moved and iteration < max_iterations:
+        moved = False
+        iteration += 1
+        items = list(pos.items())
+        for i, (n1, (x1, y1)) in enumerate(items):
+            if not n1.startswith('Module_'):
+                continue
+            for n2, (x2, y2) in items[i + 1:]:
+                if not n2.startswith('Module_'):
+                    continue
+                dx = x2 - x1
+                dy = y2 - y1
+                dist = np.hypot(dx, dy)
+                if dist == 0:
+                    dx = random.uniform(-1, 1)
+                    dy = random.uniform(-1, 1)
+                    dist = np.hypot(dx, dy)
+                if dist < min_dist:
+                    shift = (min_dist - dist) / 2.0
+                    ang = np.arctan2(dy, dx)
+                    pos[n1] = (x1 - shift * np.cos(ang), y1 - shift * np.sin(ang))
+                    pos[n2] = (x2 + shift * np.cos(ang), y2 + shift * np.sin(ang))
+                    moved = True
+    return pos
+
+
+def export_cytoscape_files(nodes, edges, module_clusters, module_overview_df, naive_categories, output_dir):
+    """
+    Export Cytoscape-compatible edge list and node attribute TSV files.
+    
+    Parameters:
+    nodes (list): Node dicts with 'id', 'type', etc.
+    edges (list): Edge dicts with 'source', 'target', 'category'
+    module_clusters (dict): module_id -> 'Cluster_N' string
+    module_overview_df (pd.DataFrame): Module overview for attribute lookup
+    naive_categories (dict or None): module_id -> naive keyword category
+    output_dir (str): Output directory
+    """
+    print("\nExporting Cytoscape-compatible files...")
+
+    # Edge file
+    edge_file = os.path.join(output_dir, 'module_network_edges.txt')
+    with open(edge_file, 'w') as f:
+        f.write("source\ttarget\tCategory\tArrowShape\n")
+        for edge in edges:
+            cat = edge.get('category', 'Other')
+            if cat == 'Causal':
+                arrow = 'DELTA'
+            elif cat == 'Metabolic_pathway':
+                arrow = 'DOT'
+            else:
+                arrow = ''
+            f.write(f"{edge['source']}\t{edge['target']}\t{cat}\t{arrow}\n")
+    print(f"  Saved edge list: {edge_file}")
+
+    # Node attributes file
+    node_file = os.path.join(output_dir, 'module_network_node_attributes.txt')
+    with open(node_file, 'w') as f:
+        header = "Node\tMegaGO_Cluster\tNaive_Category\tNode_Type\tExpression_significant\tPPI_significant\tModule_genes_count\n"
+        f.write(header)
+        for node in nodes:
+            node_id = node['id']
+            node_type = node['type']
+            if node_type == 'module':
+                module_num = node_id.replace('Module_', '')
+                cluster = module_clusters.get(module_num, 'Unassigned')
+                naive_cat = naive_categories.get(module_num, '') if naive_categories else ''
+
+                expr_flag = ''
+                ppi_flag = ''
+                gene_count = ''
+                if module_overview_df is not None and not module_overview_df.empty:
+                    mod_row = module_overview_df[module_overview_df['Module'].astype(str) == module_num]
+                    if len(mod_row) > 0:
+                        try:
+                            p_adj = mod_row.iloc[0].get('Expression_adjusted_pval', 'NA')
+                            if p_adj != 'NA' and pd.notna(p_adj):
+                                expr_flag = 'Yes' if float(p_adj) < 0.05 else 'No'
+                        except Exception:
+                            pass
+                        try:
+                            ppi_val = mod_row.iloc[0].get('PPI_FDR', 'NA')
+                            if ppi_val != 'NA' and pd.notna(ppi_val):
+                                ppi_flag = 'Yes' if float(ppi_val) < 0.05 else 'No'
+                        except Exception:
+                            pass
+                        try:
+                            genes = mod_row.iloc[0].get('Module_genes', '')
+                            if genes != 'NA' and pd.notna(genes):
+                                gene_count = str(len(str(genes).split('|')))
+                        except Exception:
+                            pass
+                f.write(f"{node_id}\t{cluster}\t{naive_cat}\t{node_type}\t{expr_flag}\t{ppi_flag}\t{gene_count}\n")
+            else:
+                naive_cat = ''
+                f.write(f"{node_id}\t\t{naive_cat}\t{node_type}\t\t\t\n")
+    print(f"  Saved node attributes: {node_file}")
+
 
 def calculate_pathway_similarity_matrix(module_pathways):
     """
@@ -691,84 +1446,83 @@ def parse_megago_output(output_text, bp_files):
 
 def megago_cluster_modules(module_pathways, n_clusters=5, use_megago=True, enrichment_data=None, output_dir='.'):
     """
-    Cluster modules using megaGO command-line tool if available, otherwise use pathway similarity
-    
+    Cluster modules using megaGO command-line tool if available, otherwise use pathway similarity.
+
+    Returns cluster labels as 'Cluster_N' strings for consistency with downstream code.
+
     Parameters:
     module_pathways (dict): Dictionary mapping module IDs to lists of pathway terms
     n_clusters (int): Number of clusters to create
     use_megago (bool): Whether to use megago for clustering
     enrichment_data (dict): Enrichment data for creating megaGO files
     output_dir (str): Output directory for temporary files
-    
+
     Returns:
-    tuple: (module_clusters dict, similarity_matrix) where module_clusters maps module IDs to cluster labels
+    tuple: (module_clusters dict, similarity_matrix)
+           module_clusters maps module_id -> 'Cluster_N' string
     """
+    def _to_cluster_str(raw_clusters):
+        """Convert integer cluster labels to 'Cluster_N' strings."""
+        return {mid: f"Cluster_{int(lbl)}" for mid, lbl in raw_clusters.items()}
+
     if not module_pathways:
         print("No pathway data available for clustering")
         return {}, None
-    
+
     modules = list(module_pathways.keys())
-    
+
     # Skip clustering if requested or not enough clusters
     if n_clusters <= 1:
         print("Functional clustering disabled - assigning all modules to single cluster")
-        return {mod: 1 for mod in modules}, None
-    
+        return {mod: 'Cluster_1' for mod in modules}, None
+
     if not use_megago:
         print("MegaGO clustering disabled by user - using pathway similarity")
     else:
         print("\nAttempting MegaGO clustering...")
-        
+
         # Try to use actual megaGO command-line tool
         if enrichment_data and 'bp' in enrichment_data:
             print(f"   Found biological process enrichment data with {len(enrichment_data['bp'])} entries")
             # Create megaGO files
             megago_dir = create_megago_files(enrichment_data, output_dir)
-            
+
             if megago_dir:
                 print(f"   Created megaGO files in: {megago_dir}")
                 # Run megaGO clustering
                 similarity_matrix, megago_module_ids = run_megago_clustering(megago_dir)
-                
+
                 if similarity_matrix is not None:
                     print("Successfully obtained MegaGO similarity matrix")
-                    
+
                     # Convert similarity to distance
                     distance_matrix = 1 - similarity_matrix
-                    
+
                     # Perform hierarchical clustering
                     if len(megago_module_ids) >= 2:
-                        # Convert to condensed distance matrix for scipy
                         condensed_dist = squareform(distance_matrix, checks=False)
-                        
-                        # Hierarchical clustering
                         linkage_matrix = linkage(condensed_dist, method='ward')
-                        
-                        # Determine optimal number of clusters
+
                         if n_clusters == 'auto':
                             n_clusters = min(5, max(2, len(megago_module_ids) // 3))
-                        
+
                         cluster_labels = fcluster(linkage_matrix, n_clusters, criterion='maxclust')
-                        
-                        # Create module-to-cluster mapping
-                        module_clusters = {}
+
+                        raw = {}
                         for i, module_id in enumerate(megago_module_ids):
-                            module_clusters[module_id] = cluster_labels[i]
-                        
-                        # Assign cluster 0 to modules without MegaGO data
+                            raw[module_id] = cluster_labels[i]
                         for module in modules:
-                            if module not in module_clusters:
-                                module_clusters[module] = 0
-                        
+                            if module not in raw:
+                                raw[module] = 0
+
+                        module_clusters = _to_cluster_str(raw)
                         print(f"Created {n_clusters} module clusters using MegaGO semantic similarity")
-                        
-                        # Print cluster summary
+
                         cluster_counts = Counter(module_clusters.values())
-                        for cluster_id, count in sorted(cluster_counts.items()):
-                            print(f"  Cluster {cluster_id}: {count} modules")
-                        
+                        for cid, count in sorted(cluster_counts.items()):
+                            print(f"  {cid}: {count} modules")
                         return module_clusters, similarity_matrix
-                    
+
                 else:
                     print("MegaGO clustering failed - falling back to pathway similarity")
             else:
@@ -780,134 +1534,98 @@ def megago_cluster_modules(module_pathways, n_clusters=5, use_megago=True, enric
                 print(f"No biological process enrichment data (available keys: {list(enrichment_data.keys())}) - falling back to pathway similarity")
             else:
                 print("No biological process enrichment data for MegaGO - falling back to pathway similarity")
-    
+
     # Fall back to enhanced pathway similarity clustering
     print("Using pathway similarity for clustering...")
-    
-    # Method 1: Jaccard similarity on pathway terms
-    jaccard_sim = calculate_pathway_similarity_matrix(module_pathways)
 
-    
-    # Combine similarities (average of Jaccard and weighted)
-    similarity_matrix = (jaccard_sim.values)
+    jaccard_sim = calculate_pathway_similarity_matrix(module_pathways)
+    similarity_matrix = jaccard_sim.values
     valid_modules = list(module_pathways.keys())
 
     print("Using enhanced pathway similarity clustering (Jaccard)")
 
-    # Convert similarity to distance
     distance_matrix = 1 - similarity_matrix
-    
-    # Perform hierarchical clustering
+
     if len(valid_modules) < 2:
-        return {mod: 0 for mod in modules}, None
-    
-    # Convert to condensed distance matrix for scipy
+        return {mod: 'Cluster_0' for mod in modules}, None
+
     condensed_dist = squareform(distance_matrix, checks=False)
-    
-    # Hierarchical clustering
     linkage_matrix = linkage(condensed_dist, method='ward')
-    
-    # Determine optimal number of clusters if not specified
+
     if n_clusters == 'auto':
         n_clusters = min(5, max(2, len(valid_modules) // 3))
-    
+
     cluster_labels = fcluster(linkage_matrix, n_clusters, criterion='maxclust')
-    
-    # Create module-to-cluster mapping
-    module_clusters = {}
+
+    raw = {}
     for i, module in enumerate(valid_modules):
-        module_clusters[module] = cluster_labels[i]
-    
-    # Assign cluster 0 to modules without pathways
+        raw[module] = cluster_labels[i]
     for module in modules:
-        if module not in module_clusters:
-            module_clusters[module] = 0
-    
+        if module not in raw:
+            raw[module] = 0
+
+    module_clusters = _to_cluster_str(raw)
     print(f"Created {n_clusters} module clusters based on functional similarity")
-    
-    # Print cluster summary
+
     cluster_counts = Counter(module_clusters.values())
-    for cluster_id, count in sorted(cluster_counts.items()):
-        print(f"  Cluster {cluster_id}: {count} modules")
-    
+    for cid, count in sorted(cluster_counts.items()):
+        print(f"  {cid}: {count} modules")
+
     return module_clusters, similarity_matrix
 
-def create_interactive_network_visualization(module_data, module_clusters, output_dir, enrichment_data=None, go_similarity_matrix=None):
+def create_interactive_network_visualization(module_data, module_clusters, output_dir,
+                                              enrichment_data=None, go_similarity_matrix=None,
+                                              module_overview_df=None, enrichment_all_df=None,
+                                              naive_categories=None, pkn_lookup=None,
+                                              name_to_hmdb=None, module_genes_map=None):
     """
-    Create interactive network visualization using plotly with MegaGO clustering layout
+    Create interactive network visualization using Plotly with MegaGO cluster coloring,
+    PKN-based edge categorization, and optional naive keyword category borders.
+
+    Generates two HTML files:
+    - interactive_module_network.html (standard)
+    - interactive_module_network_movable.html (draggable nodes)
     
     Parameters:
     module_data (list): List of module data dictionaries
-    module_clusters (dict): Dictionary mapping module IDs to cluster labels
-    output_dir (str): Output directory for saving visualization
-    enrichment_data (dict): Enrichment data for enhanced hover information
-    go_similarity_matrix (numpy.ndarray): GO similarity matrix for spatial clustering
+    module_clusters (dict): module_id -> 'Cluster_N' string
+    output_dir (str): Output directory
+    enrichment_data (dict): Old per-database enrichment dict (fallback for hover)
+    go_similarity_matrix: similarity matrix for layout
+    module_overview_df (pd.DataFrame): Module overview for hover text
+    enrichment_all_df (pd.DataFrame): Combined enrichment data with Database column
+    naive_categories (dict or None): module_id -> naive keyword category
+    pkn_lookup (dict or None): PKN edge lookup dict
+    name_to_hmdb (dict or None): metabolite name -> HMDB mapping
+    module_genes_map (dict or None): module_id -> gene list
     """
-    print("Creating interactive network visualization with MegaGO clustering...")
+    print("Creating interactive network visualization with MegaGO cluster coloring...")
     
-    # Create network graph
-    G = nx.Graph()
-    
-    # Add nodes (modules and regulators)
+    # -- Build nodes and edges --
     nodes = []
     edges = []
-    
-    # Track regulators to avoid duplicates (dynamically populated)
     regulator_modules = {}
     
-    # Process each module
     for module_info in module_data:
         module_id = str(module_info['Module'])
-        cluster_id = module_clusters.get(module_id, 0)
         
-        # Calculate node attributes
         n_genes = len(module_info.get('Module_genes', '').split('|')) if module_info.get('Module_genes', '') != 'NA' else 0
         
-        # Count regulators dynamically for all regulator types
-        regulator_counts = {}
-        regulator_columns = [col for col in module_info.keys() if col.endswith('_regulators')]
-        for reg_col in regulator_columns:
-            reg_type = reg_col.replace('_regulators', '')
-            reg_count = len(module_info.get(reg_col, '').split('|')) if module_info.get(reg_col, '') != 'NA' else 0
-            regulator_counts[reg_type] = reg_count
-        
-        # Keep legacy variables for backwards compatibility (use first two regulator types if available)
-        all_reg_types = sorted(regulator_counts.keys())
-        n_tf_regs = regulator_counts.get(all_reg_types[0], 0) if len(all_reg_types) > 0 else 0
-        n_met_regs = regulator_counts.get(all_reg_types[1], 0) if len(all_reg_types) > 1 else 0
-        
-        # Count pathways
-        pathway_counts = 0
-        for pathway_type in ['Top_3_pathways_bio_process', 'Top_3_pathways_molecular_function', 
-                           'Top_3_pathways_cellular_component', 'Top_3_pathways_KEGG', 'Top_3_pathways_Reactome']:
-            if module_info.get(pathway_type, 'NA') != 'NA':
-                pathway_counts += len(module_info[pathway_type].split('|'))
-        
-        # Create module node
         module_node = {
             'id': f"Module_{module_id}",
-            'label': f"Module {module_id}",
+            'label': f"M{module_id}",
             'type': 'module',
-            'cluster': cluster_id,
             'n_genes': n_genes,
-            'n_tf_regs': n_tf_regs,
-            'n_met_regs': n_met_regs,
-            'n_pathways': pathway_counts,
-            'expression_rank': module_info.get('Expression_rank', 'NA'),
-            'hover_info': create_module_hover_info(module_info, enrichment_data)
         }
         nodes.append(module_node)
-        G.add_node(module_node['id'], **module_node)
         
         # Collect regulators dynamically for all regulator types
         regulator_columns = [col for col in module_info.keys() if col.endswith('_regulators')]
         for reg_col in regulator_columns:
             if module_info.get(reg_col, 'NA') != 'NA':
-                # Extract regulator type name
                 reg_type = reg_col.replace('_regulators', '')
                 regs = module_info[reg_col].split('|')
                 
-                # Initialize regulator type dict if needed
                 if reg_type not in regulator_modules:
                     regulator_modules[reg_type] = {}
                 
@@ -918,188 +1636,279 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
                             regulator_modules[reg_type][reg] = []
                         regulator_modules[reg_type][reg].append(module_id)
     
-    # Create regulator nodes
+    # Create regulator nodes and edges
     for reg_type, regulators in regulator_modules.items():
         for regulator, target_modules in regulators.items():
             modules_str = ', '.join(sorted(target_modules))
             regulator_node = {
-                'id': f"{reg_type}_{regulator}",
-                'label': regulator,
+                'id': regulator,
+                'label': regulator[:15] if len(regulator) > 15 else regulator,
                 'type': reg_type,
-                'hover_info': f"<b>{regulator}</b><br>Type: {reg_type.upper()}<br>Regulates: Modules {modules_str}<br>Module count: {len(target_modules)}"
+                'hover_info': f"<b>{regulator}</b><br>Type: {reg_type}<br>Targets ({len(target_modules)}): M{', M'.join(target_modules)}"
             }
             nodes.append(regulator_node)
-            G.add_node(regulator_node['id'], **regulator_node)
             
-            # Create edges
             for module_id in target_modules:
                 edge = {
-                    'source': f"{reg_type}_{regulator}",
+                    'source': regulator,
                     'target': f"Module_{module_id}",
                     'type': f"{reg_type}_regulation"
                 }
                 edges.append(edge)
-                G.add_edge(edge['source'], edge['target'])
     
-    # Create MegaGO clustering layout
-    module_list = list(module_clusters.keys())
-    pos = create_megago_clustering_layout(nodes, edges, go_similarity_matrix, module_list)
-    
-    # Prepare data for plotly
-    edge_x = []
-    edge_y = []
-    
-    for edge in edges:
-        if edge['source'] in pos and edge['target'] in pos:
-            x0, y0 = pos[edge['source']]
-            x1, y1 = pos[edge['target']]
-            edge_x.extend([x0, x1, None])
-            edge_y.extend([y0, y1, None])
-    
-    # Create edge trace
-    edge_trace = go.Scatter(x=edge_x, y=edge_y,
-                           line=dict(width=1, color='rgba(150,150,150,0.5)'),
-                           hoverinfo='none',
-                           mode='lines',
-                           name='Connections',
-                           showlegend=False)
-    
-    # Create single node trace for all modules (no cluster-based coloring)
-    all_module_nodes = [n for n in nodes if n['type'] == 'module' and n['id'] in pos]
-    
-    if all_module_nodes:
-        node_x = [pos[n['id']][0] for n in all_module_nodes]
-        node_y = [pos[n['id']][1] for n in all_module_nodes]
-        
-        # Get hover texts and sizes
-        hover_texts = []
-        node_sizes = []
-        
-        for node in all_module_nodes:
-            hover_texts.append(node.get('hover_info', node['id']))
-            # Size based on number of genes with increased base size for better visibility
-            n_genes = node.get('n_genes', 10)
-            size = max(15, min(80, n_genes * 3))  # Increased base size and scaling factor
-            node_sizes.append(size)
-        
-        # Single trace for all modules with uniform color
-        node_trace = go.Scatter(x=node_x, y=node_y,
-                               mode='markers+text',
-                               hoverinfo='text',
-                               text=[n['label'] for n in all_module_nodes],
-                               textposition='middle center',
-                               textfont=dict(size=10, color='black'),  # Increased text size
-                               hovertext=hover_texts,
-                               name='Modules',
-                               marker=dict(size=node_sizes,
-                                         color='lightblue',  # Single uniform color
-                                         line=dict(width=2, color='darkblue'),
-                                         opacity=0.8),
-                               showlegend=True)
-        node_traces = [node_trace]
+    # Annotate edges with PKN-based categories
+    if pkn_lookup and module_genes_map:
+        edges = annotate_edges_with_category(edges, pkn_lookup, name_to_hmdb or {}, module_genes_map)
     else:
-        node_traces = []
+        for edge in edges:
+            edge['category'] = 'Other'
     
-    # Create regulator traces dynamically for all regulator types
-    regulator_traces = []
+    # Build enriched hover info for modules
+    for node in nodes:
+        if node['type'] == 'module':
+            module_id = node['id'].replace('Module_', '')
+            node['hover_info'] = build_enriched_hover_text(
+                module_id, module_overview_df, enrichment_all_df, edges
+            )
+            cluster = module_clusters.get(module_id, 'Unassigned')
+            node['hover_info'] += f"<br><b>MegaGO Cluster:</b> {cluster}"
+            if naive_categories:
+                naive_cat = naive_categories.get(module_id, 'Other')
+                node['hover_info'] += f"<br><b>Keyword Category:</b> {naive_cat}"
     
-    # Define default colors and symbols for known regulator types
-    default_styles = {
-        'TFs': {'color': 'green', 'symbol': 'triangle-up'},
-        'Metabolites': {'color': 'red', 'symbol': 'circle'},
-        'Lipids': {'color': 'gold', 'symbol': 'square'},
-        'Proteins': {'color': 'purple', 'symbol': 'diamond'}
+    # -- Create layout positions --
+    pos, cluster_positions = _create_cluster_layout(nodes, edges, module_clusters)
+    
+    # Apply overlap avoidance
+    pos = adjust_positions_to_avoid_overlap(pos, min_dist=1.5)
+    
+    # -- Build color maps --
+    all_clusters = sorted(set(module_clusters.values()))
+    cluster_palette = ['#EE6677', '#4477AA', '#228833', '#AA3377', '#66CCEE',
+                       '#CCBB44', '#EE99AA', '#44BB99', '#BBCC33', '#AAAA00']
+    cluster_color_map = {cl: cluster_palette[i % len(cluster_palette)]
+                         for i, cl in enumerate(all_clusters)}
+    cluster_color_map['Unassigned'] = '#BBBBBB'
+
+    naive_color_map = {}
+    if naive_categories is not None:
+        naives = sorted(set(naive_categories.values()))
+        naive_palette = ['#FFD700', '#ADFF2F', '#00FA9A', '#FF69B4',
+                         '#BA55D3', '#FFA500', '#87CEFA', '#40E0D0']
+        naive_color_map = {cl: naive_palette[i % len(naive_palette)]
+                           for i, cl in enumerate(naives)}
+        naive_color_map['Other'] = '#DDDDDD'
+
+    regulator_color = '#FF8C00'
+
+    # -- Edge styles by interaction category --
+    edge_styles = {
+        'Causal': {'color': 'rgba(80,80,80,0.9)', 'width': 3.0, 'label': 'Causal'},
+        'Metabolic_pathway': {'color': 'rgba(80,80,80,0.85)', 'width': 2.5, 'label': 'Metabolic pathway'},
+        'Other': {'color': 'rgba(80,80,80,0.6)', 'width': 1.5, 'label': 'Other'},
     }
-    
-    # Define colors and symbols to use for unknown regulator types dynamically
-    fallback_colors = ['orange', 'cyan', 'magenta', 'brown', 'pink', 
-                       'lime', 'navy', 'teal', 'coral']
-    fallback_symbols = ['circle', 'square', 'diamond', 'cross', 'x', 'triangle-up', 'triangle-down', 
-                        'star', 'hexagon']
-    
-    # Build regulator_styles dynamically based on found regulator types
-    regulator_styles = {}
-    for idx, reg_type in enumerate(sorted(regulator_modules.keys())):
-        if reg_type in default_styles:
-            # Use predefined style for known types
-            regulator_styles[reg_type] = {
-                'color': default_styles[reg_type]['color'],
-                'symbol': default_styles[reg_type]['symbol'],
-                'name': f'{reg_type} Regulators'
-            }
+
+    # -- Helper to build figures for both standard and movable variants --
+    def _build_figure(movable=False):
+        # Build edge traces per category
+        temp_coords = {cat: {'x': [], 'y': []} for cat in edge_styles}
+        for edge in edges:
+            if edge['source'] in pos and edge['target'] in pos:
+                x0, y0 = pos[edge['source']]
+                x1, y1 = pos[edge['target']]
+                cat = edge.get('category', 'Other')
+                if cat not in temp_coords:
+                    cat = 'Other'
+                temp_coords[cat]['x'].extend([x0, x1, None])
+                temp_coords[cat]['y'].extend([y0, y1, None])
+
+        fig = go.Figure()
+
+        # Add edge traces (Other first so thicker edges overlay)
+        for cat in ['Other', 'Metabolic_pathway', 'Causal']:
+            style = edge_styles[cat]
+            fig.add_trace(go.Scatter(
+                x=temp_coords[cat]['x'], y=temp_coords[cat]['y'],
+                line=dict(width=style['width'], color=style['color']),
+                hoverinfo='none', mode='lines',
+                name=style['label'], showlegend=True
+            ))
+
+        # Add edge decorations (arrows and dots)
+        for edge in edges:
+            if edge['source'] in pos and edge['target'] in pos:
+                x0, y0 = pos[edge['source']]
+                x1, y1 = pos[edge['target']]
+                cat = edge.get('category', 'Other')
+                if cat == 'Causal':
+                    fig.add_annotation(
+                        x=x1, y=y1, ax=x0, ay=y0,
+                        xref='x', yref='y', axref='x', ayref='y',
+                        showarrow=True, arrowhead=3, arrowsize=1,
+                        arrowwidth=edge_styles[cat]['width'],
+                        arrowcolor=edge_styles[cat]['color'],
+                        opacity=0.8
+                    )
+                elif cat == 'Metabolic_pathway':
+                    fig.add_trace(go.Scatter(
+                        x=[x1], y=[y1], mode='markers',
+                        marker=dict(symbol='circle', size=6,
+                                    color=edge_styles[cat]['color'], line=dict(width=0)),
+                        hoverinfo='none', showlegend=False
+                    ))
+
+        if movable:
+            # One trace per node for individual dragging
+            for n in nodes:
+                if n['id'] not in pos:
+                    continue
+                x, y = pos[n['id']]
+                label = n.get('label', n['id'])
+                txt = label
+                symbol = 'circle' if n['type'] == 'module' else 'diamond-wide'
+                if n['type'] == 'module':
+                    m_id = n['id'].replace('Module_', '')
+                    color = cluster_color_map.get(module_clusters.get(m_id, 'Unassigned'), '#BBBBBB')
+                    size = 50
+                    border = '#FFFFFF'
+                    if naive_categories is not None:
+                        border = naive_color_map.get(naive_categories.get(m_id, 'Other'), '#FFFFFF')
+                    text_size = 12
+                else:
+                    color = regulator_color
+                    size = min(80, max(25, len(txt) * 4))
+                    border = 'darkorange'
+                    text_size = 8
+
+                fig.add_trace(go.Scatter(
+                    x=[x], y=[y], mode='markers+text',
+                    marker=dict(size=size, color=color,
+                                line=dict(width=3, color=border),
+                                symbol=symbol),
+                    text=[txt], textposition='middle center',
+                    textfont=dict(size=text_size, color='black', family='Arial Black'),
+                    hovertext=[n.get('hover_info', txt)], hoverinfo='text',
+                    name=n['id'], showlegend=False
+                ))
         else:
-            # Dynamically assign color and symbol for unknown types
-            color_idx = idx % len(fallback_colors)
-            symbol_idx = idx % len(fallback_symbols)
-            regulator_styles[reg_type] = {
-                'color': fallback_colors[color_idx],
-                'symbol': fallback_symbols[symbol_idx],
-                'name': f'{reg_type} Regulators'
-            }
-    
-    # Create traces for all regulator types found in the data
-    for reg_type in sorted(regulator_modules.keys()):
-        reg_nodes = [n for n in nodes if n['type'] == reg_type and n['id'] in pos]
-        
-        if reg_nodes:
-            reg_x = [pos[n['id']][0] for n in reg_nodes]
-            reg_y = [pos[n['id']][1] for n in reg_nodes]
-            reg_hover = [n['hover_info'] for n in reg_nodes]
-            reg_labels = [n['label'] for n in reg_nodes]
-            
-            # Get style for this regulator type (guaranteed to exist now)
-            style = regulator_styles[reg_type]
-            
-            reg_trace = go.Scatter(x=reg_x, y=reg_y,
-                                  mode='markers+text',
-                                  hoverinfo='text',
-                                  text=reg_labels,
-                                  textposition='middle center',
-                                  textfont=dict(size=7, color='black'),
-                                  hovertext=reg_hover,
-                                  name=style['name'],
-                                  marker=dict(size=18,  # Increased regulator size
-                                            color=style['color'],
-                                            symbol=style['symbol'],
-                                            line=dict(width=1.5, color='darkgray'),
-                                            opacity=0.8),
-                                  showlegend=True)
-            regulator_traces.append(reg_trace)
-    
-    # Create the figure with larger dimensions and better scaling
-    fig = go.Figure(data=[edge_trace] + node_traces + regulator_traces,
-                   layout=go.Layout(
-                        title=dict(
-                            text='Interactive Module-Regulator Network',
-                            font=dict(size=18),
-                            x=0.5
-                        ),
-                        showlegend=True,
-                        hovermode='closest',
-                        margin=dict(b=60,l=40,r=40,t=80),
-                        width=1200,  # Explicit width for larger network display
-                        height=800,  # Explicit height for larger network display
-                        annotations=[
-                            dict(
-                                text="Modules positioned by GO biological process similarity.<br>Node size = number of genes, all modules shown in uniform color.<br>Hover over nodes for details, zoom and pan to explore the network.",
-                                showarrow=False,
-                                xref="paper", yref="paper",
-                                x=0.005, y=-0.002,
-                                xanchor='left', yanchor='bottom',
-                                font=dict(size=12)
-                            )
-                        ],
-                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, scaleanchor="y", scaleratio=1),
-                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                        plot_bgcolor='white'
-                        ))
-    
-    # Save interactive plot
+            # -- Grouped module traces by cluster --
+            for cluster in all_clusters:
+                cat_nodes = [n for n in nodes if n['type'] == 'module' and
+                             module_clusters.get(n['id'].replace('Module_', ''), 'Unassigned') == cluster
+                             and n['id'] in pos]
+                if not cat_nodes:
+                    continue
+                x_vals = [pos[n['id']][0] for n in cat_nodes]
+                y_vals = [pos[n['id']][1] for n in cat_nodes]
+                hover_texts = [n.get('hover_info', n['label']) for n in cat_nodes]
+                labels = [n['id'].replace('Module_', '') for n in cat_nodes]
+
+                # Compute border colors per module
+                line_colours = []
+                for n in cat_nodes:
+                    m_id = n['id'].replace('Module_', '')
+                    if naive_categories is not None:
+                        line_colours.append(naive_color_map.get(naive_categories.get(m_id, 'Other'), 'white'))
+                    else:
+                        line_colours.append('white')
+
+                trace = go.Scatter(
+                    x=x_vals, y=y_vals, mode='markers+text',
+                    marker=dict(size=50, color=cluster_color_map.get(cluster, '#CCCCCC'),
+                                line=dict(width=3, color=line_colours), symbol='circle'),
+                    text=labels, textposition='middle center',
+                    textfont=dict(size=12, color='black', family='Arial Black'),
+                    hovertext=hover_texts, hoverinfo='text',
+                    name=f"{cluster} ({len(cat_nodes)})", legendgroup=cluster
+                )
+                fig.add_trace(trace)
+
+            # Unassigned modules
+            unassigned_nodes = [n for n in nodes if n['type'] == 'module' and
+                                module_clusters.get(n['id'].replace('Module_', ''), 'Unassigned') == 'Unassigned'
+                                and n['id'] in pos]
+            if unassigned_nodes:
+                x_vals = [pos[n['id']][0] for n in unassigned_nodes]
+                y_vals = [pos[n['id']][1] for n in unassigned_nodes]
+                hover_texts = [n.get('hover_info', n['label']) for n in unassigned_nodes]
+                labels = [n['id'].replace('Module_', '') for n in unassigned_nodes]
+                fig.add_trace(go.Scatter(
+                    x=x_vals, y=y_vals, mode='markers+text',
+                    marker=dict(size=50, color='#BBBBBB',
+                                line=dict(width=3, color=['white'] * len(x_vals)), symbol='circle'),
+                    text=labels, textposition='middle center',
+                    textfont=dict(size=12, color='black', family='Arial Black'),
+                    hovertext=hover_texts, hoverinfo='text',
+                    name=f'Unassigned ({len(unassigned_nodes)})', legendgroup='Unassigned'
+                ))
+
+            # -- Regulator traces grouped by type --
+            for reg_type in sorted(regulator_modules.keys()):
+                reg_nodes = [n for n in nodes if n['type'] == reg_type and n['id'] in pos]
+                if not reg_nodes:
+                    continue
+                x_vals = [pos[n['id']][0] for n in reg_nodes]
+                y_vals = [pos[n['id']][1] for n in reg_nodes]
+                hover_texts = [n.get('hover_info', n['label']) for n in reg_nodes]
+                labels = [n['label'] for n in reg_nodes]
+                sizes = [min(80, max(25, len(label) * 4)) for label in labels]
+                fig.add_trace(go.Scatter(
+                    x=x_vals, y=y_vals, mode='markers+text',
+                    marker=dict(size=sizes, color=regulator_color, symbol='diamond-wide',
+                                line=dict(width=1, color='darkorange')),
+                    text=labels, textposition='middle center',
+                    textfont=dict(size=8, color='black'),
+                    hovertext=hover_texts, hoverinfo='text',
+                    name=f"{reg_type.capitalize()} ({len(reg_nodes)})", legendgroup=f'reg_{reg_type}'
+                ))
+
+        # -- Cluster label annotations --
+        annotations = []
+        for cl, (cx, cy) in cluster_positions.items():
+            annotations.append(dict(
+                x=cx * 1.3, y=cy * 1.3,
+                text=f'<b>{cl}</b>', showarrow=False,
+                font=dict(size=14, color=cluster_color_map.get(cl, '#000000')),
+                bgcolor='rgba(255,255,255,0.8)', borderpad=4
+            ))
+
+        # Add naive legend entries
+        if naive_categories is not None and not movable:
+            for cat, col in naive_color_map.items():
+                fig.add_trace(go.Scatter(
+                    x=[None], y=[None], mode='markers',
+                    marker=dict(size=20, color='white', line=dict(width=3, color=col)),
+                    name=f'Keyword: {cat}', showlegend=True
+                ))
+
+        fig.update_layout(
+            title=dict(
+                text='Module-Regulator Network<br><sub>Modules colored by MegaGO cluster</sub>',
+                x=0.5, font=dict(size=20)),
+            showlegend=True, hovermode='closest',
+            width=1400, height=1000,
+            xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+            plot_bgcolor='white',
+            annotations=annotations,
+            legend=dict(x=1.02, y=1, bgcolor='rgba(255,255,255,0.9)',
+                        bordercolor='black', borderwidth=1, font=dict(size=10))
+        )
+        return fig
+
+    # -- Generate standard network --
+    fig_standard = _build_figure(movable=False)
     output_file = os.path.join(output_dir, 'interactive_module_network.html')
-    pyo.plot(fig, filename=output_file, auto_open=False)
+    pyo.plot(fig_standard, filename=output_file, auto_open=False)
     print(f"Interactive network visualization saved to: {output_file}")
-    
-    return fig
+
+    # -- Generate movable network --
+    fig_movable = _build_figure(movable=True)
+    output_movable = os.path.join(output_dir, 'interactive_module_network_movable.html')
+    fig_movable.write_html(output_movable, config={'editable': True})
+    print(f"Movable network visualization saved to: {output_movable}")
+
+    return fig_standard
 
 def create_cluster_heatmap(module_data, module_clusters, output_dir):
     """
@@ -1459,133 +2268,91 @@ def load_filtered_modules_from_networks(input_dir):
         print(f"Error reading Networks/specific_modules.txt: {e}")
         return None
 
-def create_megago_clustering_layout(nodes, edges, go_similarity_matrix=None, module_list=None):
+def _create_cluster_layout(nodes, edges, module_clusters):
     """
-    Create network layout using megaGO-inspired GO semantic clustering
-    Uses hierarchical clustering on GO semantic similarity for BIOLOGICAL PROCESS (BP) terms only
-    """
-    print("Creating megaGO-inspired GO clustering layout (BP terms only)...")
+    Position modules in a circle-per-cluster arrangement and place regulators
+    near their connected modules with type-based angular offsets.
 
-    # Get module nodes
+    Parameters:
+        nodes (list): node dicts with 'id' and 'type'
+        edges (list): edge dicts with 'source' and 'target'
+        module_clusters (dict): module_id (str) -> 'Cluster_N' string
+
+    Returns:
+        (pos, cluster_positions):
+            pos  – dict  node_id -> (x, y)
+            cluster_positions – dict  cluster_name -> (cx, cy) centre
+    """
+    print("Creating cluster-based layout...")
+
     module_nodes = [n for n in nodes if n['type'] == 'module']
 
-    if go_similarity_matrix is None or len(module_nodes) < 2:
-        print("No GO similarity data or insufficient modules, using spring layout")
-        G_temp = nx.Graph()
-        for node in nodes:
-            G_temp.add_node(node['id'])
-        for edge in edges:
-            G_temp.add_edge(edge['source'], edge['target'])
-        return nx.spring_layout(G_temp, k=8, iterations=100, seed=42, scale=10)
+    # -- Determine unique clusters and their centres --
+    unique_clusters = sorted(set(module_clusters.values()))
+    n_clusters = len(unique_clusters)
+    radius = 8
 
-    # Step 1: Apply hierarchical clustering to GO similarity matrix
-    distance_matrix = 1 - go_similarity_matrix
-
-    try:
-        # Use hierarchical clustering (similar to megaGO's approach)
-        n_clusters = min(5, len(module_nodes) // 3 + 1)  # More clusters for finer GO grouping
-
-        # Perform hierarchical clustering
-        linkage_matrix = linkage(distance_matrix, method='ward')
-        cluster_labels = fcluster(linkage_matrix, n_clusters, criterion='maxclust')
-        cluster_labels = cluster_labels - 1  # Convert to 0-based indexing
-
-    except Exception as e:
-        print(f"Hierarchical clustering failed: {e}, using single cluster")
-        cluster_labels = [0] * len(module_nodes)
-        n_clusters = 1
-
-    # Step 2: Create spatial layout based on GO clusters
-    print("Step 2: Creating BP GO-informed spatial layout...")
-    pos = {}
-
-    # Position modules based on their GO clusters using concentric circles with larger scale
-    if n_clusters > 1:
-        # Create concentric arrangement for better visualization with larger radius
-        if n_clusters <= 4:
-            # Single ring for small number of clusters - increased radius
-            cluster_centers = [(8 * np.cos(2*np.pi*i/n_clusters), 8 * np.sin(2*np.pi*i/n_clusters))
-                              for i in range(n_clusters)]
-        else:
-            # Multiple concentric rings for more clusters - increased radii
-            inner_clusters = n_clusters // 2
-            outer_clusters = n_clusters - inner_clusters
-
-            cluster_centers = []
-            # Inner ring - increased radius
-            for i in range(inner_clusters):
-                angle = 2*np.pi*i/inner_clusters
-                cluster_centers.append((6 * np.cos(angle), 6 * np.sin(angle)))
-
-            # Outer ring - increased radius
-            for i in range(outer_clusters):
-                angle = 2*np.pi*i/outer_clusters + np.pi/outer_clusters  # Offset for better spacing
-                cluster_centers.append((12 * np.cos(angle), 12 * np.sin(angle)))
+    if n_clusters <= 1:
+        cluster_positions = {unique_clusters[0] if unique_clusters else 'Cluster_1': (0, 0)}
+    elif n_clusters <= 6:
+        cluster_positions = {
+            c: (radius * np.cos(2 * np.pi * i / n_clusters),
+                radius * np.sin(2 * np.pi * i / n_clusters))
+            for i, c in enumerate(unique_clusters)
+        }
     else:
-        cluster_centers = [(0, 0)]
+        # Two concentric rings
+        inner = n_clusters // 2
+        outer = n_clusters - inner
+        cluster_positions = {}
+        for i, c in enumerate(unique_clusters[:inner]):
+            angle = 2 * np.pi * i / inner
+            cluster_positions[c] = (radius * 0.6 * np.cos(angle),
+                                    radius * 0.6 * np.sin(angle))
+        for i, c in enumerate(unique_clusters[inner:]):
+            angle = 2 * np.pi * i / outer + np.pi / outer
+            cluster_positions[c] = (radius * 1.2 * np.cos(angle),
+                                    radius * 1.2 * np.sin(angle))
 
-    np.random.seed(123)  # Different seed for GO clustering
+    np.random.seed(42)
 
-    # Map module IDs to positions with increased jitter for better spread
-    module_id_to_pos = {}
-    for i, (module_id, cluster) in enumerate(zip(module_list, cluster_labels)):
-        center = cluster_centers[cluster % len(cluster_centers)]
-        # Add GO-specific jitter pattern with larger spread
-        jitter_x = np.random.normal(0, 1.2)  # Increased jitter for better visibility
-        jitter_y = np.random.normal(0, 1.2)  # Increased jitter for better visibility
-        module_id_to_pos[f"Module_{module_id}"] = (center[0] + jitter_x, center[1] + jitter_y)
-
-    # Position all module nodes
+    # -- Position module nodes around their cluster centres --
+    pos = {}
     for node in module_nodes:
-        if node['id'] in module_id_to_pos:
-            pos[node['id']] = module_id_to_pos[node['id']]
-        else:
-            # Fallback position with larger spread
-            pos[node['id']] = (np.random.normal(0, 5), np.random.normal(0, 5))
+        mid = node['id'].replace('Module_', '')
+        cluster = module_clusters.get(mid, unique_clusters[0] if unique_clusters else 'Cluster_1')
+        cx, cy = cluster_positions.get(cluster, (0, 0))
+        jx = np.random.normal(0, 1.2)
+        jy = np.random.normal(0, 1.2)
+        pos[node['id']] = (cx + jx, cy + jy)
 
-    # Step 3: Position regulators with GO-aware placement
+    # -- Position regulators near connected modules with type offset --
     for node in nodes:
-        if node['type'] != 'module' and node['id'] not in pos:
-            # Find connected modules
-            connected_modules = []
-            for edge in edges:
-                if edge['source'] == node['id'] and edge['target'].startswith('Module_'):
-                    connected_modules.append(edge['target'])
-                elif edge['target'] == node['id'] and edge['source'].startswith('Module_'):
-                    connected_modules.append(edge['source'])
+        if node['type'] == 'module' or node['id'] in pos:
+            continue
+        connected = [e['target'] for e in edges if e['source'] == node['id'] and e['target'].startswith('Module_')]
+        connected += [e['source'] for e in edges if e['target'] == node['id'] and e['source'].startswith('Module_')]
+        connected_pos = [pos[m] for m in connected if m in pos]
 
-            if connected_modules:
-                # Position based on connected modules' GO clusters
-                connected_positions = [pos[mod] for mod in connected_modules if mod in pos]
-
-                if connected_positions:
-                    avg_x = np.mean([p[0] for p in connected_positions])
-                    avg_y = np.mean([p[1] for p in connected_positions])
-
-                    # Add offset based on regulator type with GO-specific spacing
-                    offset_distance = 2.5  # Increased offset for better visibility
-                    if node['type'] == 'TF':
-                        angle_offset = 0
-                    elif node['type'] == 'metabolite':
-                        angle_offset = 2*np.pi/3
-                    else:  # hPTM
-                        angle_offset = 4*np.pi/3
-
-                    # Add more variation for GO-based layout
-                    angle = angle_offset + np.random.normal(0, 0.6)  # Increased variation
-                    offset_x = offset_distance * np.cos(angle)
-                    offset_y = offset_distance * np.sin(angle)
-
-                    pos[node['id']] = (avg_x + offset_x, avg_y + offset_y)
-                else:
-                    pos[node['id']] = (np.random.normal(0, 4), np.random.normal(0, 4))
+        if connected_pos:
+            avg_x = np.mean([p[0] for p in connected_pos])
+            avg_y = np.mean([p[1] for p in connected_pos])
+            offset_dist = 2.5
+            # Type-based angular offset
+            if 'TF' in node['type']:
+                base_angle = 0
+            elif 'etabolite' in node['type'] or 'Metabolite' in node['type']:
+                base_angle = 2 * np.pi / 3
             else:
-                # Random position if no connections with larger spread
-                pos[node['id']] = (np.random.normal(0, 6), np.random.normal(0, 6))
-                pos[node['id']] = (np.random.normal(0, 1.5), np.random.normal(0, 1.5))
+                base_angle = 4 * np.pi / 3
+            angle = base_angle + np.random.normal(0, 0.6)
+            pos[node['id']] = (avg_x + offset_dist * np.cos(angle),
+                                avg_y + offset_dist * np.sin(angle))
+        else:
+            pos[node['id']] = (np.random.normal(0, 4), np.random.normal(0, 4))
 
-    print(f"Successfully created megaGO-inspired BP GO clustering layout")
-    return pos
+    print(f"Layout: {len(pos)} nodes positioned in {n_clusters} cluster(s)")
+    return pos, cluster_positions
 
 def create_module_hover_info(row, enrichment_data=None):
     """Create detailed hover information for module nodes with enhanced pathway details"""
@@ -1902,6 +2669,27 @@ def create_module_expression_heatmap(module_genes, modules_to_process, expressio
         traceback.print_exc()
         return False
 
+
+def _find_coherence_file(input_dir):
+    """Search multiple possible locations for Module_coherence_scores.txt."""
+    candidates = [
+        os.path.join(input_dir, 'Module_coherence_scores.txt'),
+        os.path.join(input_dir, 'Networks', 'Module_coherence_scores.txt'),
+        'Module_coherence_scores.txt',  # current directory (Nextflow flat staging)
+    ]
+    # Also search recursively
+    for root, dirs, files in os.walk(input_dir):
+        if 'Module_coherence_scores.txt' in files:
+            candidates.append(os.path.join(root, 'Module_coherence_scores.txt'))
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            print(f"Found coherence scores file: {candidate}")
+            return candidate
+    # Return default path (will trigger FileNotFoundError in caller)
+    print(f"Warning: Module_coherence_scores.txt not found in any searched location")
+    return os.path.join(input_dir, 'Module_coherence_scores.txt')
+
+
 def main():
     parser = argparse.ArgumentParser(description='Generate interactive module overview with functional clustering')
     parser.add_argument('--input_dir', type=str, required=True,
@@ -1910,15 +2698,25 @@ def main():
                        help='Output directory for results')
     parser.add_argument('--regulator_files', type=str, required=False, default='',
                        help='Comma-separated list of regulator files (format: Type:Path,Type:Path)')
+    parser.add_argument('--regulator_score_files', type=str, required=False, default='',
+                       help='Comma-separated list of regulator score files (format: Type:Path,Type:Path)')
     parser.add_argument('--enrichment_method', type=str, default='auto',
                        choices=['EnrichR', 'GSEA', 'auto'],
                        help='Enrichment analysis method to use')
     parser.add_argument('--n_clusters', type=int, default=5,
                        help='Number of functional clusters to create')
-    parser.add_argument('--use_megago', action='store_true', default=True,
-                       help='Use megago for advanced functional clustering (default: enabled)')
+    parser.add_argument('--clustering_method', type=str, default='megago',
+                       choices=['megago', 'keyword', 'both'],
+                       help='Clustering method: megago (default), keyword (naive GO keywords), or both')
+    # Keep --use_megago/--no_megago for backward compatibility
+    parser.add_argument('--use_megago', action='store_true', default=None,
+                       help='(Deprecated) Use megago clustering. Prefer --clustering_method.')
     parser.add_argument('--no_megago', dest='use_megago', action='store_false',
-                       help='Disable megago clustering and use simple pathway similarity')
+                       help='(Deprecated) Disable megago clustering. Prefer --clustering_method keyword.')
+    parser.add_argument('--pkn_file', type=str, default=None,
+                       help='Path to PKN file (Lemonite_PKN.tsv) for edge categorization')
+    parser.add_argument('--metabolite_mapping', type=str, default=None,
+                       help='Path to metabolite name mapping file (name_map.csv) for HMDB resolution')
     parser.add_argument('--prioritize_by_expression', action='store_true', default=True,
                        help='Enable expression-based module prioritization (default: enabled)')
     parser.add_argument('--no_prioritize_by_expression', dest='prioritize_by_expression', action='store_false',
@@ -1934,6 +2732,14 @@ def main():
     
     args = parser.parse_args()
     
+    # -- Backward compatibility: map deprecated --use_megago/--no_megago to --clustering_method --
+    if args.use_megago is not None:
+        if args.use_megago:
+            args.clustering_method = 'megago'
+        else:
+            args.clustering_method = 'keyword'
+        print(f"Note: --use_megago/--no_megago is deprecated. Mapped to --clustering_method {args.clustering_method}")
+    
     # Create output directory
     output_dir = os.path.join(args.output_dir, 'Module_Overview')
     os.makedirs(output_dir, exist_ok=True)
@@ -1948,7 +2754,11 @@ def main():
     print(f"Number of clusters: {args.n_clusters}")
     print(f"Coherence threshold: {args.coherence_threshold}")
     print(f"Expression prioritization: {args.prioritize_by_expression}")
-    print(f"Use megago clustering: {args.use_megago}")
+    print(f"Clustering method: {args.clustering_method}")
+    if args.pkn_file:
+        print(f"PKN file: {args.pkn_file}")
+    if args.metabolite_mapping:
+        print(f"Metabolite mapping: {args.metabolite_mapping}")
     if args.prioritize_by_expression:
         print(f"Grouping column: {args.group_column}")
     
@@ -1970,6 +2780,26 @@ def main():
     for reg_type, reg_path in regulator_configs.items():
         print(f"Reading {reg_type} regulators from {reg_path}")
         regulators_dict[reg_type] = get_regulators(reg_path)
+    
+    # Parse and load regulator score files
+    regulator_scores_dict = {}
+    if args.regulator_score_files:
+        for score_config in args.regulator_score_files.split(','):
+            if ':' in score_config:
+                reg_type, score_path = score_config.split(':', 1)
+                print(f"Reading {reg_type} regulator scores from {score_path.strip()}")
+                regulator_scores_dict[reg_type] = load_regulator_scores(score_path.strip())
+    else:
+        # Auto-discover score files from input_dir
+        for reg_type in regulator_configs:
+            score_file = os.path.join(args.input_dir, f'{reg_type}.selected_regulators_scores.txt')
+            if os.path.exists(score_file):
+                print(f"Auto-discovered {reg_type} regulator scores: {score_file}")
+                regulator_scores_dict[reg_type] = load_regulator_scores(score_file)
+    
+    if regulator_scores_dict:
+        for reg_type, df in regulator_scores_dict.items():
+            print(f"  {reg_type}: {len(df)} regulator-module pairs loaded")
     
     module_genes = get_regulators(os.path.join(args.input_dir, 'clusters_list.txt'))
     
@@ -1999,6 +2829,98 @@ def main():
             # If no direction column, assume all are up-regulated for compatibility
             enrichment_data[key]['__direction__'] = 'Up'
     
+    # Load PPI enrichment data if available
+    print("\nLoading PPI enrichment data...")
+    ppi_enrichment_data = {}
+    moduleviewer_dir = os.path.join(args.input_dir, 'ModuleViewer_files')
+    
+    # Search multiple locations for PPI enrichment file (Nextflow may stage files flat)
+    ppi_enrichment_candidates = [
+        os.path.join(moduleviewer_dir, 'PPI_enrichment_results.csv'),
+        os.path.join(args.input_dir, 'PPI_enrichment_results.csv'),  # flat staging
+        'PPI_enrichment_results.csv',  # current directory
+    ]
+    # Also search recursively in input_dir
+    for root, dirs, files in os.walk(args.input_dir):
+        if 'PPI_enrichment_results.csv' in files:
+            ppi_enrichment_candidates.append(os.path.join(root, 'PPI_enrichment_results.csv'))
+    
+    ppi_enrichment_file = None
+    for candidate in ppi_enrichment_candidates:
+        if os.path.exists(candidate):
+            ppi_enrichment_file = candidate
+            break
+    
+    if ppi_enrichment_file:
+        try:
+            ppi_df = pd.read_csv(ppi_enrichment_file)
+            print(f"✓ Loaded PPI enrichment data from {ppi_enrichment_file}: {len(ppi_df)} modules")
+            
+            # Create dictionary for easy lookup - convert to int first to handle float module IDs
+            for _, row in ppi_df.iterrows():
+                module_id = str(int(row['Module']))
+                ppi_enrichment_data[module_id] = {
+                    'PPI_FDR': row['FDR'],
+                    'PPI_fold_enrichment': row['Fold_enrichment']
+                }
+            
+            # Summary statistics
+            n_significant = (ppi_df['FDR'] < 0.05).sum()
+            print(f"  - Modules significantly enriched for PPIs (FDR < 0.05): {n_significant}")
+            print(f"  - Mean fold enrichment: {ppi_df['Fold_enrichment'].mean():.2f}")
+        except Exception as e:
+            print(f"Warning: Could not load PPI enrichment data: {e}")
+            ppi_enrichment_data = {}
+    else:
+        print(f"PPI enrichment file not found in any searched location:")
+        for c in ppi_enrichment_candidates[:3]:
+            print(f"  - {c}")
+        print("Continuing without PPI enrichment data...")
+        ppi_enrichment_data = {}
+    
+    # Load metabolite-gene interaction enrichment data if available
+    print("\nLoading metabolite-gene interaction enrichment data...")
+    metgene_enrichment_data = {}
+    
+    metgene_enrichment_candidates = [
+        os.path.join(moduleviewer_dir, 'Metabolite_Gene_enrichment_results.csv'),
+        os.path.join(args.input_dir, 'Metabolite_Gene_enrichment_results.csv'),  # flat staging
+        'Metabolite_Gene_enrichment_results.csv',  # current directory
+    ]
+    for root, dirs, files in os.walk(args.input_dir):
+        if 'Metabolite_Gene_enrichment_results.csv' in files:
+            metgene_enrichment_candidates.append(os.path.join(root, 'Metabolite_Gene_enrichment_results.csv'))
+    
+    metgene_enrichment_file = None
+    for candidate in metgene_enrichment_candidates:
+        if os.path.exists(candidate):
+            metgene_enrichment_file = candidate
+            break
+    
+    if metgene_enrichment_file:
+        try:
+            metgene_df = pd.read_csv(metgene_enrichment_file)
+            print(f"✓ Loaded metabolite-gene enrichment data from {metgene_enrichment_file}: {len(metgene_df)} modules")
+            
+            for _, row in metgene_df.iterrows():
+                module_id = str(int(row['Module']))
+                metgene_enrichment_data[module_id] = {
+                    'MetGene_FDR': row['FDR'],
+                    'MetGene_fold_enrichment': row['Fold_enrichment'],
+                    'MetGene_N_interactions': int(row['N_interactions_observed'])
+                }
+            
+            n_significant = (metgene_df['FDR'] < 0.05).sum()
+            print(f"  - Modules significantly enriched (FDR < 0.05): {n_significant}")
+            print(f"  - Mean fold enrichment: {metgene_df['Fold_enrichment'].mean():.2f}")
+        except Exception as e:
+            print(f"Warning: Could not load metabolite-gene enrichment data: {e}")
+            metgene_enrichment_data = {}
+    else:
+        print("Metabolite-gene enrichment file not found in any searched location")
+        print("Continuing without metabolite-gene enrichment data...")
+        metgene_enrichment_data = {}
+    
     # Load coherence filtering - prioritize Networks/specific_modules.txt over coherence scores file
     
     print("\nLoading coherence-filtered modules...")    # First, try to load from Networks/specific_modules.txt (created by lemontree_to_network.py)
@@ -2011,13 +2933,14 @@ def main():
         print(f"   Processing {len(modules_to_process)} modules that passed coherence filtering")
         
         # Load coherence scores file for informational purposes only
-        coherence_file = os.path.join(args.input_dir, 'Module_coherence_scores.txt')
+        # Search multiple possible locations for the coherence scores file
+        coherence_file = _find_coherence_file(args.input_dir)
         _, coherence_df = load_coherence_filtered_modules(coherence_file, args.coherence_threshold)
         
     else:
         # Fallback to coherence scores file if Networks/specific_modules.txt is not available
         print("Networks/specific_modules.txt not found, falling back to coherence scores file")
-        coherence_file = os.path.join(args.input_dir, 'Module_coherence_scores.txt')
+        coherence_file = _find_coherence_file(args.input_dir)
         filtered_module_ids, coherence_df = load_coherence_filtered_modules(coherence_file, args.coherence_threshold)
         
         if filtered_module_ids is not None:
@@ -2114,6 +3037,24 @@ def main():
         # Store pathways for clustering
         module_pathways[module_id] = list(all_pathways)
         
+        # Add PPI enrichment data if available
+        if module_id in ppi_enrichment_data:
+            module_entry['PPI_FDR'] = ppi_enrichment_data[module_id]['PPI_FDR']
+            module_entry['PPI_fold_enrichment'] = ppi_enrichment_data[module_id]['PPI_fold_enrichment']
+        else:
+            module_entry['PPI_FDR'] = 'NA'
+            module_entry['PPI_fold_enrichment'] = 'NA'
+        
+        # Add metabolite-gene interaction enrichment data if available
+        if module_id in metgene_enrichment_data:
+            module_entry['MetGene_FDR'] = metgene_enrichment_data[module_id]['MetGene_FDR']
+            module_entry['MetGene_fold_enrichment'] = metgene_enrichment_data[module_id]['MetGene_fold_enrichment']
+            module_entry['MetGene_N_interactions'] = metgene_enrichment_data[module_id]['MetGene_N_interactions']
+        else:
+            module_entry['MetGene_FDR'] = 'NA'
+            module_entry['MetGene_fold_enrichment'] = 'NA'
+            module_entry['MetGene_N_interactions'] = 'NA'
+        
         module_data.append(module_entry)
     
     print(f"Prepared data for {len(module_data)} modules")
@@ -2171,25 +3112,107 @@ def main():
                 if f.endswith(('.txt', '.csv')):
                     print(f"  - {f}")
     
-    # Perform functional clustering using megago
-    print(f"\nPerforming functional clustering...")
-    module_clusters, go_similarity_matrix = megago_cluster_modules(module_pathways, args.n_clusters, args.use_megago, 
-                                           enrichment_data, output_dir)
+    # -- Determine clustering method and run clustering --
+    print(f"\nPerforming functional clustering (method={args.clustering_method})...")
     
-    # Create interactive visualizations
+    use_megago_flag = args.clustering_method in ('megago', 'both')
+    module_clusters, go_similarity_matrix = megago_cluster_modules(
+        module_pathways, args.n_clusters, use_megago_flag, enrichment_data, output_dir
+    )
+    
+    # Naive keyword clustering (always run when method is 'keyword' or 'both')
+    naive_categories = None
+    if args.clustering_method in ('keyword', 'both'):
+        print("Running naive keyword clustering on GO terms...")
+        naive_categories = categorize_modules_by_keywords(enrichment_data)
+        if args.clustering_method == 'keyword':
+            # When keyword-only, use naive categories as the primary module_clusters
+            module_clusters = {mid: cat for mid, cat in naive_categories.items()}
+    
+    # If 'both', compute Rand Index for comparison
+    if args.clustering_method == 'both' and naive_categories:
+        shared = sorted(set(module_clusters.keys()) & set(naive_categories.keys()))
+        if len(shared) > 1:
+            ri = rand_index_from_labels(
+                [module_clusters[m] for m in shared],
+                [naive_categories[m] for m in shared]
+            )
+            print(f"Rand Index (megaGO vs keyword): {ri:.3f}")
+    
+    # -- Load PKN data for edge categorization --
+    pkn_lookup = None
+    name_to_hmdb = None
+    if args.pkn_file and os.path.exists(args.pkn_file):
+        mapping_path = args.metabolite_mapping if (args.metabolite_mapping and os.path.exists(args.metabolite_mapping)) else None
+        pkn_lookup, name_to_hmdb = load_pkn_data(args.pkn_file, mapping_path)
+    
+    # Build module_genes_map for PKN edge matching
+    module_genes_map = {}
+    for mid, genes in module_genes.items():
+        module_genes_map[mid] = genes
+    
+    # Build module overview DataFrame for enriched hover text
+    module_overview_df = pd.DataFrame(module_data)
+    
+    # Build combined enrichment DataFrame with Database column
+    enrichment_all_frames = []
+    db_name_map = {
+        'bp': 'GO_BP', 'mf': 'GO_MF', 'cc': 'GO_CC',
+        'reactome': 'Reactome', 'kegg': 'KEGG'
+    }
+    for key, df in enrichment_data.items():
+        if df is not None and not df.empty:
+            df_copy = df.copy()
+            df_copy['Database'] = db_name_map.get(key, key)
+            enrichment_all_frames.append(df_copy)
+    enrichment_all_df = pd.concat(enrichment_all_frames, ignore_index=True) if enrichment_all_frames else pd.DataFrame()
+    
+    # -- Create interactive visualizations --
     print(f"\nCreating interactive visualizations...")
     
-    # Create network visualization with MegaGO clustering
-    network_fig = create_interactive_network_visualization(module_data, module_clusters, output_dir, enrichment_data, go_similarity_matrix)
+    network_fig = create_interactive_network_visualization(
+        module_data, module_clusters, output_dir,
+        enrichment_data=enrichment_data,
+        go_similarity_matrix=go_similarity_matrix,
+        module_overview_df=module_overview_df,
+        enrichment_all_df=enrichment_all_df,
+        naive_categories=naive_categories,
+        pkn_lookup=pkn_lookup,
+        name_to_hmdb=name_to_hmdb,
+        module_genes_map=module_genes_map
+    )
     
-    # COMMENTED OUT: Create cluster heatmap - not needed in output
-    # heatmap_fig, cluster_stats = create_cluster_heatmap(module_data, module_clusters, output_dir)
+    # Export Cytoscape-compatible TSV files
+    nodes_for_cytoscape = []
+    edges_for_cytoscape = []
+    # Re-build minimal nodes/edges for export (same logic as in visualization)
+    for module_info in module_data:
+        mid = str(module_info['Module'])
+        nodes_for_cytoscape.append({'id': f"Module_{mid}", 'type': 'module'})
+        for col in module_info:
+            if col.endswith('_regulators') and module_info.get(col, 'NA') != 'NA':
+                rtype = col.replace('_regulators', '')
+                for reg in module_info[col].split('|'):
+                    reg = reg.strip()
+                    if reg:
+                        nodes_for_cytoscape.append({'id': reg, 'type': rtype})
+                        edges_for_cytoscape.append({'source': reg, 'target': f"Module_{mid}", 'type': f"{rtype}_regulation"})
+    # Annotate edges for export
+    if pkn_lookup and module_genes_map:
+        edges_for_cytoscape = annotate_edges_with_category(edges_for_cytoscape, pkn_lookup, name_to_hmdb or {}, module_genes_map)
+    else:
+        for e in edges_for_cytoscape:
+            e['category'] = 'Other'
+    
+    export_cytoscape_files(nodes_for_cytoscape, edges_for_cytoscape, module_clusters,
+                           module_overview_df, naive_categories, output_dir)
+    
     cluster_stats = pd.DataFrame()  # Empty DataFrame to avoid errors
     
     # Add cluster information to module data
     for module_entry in module_data:
         module_id = str(module_entry['Module'])
-        module_entry['Functional_Cluster'] = module_clusters.get(module_id, 0)
+        module_entry['Functional_Cluster'] = module_clusters.get(module_id, 'Cluster_0')
         
         # Add expression rank if available
         if expression_priority and module_id in expression_priority:
@@ -2227,6 +3250,17 @@ def main():
     output_file = os.path.join(output_dir, 'Module_Overview.csv')
     module_df.to_csv(output_file, sep='\t', index=False)
     print(f"Enhanced module overview saved to: {output_file}")
+    
+    # Generate regulator ranking tables HTML
+    regulator_tables_html = None
+    if regulator_scores_dict:
+        regulator_tables_path = generate_regulator_tables_html(regulator_scores_dict, output_dir)
+        # Read the generated HTML for embedding in comprehensive report
+        try:
+            with open(regulator_tables_path, 'r') as f:
+                regulator_tables_html = f.read()
+        except Exception as e:
+            print(f"Warning: Could not read regulator tables HTML: {e}")
     
     # Create Module Expression Heatmap if differential expression was performed
     if args.prioritize_by_expression and expression_file and metadata_file:
@@ -2282,20 +3316,56 @@ def main():
         print(f"Expression-prioritized modules: {len(expression_results_df)}")
         print(f"Significantly different modules: {significant_count}")
     
+    # Print PPI enrichment summary
+    if ppi_enrichment_data:
+        modules_with_ppi = sum(1 for entry in module_data if entry.get('PPI_FDR') != 'NA')
+        significant_ppi = sum(1 for entry in module_data if entry.get('PPI_FDR') != 'NA' and entry.get('PPI_FDR') < 0.05)
+        print(f"PPI enrichment analysis: {modules_with_ppi} modules analyzed")
+        print(f"Significantly enriched modules (FDR < 0.05): {significant_ppi}")
+    
+    # Print metabolite-gene enrichment summary
+    if metgene_enrichment_data:
+        modules_with_metgene = sum(1 for entry in module_data if entry.get('MetGene_FDR') != 'NA')
+        significant_metgene = sum(1 for entry in module_data if entry.get('MetGene_FDR') != 'NA' and entry.get('MetGene_FDR') < 0.05)
+        print(f"Metabolite-gene enrichment analysis: {modules_with_metgene} modules analyzed")
+        print(f"Significantly enriched modules (FDR < 0.05): {significant_metgene}")
+    
     # Print cluster summary
     cluster_counts = Counter(module_clusters.values())
     print(f"\nCluster distribution:")
     for cluster_id in sorted(cluster_counts.keys()):
         count = cluster_counts[cluster_id]
-        print(f"  Cluster {cluster_id}: {count} modules")
+        print(f"  {cluster_id}: {count} modules")
     
     print(f"\nFiles created:")
     print(f"  - {output_file}")
-    # COMMENTED OUT: These files are no longer generated
-    # print(f"  - {cluster_file}")
-    # print(f"  - {os.path.join(output_dir, 'cluster_characteristics_heatmap.html')}")
-    # print(f"  - {os.path.join(output_dir, 'cluster_statistics.csv')}")
-    print(f"  - {os.path.join(output_dir, 'interactive_module_network.html')}")
+    
+    network_html_path = os.path.join(output_dir, 'interactive_module_network.html')
+    print(f"  - {network_html_path}")
+    
+    movable_html_path = os.path.join(output_dir, 'interactive_module_network_movable.html')
+    if os.path.exists(movable_html_path):
+        print(f"  - {movable_html_path}")
+    
+    cytoscape_edges = os.path.join(output_dir, 'module_network_edges.txt')
+    cytoscape_nodes = os.path.join(output_dir, 'module_network_node_attributes.txt')
+    if os.path.exists(cytoscape_edges):
+        print(f"  - {cytoscape_edges}")
+        print(f"  - {cytoscape_nodes}")
+    
+    regulator_html_path = None
+    if regulator_scores_dict:
+        regulator_html_path = os.path.join(output_dir, 'regulator_rankings.html')
+        print(f"  - {regulator_html_path}")
+
+    
+    # Generate comprehensive HTML report combining network and regulator tables
+    comprehensive_report = create_comprehensive_html_report(
+        regulator_tables_html_path=regulator_html_path,
+        network_html_path=network_html_path,
+        output_dir=output_dir
+    )
+    print(f"  - {comprehensive_report}")
     
     if args.prioritize_by_expression and not expression_results_df.empty:
         print(f"  - {os.path.join(output_dir, 'module_expression_analysis.csv')}")

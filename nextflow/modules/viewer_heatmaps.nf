@@ -6,7 +6,9 @@ process MODULE_VIEWER_HEATMAPS {
     path viewer_files
     path filtered_modules
     path input_dir
+    path expression_file        // LemonPreprocessed_expression.txt
     path preprocessed_file
+    path omics_files             // omics-specific LemonPreprocessed_*.txt files
     val run_id
     val regulator_types
     
@@ -15,11 +17,23 @@ process MODULE_VIEWER_HEATMAPS {
     path "module_viewer_summary.txt", emit: summary
     
     script:
-    def modules_arg = filtered_modules.name != 'NO_FILE' ? "--modules \$(cat ${filtered_modules} | tr '\n' ',')" : ""
+    def modules_arg = filtered_modules.name != 'NO_FILE' ? "--modules \$(cat ${filtered_modules} | tr '\n' ',' | sed 's/,\$//')" : ""
     def top_n_percent_regulators = params.top_n_percent_regulators ?: 2.0
     
     """
     # Create output directory
+    # stage expression data explicitly
+    mkdir -p Preprocessing
+    cp "${expression_file}" Preprocessing/LemonPreprocessed_expression.txt
+
+    # Stage omics-specific preprocessed files (e.g. LemonPreprocessed_proteomics.txt)
+    # These are passed via the omics_files input channel from PREPROCESSING_TFA
+    for f in ${omics_files}; do
+        if [ -f "\$f" ]; then
+            cp -L "\$f" Preprocessing/ || true
+        fi
+    done
+
     mkdir -p heatmaps
     # Ensure canonical ModuleViewer_files directory exists and copy staged viewer files into it
     mkdir -p ModuleViewer_files
@@ -33,56 +47,44 @@ process MODULE_VIEWER_HEATMAPS {
     done
     # sample_mapping.mvf is expected to be present inside the staged viewer_files directory
     
-    # Also stage preprocessing file(s) so the module viewer can find expression data.
-    # Need both LemonPreprocessed_expression.txt (for main heatmap) and LemonPreprocessed_complete.txt (for regulator blocks)
-    # Try a few strategies and follow symlinks: 1) look under the staged input_dir, 2) search the workdir (following symlinks), 3) fallback to any results/*/LemonTree/Preprocessing path.
+    # Also stage preprocessing file(s) so the module viewer can find expression/omics data.
+    # Need LemonPreprocessed_expression.txt (main heatmap), LemonPreprocessed_complete.txt (TF regulators),
+    # and LemonPreprocessed_*.txt for each omics type (e.g. LemonPreprocessed_proteomics.txt, LemonPreprocessed_metabolomics.txt).
+    # Try a few strategies and follow symlinks: 1) look under the staged input_dir, 2) search the workdir, 3) fallback to results paths.
     mkdir -p Preprocessing
     
-    # Copy LemonPreprocessed_expression.txt
+    # Copy ALL LemonPreprocessed_*.txt files (expression, complete, and omics-specific)
     # 1) staged input_dir paths (if available)
-    if [ -d "${input_dir}/Preprocessing" ] && [ -f "${input_dir}/Preprocessing/LemonPreprocessed_expression.txt" ]; then
-        cp -L "${input_dir}/Preprocessing/LemonPreprocessed_expression.txt" Preprocessing/ || true
+    if [ -d "${input_dir}/Preprocessing" ]; then
+        for f in ${input_dir}/Preprocessing/LemonPreprocessed_*.txt; do
+            [ -f "\$f" ] && cp -L "\$f" Preprocessing/ || true
+        done
     fi
-    if [ -f "${input_dir}/LemonPreprocessed_expression.txt" ]; then
-        cp -L "${input_dir}/LemonPreprocessed_expression.txt" Preprocessing/ || true
-    fi
-    # 2) search the current workdir and follow symlinks
-    PREPROC_EXPR=\$(find -L . -type f -name 'LemonPreprocessed_expression.txt' -print -quit 2>/dev/null || true)
-    if [ -n "\$PREPROC_EXPR" ]; then
-        cp -L "\$PREPROC_EXPR" Preprocessing/ || true
-    fi
-    # 3) try common results path(s) if present
-    for p in ./results/*/LemonTree/Preprocessing ./results/*/Preprocessing ../results/*/LemonTree/Preprocessing; do
-        if ls \$p/LemonPreprocessed_expression.txt 1> /dev/null 2>&1; then
-            cp -L \$p/LemonPreprocessed_expression.txt Preprocessing/ || true
-            break
-        fi
+    for f in ${input_dir}/LemonPreprocessed_*.txt; do
+        [ -f "\$f" ] && cp -L "\$f" Preprocessing/ || true
     done
-    
-    # Copy LemonPreprocessed_complete.txt
-    # 1) staged input_dir paths (if available)
-    if [ -d "${input_dir}/Preprocessing" ] && [ -f "${input_dir}/Preprocessing/LemonPreprocessed_complete.txt" ]; then
-        cp -L "${input_dir}/Preprocessing/LemonPreprocessed_complete.txt" Preprocessing/ || true
-    fi
-    if [ -f "${input_dir}/LemonPreprocessed_complete.txt" ]; then
-        cp -L "${input_dir}/LemonPreprocessed_complete.txt" Preprocessing/ || true
-    fi
     # 1b) copy the explicitly passed preprocessed_file (deterministic channel)
     if [ -n "${preprocessed_file}" ] && [ -f "${preprocessed_file}" ]; then
         cp -L "${preprocessed_file}" Preprocessing/ || true
     fi
-    # 2) search the current workdir and follow symlinks to find any LemonPreprocessed_complete.txt
-    PREPROC_SRC=\$(find -L . -type f -name 'LemonPreprocessed_complete.txt' -print -quit 2>/dev/null || true)
-    if [ -n "\$PREPROC_SRC" ]; then
-        cp -L "\$PREPROC_SRC" Preprocessing/ || true
-    fi
+    # 2) search the current workdir (shallow) for any LemonPreprocessed_*.txt
+    # Use -maxdepth 2 to avoid following the input_dir symlink into work/ (causes a loop)
+    find -L . -maxdepth 2 -type f -name 'LemonPreprocessed_*.txt' -print 2>/dev/null | while read -r src; do
+        fname=\$(basename "\$src")
+        [ ! -f "Preprocessing/\$fname" ] && cp -L "\$src" Preprocessing/ || true
+    done || true
     # 3) try common results path(s) if present
     for p in ./results/*/LemonTree/Preprocessing ./results/*/Preprocessing ../results/*/LemonTree/Preprocessing; do
-        if ls \$p/LemonPreprocessed_complete.txt 1> /dev/null 2>&1; then
-            cp -L \$p/LemonPreprocessed_complete.txt Preprocessing/ || true
-            break
-        fi
+        for f in \$p/LemonPreprocessed_*.txt; do
+            if [ -f "\$f" ]; then
+                fname=\$(basename "\$f")
+                [ ! -f "Preprocessing/\$fname" ] && cp -L "\$f" Preprocessing/ || true
+            fi
+        done
     done
+    
+    echo "Staged preprocessing files:"
+    ls -la Preprocessing/LemonPreprocessed_*.txt 2>/dev/null || echo "  (none found)"
     
     # Build regulator_files argument dynamically based on regulator_types
     # Parse regulator_types (format: "Type:Prefix,Type:Prefix")
@@ -129,10 +131,11 @@ process MODULE_VIEWER_HEATMAPS {
         echo "Error: module_viewer.py not found"
         exit 1
     fi
-    python3 \$SCRIPT_PATH \\
+    PYTHONNOUSERSITE=1 python3 \$SCRIPT_PATH \\
         --input_dir . \\
         --output_dir heatmaps \\
         --regulator_files "\$regulator_files_arg" \\
+        --regulator_types "${regulator_types}" \\
         --dpi 300 \\
         --show_regulator_scores \\
         --annotation_types "${params.heatmap_metadata_cols ?: params.metadata_columns ?: 'diagnosis'}" \\

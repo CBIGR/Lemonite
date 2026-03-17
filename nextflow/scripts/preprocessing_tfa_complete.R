@@ -43,23 +43,32 @@ opt_parser <- OptionParser(option_list=option_list)
 opt <- parse_args(opt_parser)
 
 # Parse regulator types configuration
+# Format: "Prefix1:DataFile1[:DataType1],Prefix2:DataFile2[:DataType2]"
+# DataType is optional: 'c' for continuous (default), 'd' for discrete/binary
 parse_regulator_config <- function(regulator_types_str) {
   configs <- list()
+  data_types <- list()
   pairs <- strsplit(regulator_types_str, ",")[[1]]
   
   for (pair in pairs) {
     pair <- trimws(pair)
     parts <- strsplit(pair, ":")[[1]]
-    if (length(parts) == 2) {
+    if (length(parts) >= 2) {
       prefix <- trimws(parts[1])
       filename <- trimws(parts[2])
+      data_type <- ifelse(length(parts) >= 3, tolower(trimws(parts[3])), "c")
+      if (!data_type %in% c("c", "d")) {
+        warning(paste("Invalid data type '", data_type, "' for", prefix, "- using 'c' (continuous). Valid: 'c' or 'd'"))
+        data_type <- "c"
+      }
       configs[[prefix]] <- filename
+      data_types[[prefix]] <- data_type
     } else {
-      warning(paste("Invalid regulator config format:", pair, "(expected Prefix:DataFile)"))
+      warning(paste("Invalid regulator config format:", pair, "(expected Prefix:DataFile[:DataType])"))
     }
   }
   
-  return(configs)
+  return(list(configs = configs, data_types = data_types))
 }
 
 # Validate required inputs
@@ -69,10 +78,14 @@ if (is.null(opt$expression) || is.null(opt$metadata)){
 }
 
 # Parse regulator configurations
-regulator_configs <- parse_regulator_config(opt$regulator_types)
+reg_parsed <- parse_regulator_config(opt$regulator_types)
+regulator_configs <- reg_parsed$configs
+regulator_data_types <- reg_parsed$data_types
 cat("\n Regulator types configuration:\n")
 for (prefix in names(regulator_configs)) {
-  cat(sprintf("   - %s: %s\n", prefix, regulator_configs[[prefix]]))
+  dt <- regulator_data_types[[prefix]]
+  dt_label <- ifelse(dt == "d", "discrete/binary", "continuous")
+  cat(sprintf("   - %s: %s (%s)\n", prefix, regulator_configs[[prefix]], dt_label))
 }
 
 # Set working directory and variables
@@ -215,7 +228,13 @@ other_regulator_files <- list()
 
 for (prefix in names(regulator_configs)) {
   filename <- regulator_configs[[prefix]]
+  data_type <- regulator_data_types[[prefix]]
   is_tf_list <- grepl("TF", prefix, ignore.case = TRUE) || grepl("_list\\.txt$", filename, ignore.case = TRUE)
+  
+  # Discrete/binary regulators are never TF lists — they contain abundance data (0/1)
+  if (data_type == "d") {
+    is_tf_list <- FALSE
+  }
   
   # Auto-replace Lovering_TF_list.txt with organism-specific version
   if (is_tf_list) {
@@ -1000,7 +1019,7 @@ pareto_scale <- function(x, centering = TRUE) {
 }
 
 # Define function to process omics data (metabolomics or lipidomics)
-process_omics_data <- function(omics_file, omics_type, use_pareto = TRUE) {
+process_omics_data <- function(omics_file, omics_type, use_pareto = TRUE, data_type = "c") {
   cat("\n")
   cat("=======================================================================\n")
   cat("Processing", omics_type, "data...\n")
@@ -1036,14 +1055,23 @@ process_omics_data <- function(omics_file, omics_type, use_pareto = TRUE) {
     })
   })
   
-  # Process row names
-  if (!"Name" %in% colnames(omics_data)) {
-    rownames(omics_data) <- omics_data[[1]]
-    omics_data[[1]] <- NULL
-  } else {
-    rownames(omics_data) <- omics_data$Name
+  # Convert to data.frame immediately - fread returns data.table which silently
+  # ignores rowname assignment, causing feature names to be lost
+  omics_data <- as.data.frame(omics_data, check.names = FALSE)
+  
+  cat(sprintf("  Data dimensions: %d features x %d columns\n", nrow(omics_data), ncol(omics_data)))
+  
+  # Extract feature names from 'Name' column (or first column) and set as rownames
+  if ("Name" %in% colnames(omics_data)) {
+    feature_names <- as.character(omics_data$Name)
     omics_data$Name <- NULL
+  } else {
+    feature_names <- as.character(omics_data[[1]])
+    omics_data[[1]] <- NULL
   }
+  rownames(omics_data) <- feature_names
+  
+  cat(sprintf("  First 5 feature names: %s\n", paste(head(rownames(omics_data), 5), collapse=", ")))
   
   # Clean row names
   rownames(omics_data) <- str_replace_all(rownames(omics_data), ' ', '_')
@@ -1051,6 +1079,8 @@ process_omics_data <- function(omics_file, omics_type, use_pareto = TRUE) {
   rownames(omics_data) <- str_replace_all(rownames(omics_data), ':', '_')
   rownames(omics_data) <- str_replace_all(rownames(omics_data), '\\+', '_')
   rownames(omics_data) <- str_replace_all(rownames(omics_data), '_$', '')
+  
+  cat(sprintf("  First 5 feature names (cleaned): %s\n", paste(head(rownames(omics_data), 5), collapse=", ")))
   
   # Convert to numeric and handle NAs
   for (col_idx in 1:ncol(omics_data)) {
@@ -1066,28 +1096,36 @@ process_omics_data <- function(omics_file, omics_type, use_pareto = TRUE) {
   median_val <- median(as.matrix(omics_data), na.rm = TRUE)
   max_val <- max(as.matrix(omics_data), na.rm = TRUE)
   
-  already_log_transformed <- FALSE
-  if (median_val < 100 && max_val < 100) {
-    cat("[WARNING]  Data appears to be already log-transformed (median:", round(median_val, 2), ", max:", round(max_val, 2), ")\n")
-    cat("   Skipping log transformation to avoid double-logging\n")
-    already_log_transformed <- TRUE
-  }
-  
-  # Log transformation (only if not already log-transformed)
-  if (!already_log_transformed) {
-    cat("Applying log transformation...\n")
-    omics_data <- log(omics_data + 1)
+  # For discrete/binary data, skip all transformations and scaling
+  if (data_type == "d") {
+    unique_vals <- sort(unique(as.vector(as.matrix(omics_data))))
+    cat(sprintf("[INFO] Discrete/binary data detected — skipping log transformation and scaling\n"))
+    cat(sprintf("  Unique values found: %s\n", paste(unique_vals, collapse = ", ")))
+    cat(sprintf("  Data will be used as-is for LemonTree discrete regulator assignment\n"))
   } else {
-    cat("Using data as-is (already in log space)\n")
-  }
-  
-  # Apply scaling based on omics type
-  if (use_omics_specific_scaling && use_pareto) {
-    cat("Applying Pareto scaling for", omics_type, "...\n")
-    omics_data <- as.data.frame(pareto_scale(omics_data, centering = TRUE))
-  } else {
-    cat("Applying standard (z-score) scaling for", omics_type, "...\n")
-    omics_data <- as.data.frame(t(scale(t(omics_data))))
+    already_log_transformed <- FALSE
+    if (median_val < 100 && max_val < 100) {
+      cat("[WARNING]  Data appears to be already log-transformed (median:", round(median_val, 2), ", max:", round(max_val, 2), ")\n")
+      cat("   Skipping log transformation to avoid double-logging\n")
+      already_log_transformed <- TRUE
+    }
+    
+    # Log transformation (only if not already log-transformed)
+    if (!already_log_transformed) {
+      cat("Applying log transformation...\n")
+      omics_data <- log(omics_data + 1)
+    } else {
+      cat("Using data as-is (already in log space)\n")
+    }
+    
+    # Apply scaling based on omics type
+    if (use_omics_specific_scaling && use_pareto) {
+      cat("Applying Pareto scaling for", omics_type, "...\n")
+      omics_data <- as.data.frame(pareto_scale(omics_data, centering = TRUE))
+    } else {
+      cat("Applying standard (z-score) scaling for", omics_type, "...\n")
+      omics_data <- as.data.frame(t(scale(t(omics_data))))
+    }
   }
   
   # Create visualization
@@ -1117,10 +1155,11 @@ processed_regulator_data <- list()
 
 for (prefix in names(other_regulator_files)) {
   filepath <- other_regulator_files[[prefix]]
+  data_type <- regulator_data_types[[prefix]]
   
   if (file.exists(filepath)) {
-    cat(sprintf("\n Processing %s data from: %s\n", prefix, filepath))
-    omics_data <- process_omics_data(filepath, prefix, use_pareto = TRUE)
+    cat(sprintf("\n Processing %s data from: %s (data_type=%s)\n", prefix, filepath, data_type))
+    omics_data <- process_omics_data(filepath, prefix, use_pareto = TRUE, data_type = data_type)
     processed_regulator_data[[prefix]] <- omics_data
   } else {
     cat(sprintf("[WARNING]  Warning: File not found for %s: %s\n", prefix, filepath))
@@ -1168,10 +1207,13 @@ for (prefix in names(processed_regulator_data)) {
   omics_data$symbol <- row.names(omics_data)
   omics_data <- omics_data[, c(ncol(omics_data), ncol(omics_data)-1, 1:(ncol(omics_data)-2))]
   
-  # Save preprocessed file
-  output_filename <- paste0('./LemonTree/Preprocessing/LemonPreprocessed_', tolower(prefix), '.txt')
+  # Derive output filename from the original data file name (not the prefix) so that
+  # e.g. Metabolites:Metabolomics.txt -> LemonPreprocessed_metabolomics.txt
+  #      Proteins:proteomics.txt      -> LemonPreprocessed_proteomics.txt
+  data_file_basename <- tolower(tools::file_path_sans_ext(basename(regulator_configs[[prefix]])))
+  output_filename <- paste0('./LemonTree/Preprocessing/LemonPreprocessed_', data_file_basename, '.txt')
   write.table(omics_data, output_filename, sep = '\t', quote=FALSE, row.names=FALSE)
-  cat(sprintf("[OK] Saved: LemonPreprocessed_%s.txt\n", tolower(prefix)))
+  cat(sprintf("[OK] Saved: LemonPreprocessed_%s.txt\n", data_file_basename))
   
   # Add to datasets list
   omics_datasets[[length(omics_datasets) + 1]] <- omics_data
@@ -1180,10 +1222,22 @@ for (prefix in names(processed_regulator_data)) {
   regulator_names <- rownames(processed_regulator_data[[prefix]])
   all_regulator_names[[prefix]] <- regulator_names
   
-  # Write regulator list file
+  # Write regulator list file (keep prefix-based naming for downstream LemonTree compatibility)
   list_filename <- paste0('./LemonTree/Preprocessing/', tolower(prefix), '.txt')
-  write.table(regulator_names, list_filename, quote = FALSE, row.names = FALSE, col.names=FALSE)
-  cat(sprintf("[OK] Saved: %s regulator list (%d features) -> %s\n", tolower(prefix), length(regulator_names), list_filename))
+  data_type <- regulator_data_types[[prefix]]
+  if (!is.null(data_type) && data_type == "d") {
+    # Write 2-column format with 'd' flag as required by LemonTree for discrete regulators
+    # Format: regulator_name<tab>d (one per line)
+    reg_df <- data.frame(name = regulator_names, type = rep("d", length(regulator_names)))
+    write.table(reg_df, list_filename, quote = FALSE, row.names = FALSE, col.names = FALSE, sep = "\t")
+    cat(sprintf("[OK] Saved: %s DISCRETE regulator list (2-column format with 'd' flag, %d features) -> %s\n",
+                tolower(prefix), length(regulator_names), list_filename))
+  } else {
+    write.table(regulator_names, list_filename, quote = FALSE, row.names = FALSE, col.names=FALSE)
+    cat(sprintf("[OK] Saved: %s regulator list (%d features, e.g. %s) -> %s\n",
+                tolower(prefix), length(regulator_names),
+                paste(head(regulator_names, 3), collapse=", "), list_filename))
+  }
 }
 
 # Handle TF list file separately (it's a list of gene names, not abundance data)
@@ -1237,6 +1291,8 @@ cat("   - Format: Tab-separated with sample IDs as row names\n")
 cat("   - Dimensions:", nrow(DESeq_groups), "samples x", ncol(DESeq_groups), "columns\n")
 cat("   - Columns:", paste(colnames(DESeq_groups), collapse=", "), "\n")
 
+write.table(DESeq_groups_all, './LemonTree/Preprocessing/DESeq_groups.txt', quote=FALSE, sep='\t', row.names = TRUE)
+
 # Validate that we have the required columns for downstream analysis
 required_for_pipeline <- c(contrast_column)
 available_for_pipeline <- intersect(required_for_pipeline, colnames(DESeq_groups))
@@ -1247,10 +1303,7 @@ if (length(missing_for_pipeline) > 0) {
       paste(missing_for_pipeline, collapse=", "), "\n")
 }
 
-write.table(DESeq_groups_all, './LemonTree/Preprocessing/DESeq_groups.txt', quote=FALSE, sep='\t', row.names = TRUE)
-cat("[OK] DESeq_groups.txt written successfully\n")
 
-# Validate metadata compatibility with downstream modules
 cat("\n Pipeline compatibility check:\n")
 cat("   - [OK] DESeq_groups.txt: Compatible with DESeq2 and overview modules\n")
 cat("   - [OK] Sample IDs: Available as row names for sample matching\n")
@@ -1279,7 +1332,8 @@ if (!is.null(TF_file) && file.exists(TF_file)) {
   cat(sprintf("   - %s.txt (TF list)\n", tolower(TF_prefix)))
 }
 for (prefix in names(all_regulator_names)) {
-  cat(sprintf("   - LemonPreprocessed_%s.txt\n", tolower(prefix)))
+  data_file_basename <- tolower(tools::file_path_sans_ext(basename(regulator_configs[[prefix]])))
+  cat(sprintf("   - LemonPreprocessed_%s.txt\n", data_file_basename))
   cat(sprintf("   - %s.txt (regulator list)\n", tolower(prefix)))
 }
 

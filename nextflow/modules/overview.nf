@@ -9,6 +9,8 @@ process MODULE_OVERVIEW_INTERACTIVE {
     path lemontree_outputs
     path expression_file
     path deseq_groups_file
+    path pkn_file
+    path metabolite_mapping
     val run_id
     val regulator_types
 
@@ -28,6 +30,7 @@ process MODULE_OVERVIEW_INTERACTIVE {
                            enrichment_input
     def use_megago = params.use_megago
     def prioritize_by_expression = params.prioritize_by_expression
+    def clustering_method = params.clustering_method ?: 'megago'
     
     """
     # Create working directory
@@ -57,6 +60,9 @@ process MODULE_OVERVIEW_INTERACTIVE {
     echo "  N clusters: ${n_clusters}"
     echo "  Coherence threshold: ${coherence_threshold}"
     echo "  Use megago: ${use_megago}"
+    echo "  Clustering method: ${clustering_method}"
+    echo "  PKN file: ${pkn_file}"
+    echo "  Metabolite mapping: ${metabolite_mapping}"
     # Debug: list enrichment dir if present
     if [ -d "Enrichment" ]; then
         echo "=== Enrichment directory contents ==="
@@ -66,6 +72,7 @@ process MODULE_OVERVIEW_INTERACTIVE {
     
     # Build regulator_files argument dynamically based on regulator_types
     REGULATOR_FILES=""
+    REGULATOR_SCORE_FILES=""
     REGULATOR_TYPES="${regulator_types}"
     
     # Parse regulator types and find corresponding files
@@ -89,6 +96,19 @@ process MODULE_OVERVIEW_INTERACTIVE {
         else
             echo "Warning: Regulator file \$REG_FILE not found"
         fi
+        
+        # Also look for regulator score files (selected_regulators_scores.txt)
+        SCORE_FILE="\${TYPE_NAME}.selected_regulators_scores.txt"
+        if [ -f "\$SCORE_FILE" ]; then
+            if [ -n "\$REGULATOR_SCORE_FILES" ]; then
+                REGULATOR_SCORE_FILES="\$REGULATOR_SCORE_FILES,\${TYPE_NAME}:\${SCORE_FILE}"
+            else
+                REGULATOR_SCORE_FILES="\${TYPE_NAME}:\${SCORE_FILE}"
+            fi
+            echo "Found \${TYPE_NAME} regulator score file: \$SCORE_FILE"
+        else
+            echo "Warning: Regulator score file \$SCORE_FILE not found"
+        fi
     done
     
     # Construct command arguments
@@ -99,14 +119,27 @@ process MODULE_OVERVIEW_INTERACTIVE {
     if [ -n "\$REGULATOR_FILES" ]; then
         args="\$args --regulator_files \$REGULATOR_FILES"
     fi
+    if [ -n "\$REGULATOR_SCORE_FILES" ]; then
+        args="\$args --regulator_score_files \$REGULATOR_SCORE_FILES"
+    fi
     
-    # Add megago clustering if enabled
-    if [ "${use_megago}" = "true" ]; then
-        args="\$args --n_clusters ${n_clusters}"
-        echo "Megago functional clustering enabled with ${n_clusters} clusters"
-    else
-        args="\$args --n_clusters 1"
-        echo "Megago clustering disabled - using simple module grouping"
+    # Always pass n_clusters; clustering algorithm is controlled by --clustering_method
+    args="\$args --n_clusters ${n_clusters}"
+    echo "Functional clustering: method=${clustering_method}, n_clusters=${n_clusters}"
+    
+    # Add clustering method
+    args="\$args --clustering_method ${clustering_method}"
+    
+    # Add PKN file for edge categorization if available
+    if [ -f "${pkn_file}" ]; then
+        args="\$args --pkn_file ${pkn_file}"
+        echo "PKN file provided for edge categorization"
+    fi
+    
+    # Add metabolite mapping if available
+    if [ -f "${metabolite_mapping}" ]; then
+        args="\$args --metabolite_mapping ${metabolite_mapping}"
+        echo "Metabolite name mapping provided"
     fi
     
     # Expression prioritization is enabled by default but can be disabled
@@ -140,11 +173,11 @@ process MODULE_OVERVIEW_INTERACTIVE {
     stub:
     """
     mkdir -p Module_Overview
-    touch Module_Overview/Module_Overview_Interactive.csv
-    touch Module_Overview/module_functional_clusters.csv
+    touch Module_Overview/Module_Overview.csv
     touch Module_Overview/interactive_module_network.html
-    touch Module_Overview/cluster_characteristics_heatmap.html
-    touch Module_Overview/cluster_statistics.csv
+    touch Module_Overview/interactive_module_network_movable.html
+    touch Module_Overview/module_network_edges.txt
+    touch Module_Overview/module_network_node_attributes.txt
     touch Module_Overview/module_expression_analysis.csv
     """
 }

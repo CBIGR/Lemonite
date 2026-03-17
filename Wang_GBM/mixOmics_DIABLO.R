@@ -559,13 +559,14 @@ for (comp in 1:n_components) {
 
 cat(sprintf("Feature weights saved in: %s\n", weights_dir))
 
+#########
 
+# Now create barplots that show feature weights on the different components, grouped per omics type
 
-# Now create a heatmap that shows feature weights on the different components, grouped per omics type
 library(dplyr)
 library(tidyr)
 library(ggplot2)
-library(patchwork) 
+library(patchwork)
 
 # --- 1. Extract loadings ---
 loadings_list <- lapply(final.diablo.model$loadings, function(x) x[, 1:4, drop = FALSE])
@@ -575,8 +576,10 @@ loadings_matrix <- do.call(rbind, loadings_list)
 
 # --- 2. Convert to long format ---
 df_long <- as.data.frame(loadings_matrix) %>%
-  mutate(Feature = feature_names,
-         Block = blocks) %>%
+  mutate(
+    Feature = feature_names,
+    Block = blocks
+  ) %>%
   pivot_longer(
     cols = starts_with("Comp"),
     names_to = "Component",
@@ -596,91 +599,192 @@ df_top <- df_long_nonzero %>%
   slice_max(order_by = abs(Loading), n = topN) %>%
   ungroup()
 
-# --- 5. Reorder features independently per Component ---
+# --- 5. Reorder features independently per component ---
 df_top <- df_top %>%
   group_by(Component) %>%
-  mutate(Feature_plot = factor(Feature, levels = Feature[order(abs(Loading))])) %>%
+  mutate(
+    Feature_plot = factor(Feature, levels = Feature[order(abs(Loading))])
+  ) %>%
   ungroup()
 
-# --- 6. Create separate plots per Component ---
+# --- 6. Create plots per Component (same strategy as before) ---
 plots <- lapply(unique(df_top$Component), function(comp) {
-  df_sub <- df_top %>% filter(Component == comp)
   
-  # Extract the component number from 'comp1', 'comp2', etc.
-  comp_num <- gsub("comp", "", comp)
+  df_sub <- df_top %>% filter(Component == comp)
+  comp_num <- gsub("Comp|comp", "", comp)
   
   ggplot(df_sub, aes(x = Feature_plot, y = Loading, fill = Block)) +
-    geom_col(width = 0.8) +  # thinner bars
-    coord_flip() +
-    scale_x_discrete(position = "top") +   # move y-axis labels to right (top after coord_flip)
-    theme_bw() +
-    theme(
-      axis.text.x = element_text(size = 8, margin = margin(l = 15)),  # adjust margin
-      axis.title.x = element_text(margin = margin(l = 15)),          
-      plot.margin = margin(5, 20, 5, 40),
-      legend.position = "left"  # move legend to left
+    geom_col(width = 0.8, color = "black", size = 0.5) +
+    scale_x_discrete(
+      labels = function(x)
+        ifelse(nchar(x) > 20, paste0(substr(x, 1, 20), "..."), x)
     ) +
-    labs(
-      y = "Feature",
-      x = "Feature Loading",
-      title = paste("Component", comp_num)  # Nice title: Component 1, 2, ...
-    )
-})
-
-
-
-# Arrange plots in a single column
-final_plot <- wrap_plots(plots, ncol = 1) + 
-  plot_annotation(title = "Top 5 DIABLO Features per Component and Block")
-
-# Display plot
-final_plot
-
-ggsave(paste0(base_dir, 'results/MixOmics/Top_DIABLO_features_per_component.png'),
-       width = 8, height = 12)
-
-# --- Create version with legend and consistent colors ---
-plots_with_legend <- lapply(unique(df_top$Component), function(comp) {
-  df_sub <- df_top %>% filter(Component == comp)
-  
-  # Extract the component number from 'comp1', 'comp2', etc.
-  comp_num <- gsub("comp", "", comp)
-  
-  ggplot(df_sub, aes(x = Feature_plot, y = Loading, fill = Block)) +
-    geom_col(width = 0.8) +  # thinner bars
-    coord_flip() +
-    scale_x_discrete(position = "top") +   # move y-axis labels to right (top after coord_flip)
     scale_fill_manual(
       values = c("Lipidomics" = "#F8766D", "Transcriptomics" = "#00BA38", "Metabolomics" = "#619CFF"),
       name = "Omics Type"
     ) +
     theme_bw() +
     theme(
-      axis.text.x = element_text(size = 8, margin = margin(l = 15)),
-      axis.title.x = element_text(margin = margin(l = 15)),          
-      plot.margin = margin(5, 20, 5, 40),
-      legend.position = "right",
-      legend.title = element_text(size = 10, face = "bold"),
-      legend.text = element_text(size = 9)
+      axis.title.x = element_blank(),
+      axis.text.x = element_text(
+        angle = 45,
+        hjust = 1,
+        vjust = 1,
+        size = 11,
+        margin = margin(t = 10)
+      ),
+      plot.margin = margin(10, 20, 80, 20),
+      plot.title = element_text(hjust = 0.5, face = "bold"),
+      legend.position = "right"
     ) +
     labs(
-      y = "Feature",
-      x = "Feature Loading",
+      y = "Feature Loading",
       title = paste("Component", comp_num)
     )
 })
 
-final_plot_with_legend <- wrap_plots(plots_with_legend, ncol = 1, guides = "collect") + 
-  plot_annotation(title = "Top 5 DIABLO Features per Component and Block") &
-  theme(legend.position = "right")
+# --- 7. Arrange side-by-side with shared legend ---
+final_plot <- wrap_plots(
+  plots,
+  ncol = length(plots),
+  guides = "collect"
+) +
+  plot_annotation(title = "Top 5 DIABLO Features per Component and Block")
 
-ggsave(paste0(base_dir, 'results/MixOmics/Top_DIABLO_features_per_component_withlegend.png'),
-       plot = final_plot_with_legend,
-       width = 10, height = 12)
+# --- 8. Display ---
+final_plot
 
-cat("Saved both versions:\n")
-cat("  - Top_DIABLO_features_per_component.png (original)\n")
-cat("  - Top_DIABLO_features_per_component_withlegend.png (with legend)\n")
+ggsave(paste0(base_dir, 'results/MixOmics/Top_DIABLO_features_per_component.png'),
+       width = 18, height = 7)
+
+
+# Commented out: vertical version that was overwriting horizontal version
+# (Keeping the horizontal orientation as per user request with 45-degree x-axis labels)
+# 
+# #######
+# 
+# # Now create a heatmap that shows feature weights on the different components, grouped per omics type
+# library(dplyr)
+# library(tidyr)
+# library(ggplot2)
+# library(patchwork) 
+# 
+# # --- 1. Extract loadings ---
+# loadings_list <- lapply(final.diablo.model$loadings, function(x) x[, 1:4, drop = FALSE])
+# blocks <- rep(names(loadings_list), sapply(loadings_list, nrow))
+# feature_names <- unlist(lapply(loadings_list, rownames))
+# loadings_matrix <- do.call(rbind, loadings_list)
+# 
+# # --- 2. Convert to long format ---
+# df_long <- as.data.frame(loadings_matrix) %>%
+#   mutate(Feature = feature_names,
+#          Block = blocks) %>%
+#   pivot_longer(
+#     cols = starts_with("Comp"),
+#     names_to = "Component",
+#     values_to = "Loading"
+#   )
+# 
+# # remove block Y
+# df_long <- df_long %>% filter(Block != "Y")
+# 
+# # --- 3. Keep only features selected for their component ---
+# df_long_nonzero <- df_long %>% filter(Loading != 0)
+# 
+# # --- 4. Select top 5 features per block per component ---
+# topN <- 5
+# df_top <- df_long_nonzero %>%
+#   group_by(Component, Block) %>%
+#   slice_max(order_by = abs(Loading), n = topN) %>%
+#   ungroup()
+# 
+# # --- 5. Reorder features independently per Component ---
+# df_top <- df_top %>%
+#   group_by(Component) %>%
+#   mutate(Feature_plot = factor(Feature, levels = Feature[order(abs(Loading))])) %>%
+#   ungroup()
+# 
+# # --- 6. Create separate plots per Component ---
+# plots <- lapply(unique(df_top$Component), function(comp) {
+#   df_sub <- df_top %>% filter(Component == comp)
+#   
+#   # Extract the component number from 'comp1', 'comp2', etc.
+#   comp_num <- gsub("comp", "", comp)
+#   
+#   ggplot(df_sub, aes(x = Feature_plot, y = Loading, fill = Block)) +
+#     geom_col(width = 0.8) +  # thinner bars
+#     coord_flip() +
+#     scale_x_discrete(position = "top") +   # move y-axis labels to right (top after coord_flip)
+#     theme_bw() +
+#     theme(
+#       axis.text.x = element_text(size = 8, margin = margin(l = 15)),  # adjust margin
+#       axis.title.x = element_text(margin = margin(l = 15)),          
+#       plot.margin = margin(5, 20, 5, 40),
+#       legend.position = "left"  # move legend to left
+#     ) +
+#     labs(
+#       y = "Feature",
+#       x = "Feature Loading",
+#       title = paste("Component", comp_num)  # Nice title: Component 1, 2, ...
+#     )
+# })
+# 
+# 
+# 
+# # Arrange plots in a single column
+# final_plot <- wrap_plots(plots, ncol = 1) + 
+#   plot_annotation(title = "Top 5 DIABLO Features per Component and Block")
+# 
+# # Display plot
+# final_plot
+# 
+# ggsave(paste0(base_dir, 'results/MixOmics/Top_DIABLO_features_per_component.png'),
+#        width = 8, height = 12)
+# 
+# # --- Create version with legend and consistent colors ---
+# plots_with_legend <- lapply(unique(df_top$Component), function(comp) {
+#   df_sub <- df_top %>% filter(Component == comp)
+#   
+#   # Extract the component number from 'comp1', 'comp2', etc.
+#   comp_num <- gsub("comp", "", comp)
+#   
+#   ggplot(df_sub, aes(x = Feature_plot, y = Loading, fill = Block)) +
+#     geom_col(width = 0.8, color = "black", size = 0.5) +  # thinner bars with black outline
+#     coord_flip() +
+#     scale_x_discrete(position = "top") +   # move y-axis labels to right (top after coord_flip)
+#     scale_fill_manual(
+#       values = c("Lipidomics" = "#F8766D", "Transcriptomics" = "#00BA38", "Metabolomics" = "#619CFF"),
+#       name = "Omics Type"
+#     ) +
+#     theme_bw() +
+#     theme(
+#       axis.text.x = element_text(size = 8, margin = margin(l = 15)),
+#       axis.title.x = element_text(margin = margin(l = 15)),          
+#       plot.margin = margin(5, 20, 5, 40),
+#       legend.position = "right",
+#       legend.title = element_text(size = 10, face = "bold"),
+#       legend.text = element_text(size = 9)
+#     ) +
+#     labs(
+#       y = "Feature",
+#       x = "Feature Loading",
+#       title = paste("Component", comp_num)
+#     )
+# })
+# 
+# final_plot_with_legend <- wrap_plots(plots_with_legend, ncol = 1, guides = "collect") + 
+#   plot_annotation(title = "Top 5 DIABLO Features per Component and Block") &
+#   theme(legend.position = "right")
+# 
+# ggsave(paste0(base_dir, 'results/MixOmics/Top_DIABLO_features_per_component_withlegend.png'),
+#        plot = final_plot_with_legend,
+#        width = 10, height = 12)
+# 
+# cat("Saved both versions:\n")
+# cat("  - Top_DIABLO_features_per_component.png (original)\n")
+# cat("  - Top_DIABLO_features_per_component_withlegend.png (with legend)\n")
+
+
 
 
 ###########################################################################################

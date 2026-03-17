@@ -265,9 +265,27 @@ else:
 
 **Format:** Same as Metabolomics.txt (tab-separated, features as rows, samples as columns) - samples IDs must match 
 **Purpose:** Additional omics to assign as regulators
-**Note:** Must be continuous data (not binary)
+**Data types:** Supports both continuous and discrete/binary data
+- **Continuous** (default): Data will be log-transformed and scaled (Pareto or z-score)
+- **Discrete/binary** (append `:d` to config): Data will be used as-is (no transformation or scaling). LemonTree will use its native discrete regulator scoring.
+
+**Example discrete data format:**
+```tsv
+Name	Sample1	Sample2	Sample3	Sample4
+Mutation_A	1	0	1	0
+Mutation_B	0	0	1	1
+Treatment_X	1	1	0	0
+```
+
+**Configuration:** Specify in `--regulator_types` parameter. Append `:d` for discrete data:
+```bash
+# Continuous regulators (default)
+--regulator_types "TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt"
+
+# Mix of continuous and discrete regulators
+--regulator_types "TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt,ClinicalParams:clinical_data.txt:d"
+```
 **File naming:** Can use any descriptive name (e.g., `Proteomics.txt`, `Lipidomics.tsv`, `Kinases.txt`)
-**Configuration:** Specify in `--regulator_types` parameter to include in analysis
 
 #### 4. Metadata.txt (Sample Metadata)
 
@@ -410,20 +428,22 @@ nextflow run main.nf --input_dir /path/to/data --organism mouse
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `--regulator_types` | String | `"TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt"` | Comma-separated Prefix:DataFile pairs |
+| `--regulator_types` | String | `"TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt"` | Comma-separated Prefix:DataFile[:DataType] pairs |
 
 **Format Specification:**
 ```
-Prefix1:DataFile1,Prefix2:DataFile2,Prefix3:DataFile3,...
+Prefix1:DataFile1[:DataType1],Prefix2:DataFile2[:DataType2],Prefix3:DataFile3[:DataType3],...
 ```
 
 Where:
 - **Prefix**: Used throughout pipeline for naming intermediate/output files (e.g., `TFs`, `Metabolites`, `Lipids`, `Proteins`)
 - **DataFile**: Name of the input data file in your `data/` directory
+- **DataType** (optional): `c` for continuous (default) or `d` for discrete/binary data
 
 **Important:**
 - For **TFs**: DataFile should be a list file (e.g., `Lovering_TF_list.txt`)
 - For **other regulators**: DataFile should be abundance data (e.g., `Metabolomics.txt`, `Proteomics.txt`)
+- For **discrete/binary regulators**: Append `:d` to skip scaling and use LemonTree's discrete scoring (e.g., `ClinicalParams:clinical.txt:d`)
 
 **Examples:**
 
@@ -445,6 +465,12 @@ Where:
 
 # Single regulator type (TFs only)
 --regulator_types "TFs:Lovering_TF_list.txt"
+
+# Discrete/binary regulators (e.g., clinical presence/absence, mutation status)
+--regulator_types "TFs:Lovering_TF_list.txt,ClinicalParams:clinical_binary.txt:d"
+
+# Mix of continuous and discrete regulators
+--regulator_types "TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt,Mutations:mutation_status.txt:d"
 ```
 
 **File mapping example:**
@@ -632,6 +658,7 @@ for each module:
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `--use_megago` | Boolean | `false` | Use [megago](http://megago.ugent.be/about) for functional clustering ⚠️ |
+| `--clustering_method` | String | `megago` | Clustering method: `megago` (semantic GO similarity via megaGO), `keyword` (naive GO-keyword matching), or `both` (run both and report Rand Index) |
 | `--prioritize_by_expression` | Boolean | `true` | Rank modules by differential expression |
 
 **⚠️ Megago functional clustering:**
@@ -640,6 +667,19 @@ for each module:
 - Groups modules by functional similarity (top 10 upregulated pathways)
 - Uses GO term enrichment overlap while considering hierarchical organization of GO terms
 - **For HPC systems**: Use `--use_megago true` with the `hpc` profile (see below)
+
+**Clustering methods explained:**
+- **megago** (default): Uses the megaGO command-line tool for GO semantic similarity, then Ward hierarchical clustering. Produces biologically meaningful groupings. Requires `--use_megago true` and is computationally intensive.
+- **keyword**: A fast, naive clustering method that assigns modules to predefined functional categories (Immune/Inflammation, Metabolism/Energy, Cell Cycle/Proliferation, Signaling, etc.) based on keyword matching in enriched GO terms. No external tools needed.
+- **both**: Runs both methods and computes a Rand Index to compare their agreement. The megaGO clustering is used as the primary layout; keyword categories are shown as border colors on each module node.
+
+**PKN-based edge categorization:**
+The module overview network automatically categorizes regulator-module edges when a Prior Knowledge Network (PKN) file is available (passed via the nextflow pipeline). Edge categories are:
+- **Causal**: Supported by LINCS or chEMBL evidence in the PKN
+- **Metabolic_pathway**: Supported by Human1 GEM metabolic pathway evidence
+- **Other**: No direct PKN support found
+
+These categories are reflected as distinct edge styles in the interactive HTML and in the exported Cytoscape files.
 
 #### PKN Evaluation Parameters
 
@@ -830,10 +870,29 @@ Master table with columns:
 - `Top_3_pathways_Reactome`: Top 3 enriched pathways in Reactome 2025
 - `Top_3_pathways_KEGG`: Top 3 enriched pathways in KEGG 2021
 - `Expression_adjustedpval`: adjusted p-value for module differential expression
+- `Functional_Cluster`: Cluster assignment (e.g., `Cluster_1`, `Cluster_2`, etc.)
 
 **`interactive_module_network.html`**
 - Interactive Plotly-based visualization of the integrated regulator-module network
-- Additional information displayed when hovering over a node
+- Module nodes colored by megaGO (or keyword) cluster assignment
+- Hover information includes: top 3 enriched pathways per database (with p-values), cluster assignment, naive keyword category (if `--clustering_method both`), and incoming/outgoing edge details
+- Edge styles reflect PKN-based categorization when a PKN file is provided:
+  - Solid arrows: Causal edges (LINCS/chEMBL evidence)
+  - Dotted with circle markers: Metabolic pathway edges (Human1 GEM)
+  - Dashed: Other/unknown support
+- Module nodes optionally show border color for naive keyword functional category when `--clustering_method both`
+
+**`interactive_module_network_movable.html`**
+- Same visualization with draggable nodes using Plotly's `editable` config, allowing manual layout adjustments in the browser
+
+**`module_network_edges.txt`**
+- Cytoscape-compatible tab-separated edge list
+- Columns: `Source`, `Target`, `Type`, `Category` (Causal / Metabolic_pathway / Other)
+- Importable directly into Cytoscape for further network analysis
+
+**`module_network_node_attributes.txt`**
+- Cytoscape-compatible tab-separated node attribute table
+- Columns: `Node`, `Type`, `MegaGO_Cluster`, `Naive_Category` (if applicable), plus module-specific fields from the overview (coherence, top pathways, expression p-value)
 
 ---
 
@@ -851,12 +910,16 @@ The pipeline supports any number and type of regulators through the `--regulator
 
 # Example: Add kinases and microRNAs + use a custom TF list
 --regulator_types "TFs:MyTFs.txt,Kinases:Kinase_abundance.txt,miRNAs:miRNA_expression.txt"
+
+# Example: Add discrete/binary regulators (e.g., clinical parameters, mutation status)
+--regulator_types "TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt,ClinicalParams:clinical_binary.txt:d"
 ```
 
 **Requirements:**
 1. Create your data file in the `data/` directory with the exact name specified
 2. For abundance data: Format as tab-separated with features as rows, samples as columns
 3. For TF lists: Format as plain text with one gene symbol per line
+4. For discrete/binary data: Format as tab-separated with features as rows, samples as columns (values should be 0/1 or discrete categories). Append `:d` to the regulator_types entry.
 
 **TF List File Example (`data/MyTFs.txt`):**
 ```txt
@@ -877,7 +940,8 @@ CDK1	123.4	234.5	345.6
 **How it works:**
 1. **Preprocessing stage**: 
    - For TF lists: Copied to `Preprocessing/` directory with lowercase prefix (e.g., `tfs.txt`)
-   - For abundance data: Normalized, scaled, and row names extracted to create regulator list (e.g., `proteins.txt`)
+   - For continuous abundance data: Normalized, scaled, and row names extracted to create regulator list (e.g., `proteins.txt`)
+   - For discrete/binary data (`:d`): Used as-is without log transformation or scaling. Regulator list is written in 2-column format (`name\td`) to enable LemonTree's native discrete scoring.
    - All abundance data merged into `LemonPreprocessed_complete.txt`
 
 2. **LemonTree clustering**: 

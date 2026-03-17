@@ -70,9 +70,10 @@ opt <- parse_args(opt_parser)
 
 # Function to parse regulator types string
 parse_regulator_types <- function(regulator_types_str) {
-  # Parse regulator types string into list of prefix:datafile pairs
-  # Format: 'Prefix1:DataFile1,Prefix2:DataFile2'
-  # Example: 'TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt,Lipids:Lipidomics.txt'
+  # Parse regulator types string into list of prefix:datafile[:datatype] entries
+  # Format: 'Prefix1:DataFile1[:DataType1],Prefix2:DataFile2[:DataType2]'
+  # DataType is optional: 'c' for continuous (default), 'd' for discrete/binary
+  # Example: 'TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt,ClinicalParams:clinical.txt:d'
   
   configs <- list()
   config_strings <- strsplit(regulator_types_str, ",")[[1]]
@@ -84,10 +85,12 @@ parse_regulator_types <- function(regulator_types_str) {
       if (length(parts) >= 2) {
         prefix <- trimws(parts[1])
         data_file <- trimws(parts[2])
+        data_type <- ifelse(length(parts) >= 3, tolower(trimws(parts[3])), "c")
         configs[[length(configs) + 1]] <- list(
           prefix = prefix,       # Used for output filenames
           type = prefix,         # Used as edge type (same as prefix)
-          data_file = data_file  # Store for reference
+          data_file = data_file, # Store for reference
+          data_type = data_type  # 'c' for continuous, 'd' for discrete/binary
         )
       }
     }
@@ -628,8 +631,8 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
   cat("Running EnrichR for", length(clusters_to_genes), "modules using", n_threads, "threads...\n")
   
   # For EnrichR, use more aggressive parallelization but with rate limiting
-  # Increase thread limit for better performance on high-core systems
-  effective_threads <- min(n_threads, 6)  # Increased from 4 to 6 threads
+  # Use all available threads specified by user
+  effective_threads <- n_threads  # Use all specified threads
   cat("Using", effective_threads, "threads for EnrichR with API rate limiting\n")
   
   # Set up parallel processing for EnrichR
@@ -845,8 +848,8 @@ cat("\n[OK] All output files are compatible with module_overview.py downstream p
 #### EnrichR analysis on target genes of regulators - parallellized - courtesy by chatGPT
 ######################################################################################################################################
 
-# Parallel plan - use more aggressive threading for regulator analysis
-effective_threads_regulators <- min(n_threads, 5)  # Increased from 3 to 5 threads
+# Parallel plan - use all available threads for regulator analysis
+effective_threads_regulators <- n_threads  # Use all specified threads
 cat("Using", effective_threads_regulators, "threads for regulator enrichment analysis\n")
 plan(multisession, workers = effective_threads_regulators)
 
