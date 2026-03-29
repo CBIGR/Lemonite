@@ -176,12 +176,11 @@ results/{run_id}/LemonTree/
 
 📖 **[Complete pipeline documentation & advanced usage →](https://github.com/CBIGR/Lemonite/wiki)**
 
-
 ---
 
 ## Reference
 
-If you use LemonIte in your research, please cite:
+If you use Lemonite in your research, please cite:
 
 ```bibtex
 @article{vandemoortele2025lemonite,
@@ -194,14 +193,10 @@ If you use LemonIte in your research, please cite:
 ```
 
 
-```
-
----
 
 ## Support & Contact
 
 - **Report Issues**: [GitHub Issues](https://github.com/CBIGR/Lemonite/issues)
-- **Lab Website**: [Vermeirssen Lab](https://www.crig.ugent.be/en/prof-vanessa-vermeirssen-phd)
 
 ---
 
