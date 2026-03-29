@@ -20,9 +20,9 @@
 ### Key Features
 
 - **Multi-omics Integration**: Integrate transcriptomics, metabolomics, lipidomics, and other omics data types
-- **Flexible Regulator Assignment**: Support for TFs, metabolites, lipids, and or other omics (binary data currenlty not supported)
+- **Flexible Regulator Assignment**: Support for TFs, metabolites, lipids, and or other omics (binary data currently not supported)
 - **Prior Knowledge Networks**: Lemonite knowledge graph for validation of metabolite-gene and protein-protein interactions
-- **Rich Visualizations**: Interactive network graphs, module heatmaps, in silico validation with knowledge graph,and enrichment results
+- **Rich Visualizations**: Interactive network graphs, module heatmaps, in silico validation with knowledge graph, and enrichment results
 
 ---
 
@@ -236,7 +236,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ```
 MIT License
 
-Copyright (c) 2025 vermeirssenlab
+Copyright (c) 2026 CBIGR - Lab Vanessa Vermeirssen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
