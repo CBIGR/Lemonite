@@ -179,7 +179,7 @@ results/{run_id}/LemonTree/
 
 ---
 
-## 📚 Citation
+## Reference
 
 If you use LemonIte in your research, please cite:
 
@@ -193,37 +193,21 @@ If you use LemonIte in your research, please cite:
 }
 ```
 
-**Original LemonTree algorithm:**
-```bibtex
-@article{bonnet2015lemontree,
-  title={Integrative Multi-omics Module Network Inference with Lemon-Tree},
-  author={Bonnet, Eric and Calzone, Laurence and Michoel, Tom},
-  journal={PLOS Computational Biology},
-  volume={11},
-  number={2},
-  pages={e1003983},
-  year={2015}
-}
+
 ```
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome and appreciated! Send me an email and we can discuss the implementation of your requested feature into the Lemonite pipeline.
-
-
 ## Support & Contact
 
-- **Report Issues**: [GitHub Issues](https://github.com/CBIGR/LemonIte/issues)
-- **Email**: boris.vandemoortele@ugent.be
+- **Report Issues**: [GitHub Issues](https://github.com/CBIGR/Lemonite/issues)
 - **Lab Website**: [Vermeirssen Lab](https://www.crig.ugent.be/en/prof-vanessa-vermeirssen-phd)
 
 ---
 
 ## Acknowledgments
 
-- **LemonTree**: Original algorithm by Bonnet, Calzone & Michoel
+- **Lemon-Tree**: Original algorithm by Eric Bonnet & Tom Michoel: doi:10.1371/journal.pcbi.1003983
 - **Data Sources**: Lloyd-Price et al. (IBD), Wang et al. (GBM)
 - **PKN Databases**: IntAct, STITCH, BioGRID, STRING, UniProtKB, ChEMBL, LINCS, MetalinksDB, Human1-GEM
 
