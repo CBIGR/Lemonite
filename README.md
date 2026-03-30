@@ -1,6 +1,6 @@
 # 🍋 Lemonite
 
-**Uncovering regulatory metabolites through interpretable, data-driven multi-omics integration**
+**Lemonite: identification of regulatory metabolites through data-driven, interpretable integration of transcriptomics and metabolomics data**
 
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A525.04.0-brightgreen.svg)](https://www.nextflow.io/)
 [![Docker](https://img.shields.io/badge/docker-available-blue.svg)](https://www.docker.com/)
@@ -184,11 +184,11 @@ If you use Lemonite in your research, please cite:
 
 ```bibtex
 @article{vandemoortele2025lemonite,
-  title={LemonIte: Interpretable multi-omics integration for regulatory metabolite discovery},
-  author={Vandemoortele, Boris et al},
-  journal={[Journal Name]},
-  year={2025},
-  note={In preparation}
+  title={Lemonite: identification of regulatory metabolites through data-driven, interpretable integration of transcriptomics and metabolomics data},
+  author={Vandemoortele, Boris et al.},
+  journal={[bioRxiv]},
+  year={2026},
+  note={https://doi.org/10.64898/2026.03.27.714373}
 }
 ```
 
