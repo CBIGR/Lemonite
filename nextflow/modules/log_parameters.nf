@@ -1,6 +1,5 @@
 process LOG_PARAMETERS {
     tag "Logging pipeline parameters"
-    publishDir "${(params.output_dir ?: (params.input_dir ? params.input_dir + '/results' : './results'))}/${(params.computed_run_id ?: (params.run_id ?: 'run_auto'))}", mode: 'copy'
 
     output:
     path "pipeline_parameters_log.txt", emit: parameters_log

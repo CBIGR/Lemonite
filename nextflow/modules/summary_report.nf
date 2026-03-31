@@ -1,10 +1,5 @@
 process SUMMARY_REPORT {
     tag "Generating summary report"
-    publishDir "${(params.output_dir ?: (params.input_dir ? params.input_dir + '/results' : './results'))}/${(params.computed_run_id ?: (params.run_id ?: 'run_auto'))}", mode: 'copy'
-    
-    memory '8 GB'
-    cpus 2
-    time '1h'
 
     input:
     path viewer_files

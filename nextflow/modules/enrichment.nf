@@ -1,6 +1,5 @@
 process ENRICHMENT_ANALYSIS {
     tag "Pathway enrichment analysis"
-    publishDir "${(params.output_dir ?: (params.input_dir ? params.input_dir + '/results' : './results'))}/${(params.computed_run_id ?: (params.run_id ?: 'run_auto'))}/LemonTree", mode: 'copy'
 
     input:
     path filtered_modules

@@ -108,8 +108,8 @@ Lemonite is a comprehensive Nextflow pipeline for multi-omics data integration t
 
 ### Software Prerequisites
 
-1. **Nextflow** (≥ 25.04.0)
-2. **Container runtime**: Docker OR Singularity
+1. **Nextflow** (≥ 23.04.0)
+2. **Container runtime**: Singularity (recommended) — Docker support is deprecated
 3. **Java** 11+ (for Nextflow)
 
 ### Step-by-Step Installation
@@ -130,23 +130,7 @@ nextflow -version
 
 #### 2. Install Container Runtime
 
-**Docker (Local/Workstation):**
-```bash
-# Ubuntu/Debian
-sudo apt-get update
-sudo apt-get install docker.io
-sudo systemctl start docker
-sudo systemctl enable docker
-
-# Add user to docker group (avoid sudo)
-sudo usermod -aG docker $USER
-# Log out and back in for group changes to take effect
-
-# Verify
-docker --version
-```
-
-**Singularity (HPC):**
+**Singularity (Recommended):**
 ```bash
 # Usually pre-installed on HPC clusters
 # Check with your system administrator
@@ -155,6 +139,8 @@ singularity --version
 # If not available, see: https://docs.sylabs.io/guides/latest/admin-guide/
 ```
 
+> **Note:** Docker support is deprecated. The Docker profile and `docker-compose.yml` are retained for legacy compatibility but are no longer actively maintained. Use Singularity for all new deployments.
+
 #### 3. Clone Repository
 
 ```bash
@@ -162,16 +148,9 @@ git clone https://github.com/CBIGR/Lemonite.git
 cd Lemonite/nextflow
 ```
 
-#### 4. Build Container Images
+#### 4. Build Container Image
 
-**Docker:**
-```bash
-./build-docker.sh
-# Or manually:
-docker build -t lemontree-pipeline:latest .
-```
-
-**Singularity:**
+**Singularity (Recommended):**
 ```bash
 ./build-singularity.sh
 # Or manually:
@@ -384,7 +363,7 @@ Glucose,HMDB0000122
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `--input_dir` | Path | **REQUIRED** | Directory containing `data/` folder with input files |
-| `--output_dir` | Path | `./results` | Output directory for all results |
+| `--output_dir` | Path | `{input_dir}/results` | Output directory for all results |
 | `--data_dir` | Path | `{input_dir}/data` | Specific data directory (auto-detected if not provided) |
 | `--run_id` | String | Auto-generated | Unique identifier for this run (used in output naming) |
 | `--lemontree_jar` | Path | `/opt/lemontree/lemontree_v3.1.1.jar` | Path to LemonTree JAR file |
@@ -392,8 +371,20 @@ Glucose,HMDB0000122
 | `--max_memory` | String | `64.GB` | Maximum memory allocation |
 | `--max_time` | String | `24.h` | Maximum time for any single task |
 | `--organism` | String | `human` | Currently either human or mouse |
+| `--expression_file` | Path | Auto-detected | Explicit path to expression file (skips auto-detection) |
+| `--metadata_file` | Path | Auto-detected | Explicit path to metadata file (skips auto-detection) |
 
 Run_id will be auto-generated if not specified by the user:
+
+**Parameter Validation:**
+The pipeline validates key parameters at startup and will exit with a clear error message if:
+- `--organism` is not `human` or `mouse`
+- `--enrichment_method` is not `EnrichR`, `GSEA`, `both`, or `auto`
+- `--regulator_selection_method` is not `percentage` or `fold_per_module`
+- `--n_clusters` is less than 1
+- `--coherence_threshold` is not between 0 and 1
+
+Run_id auto-generation format:
 ```
 Format: {top_n_genes}HVG_coherence{threshold}_{method}_{n_clusters}
 Example: 1500HVG_coherence0.6_fold2.5x_permodule_100
@@ -1027,7 +1018,7 @@ Specify which metadata columns to include when running the pipeline:
 nextflow run main.nf \
   --input_dir /path/to/data \
   --metadata_columns "diagnosis,sex,age,batch,tissue" \
-  -profile docker
+  -profile singularity
 ```
 
 This saves all specified columns in `DESeq_groups.txt` and generates `sample_mapping.mvf` with color mappings for each metadata type.
@@ -1190,7 +1181,7 @@ nextflow run main.nf \
   --input_dir /data/sepsis_study \
   --metadata_columns "diagnosis,sex,age_group,batch,tissue" \
   --design_formula "~ batch + diagnosis" \
-  -profile docker
+  -profile singularity
 
 # Pipeline automatically generates module heatmaps with all available annotations
 
@@ -1209,12 +1200,12 @@ python scripts/module_viewer.py \
 
 ### Parallelization Strategies
 
-#### Local/Docker
+#### Local/Singularity
 ```bash
 # Optimize for system with 16 cores, 64GB RAM
 --max_cpus 16 \
 --max_memory 64.GB \
--profile docker
+-profile singularity
 
 # In nextflow.config or via CLI
 process.executor = 'local'
@@ -1268,56 +1259,6 @@ nextflow run main.nf \
 
 ## Container Management
 
-### Docker Image Management
-
-#### Building
-```bash
-# Standard build
-docker build -t lemontree-pipeline:latest .
-
-# Build without cache
-docker build --no-cache -t lemontree-pipeline:latest .
-
-# Build with specific tag
-docker build -t lemontree-pipeline:v1.0.0 .
-```
-
-#### Listing
-```bash
-# List all images
-docker images
-
-# List lemontree images
-docker images | grep lemontree-pipeline
-```
-
-#### Removing
-```bash
-# Remove specific image
-docker rmi lemontree-pipeline:latest
-
-# Force remove (if containers exist)
-docker rmi -f lemontree-pipeline:latest
-
-# Remove all lemontree images
-docker rmi $(docker images | grep lemontree-pipeline | awk '{print $3}')
-```
-
-#### Cleaning Up
-```bash
-# Stop all containers
-docker stop $(docker ps -a -q)
-
-# Remove all stopped containers
-docker container prune
-
-# Remove unused images
-docker image prune -a
-
-# Complete cleanup (WARNING: removes all unused Docker data)
-docker system prune -a
-```
-
 ### Singularity Image Management
 
 #### Building
@@ -1328,13 +1269,27 @@ sudo singularity build lemontree-pipeline.sif Singularity.def
 # Build in sandbox mode (for testing)
 sudo singularity build --sandbox lemontree-sandbox/ Singularity.def
 
-# Build from Docker image
+# Build from Docker image (if available)
 singularity build lemontree-pipeline.sif docker://lemontree-pipeline:latest
 ```
 
 #### Testing
 
 Run the script ./test_singularity.sh to build the singularity image and do a Lemonite run on the test dataset provided in this repository.
+
+### Development Profile
+
+For active development, use the `dev` profile to bind-mount host scripts and PKN directory into the container, allowing rapid iteration without rebuilding:
+
+```bash
+nextflow run main.nf \
+  --input_dir /path/to/data \
+  -profile singularity,dev
+```
+
+This overrides container scripts with host versions from `${projectDir}/scripts` and `${projectDir}/PKN`.
+
+> **Note:** Do not use the `dev` profile for production runs — it bypasses container isolation.
 
 
 ---
@@ -1403,4 +1358,4 @@ https://doi.org/10.1371/journal.pcbi.1003983
 
 ---
 
-**Last Updated:** November 26, 2025
+**Last Updated:** March 31, 2026

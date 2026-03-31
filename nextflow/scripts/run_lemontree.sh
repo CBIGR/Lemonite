@@ -17,23 +17,23 @@ echo "LemonTree JAR: ${LEMONTREE_JAR}"
 echo "========================================"
 
 # Create output directory
-mkdir -p ${OUTPUT_DIR}/Lemon_results
+mkdir -p "${OUTPUT_DIR}/Lemon_results"
 
 # Run LemonTree clustering
 if command -v java &> /dev/null; then
     echo "Java found: $(java -version 2>&1 | head -n 1)"
     
     # Build classpath including all dependencies
-    LEMONTREE_DIR=$(dirname ${LEMONTREE_JAR})
+    LEMONTREE_DIR=$(dirname "${LEMONTREE_JAR}")
     echo "LemonTree directory: ${LEMONTREE_DIR}"
     
     CLASSPATH="${LEMONTREE_JAR}"
     if [ -d "${LEMONTREE_DIR}/lib" ]; then
         echo "Found lib directory at ${LEMONTREE_DIR}/lib"
-        for jar in ${LEMONTREE_DIR}/lib/*.jar; do
+        for jar in "${LEMONTREE_DIR}"/lib/*.jar; do
             CLASSPATH="${CLASSPATH}:${jar}"
         done
-        echo "Classpath includes $(ls -1 ${LEMONTREE_DIR}/lib/*.jar 2>/dev/null | wc -l) dependency JARs"
+        echo "Classpath includes $(ls -1 "${LEMONTREE_DIR}"/lib/*.jar 2>/dev/null | wc -l) dependency JARs"
     else
         echo "Warning: lib directory not found at ${LEMONTREE_DIR}/lib"
     fi
@@ -42,12 +42,12 @@ if command -v java &> /dev/null; then
     echo "Running LemonTree..."
     
     # LemonTree clustering - save to Lemon_results subdirectory
-    java -cp ${CLASSPATH} lemontree.modulenetwork.RunCli -task ganesh -data_file ${INPUT_FILE} -output_file ${OUTPUT_DIR}/Lemon_results/cluster_${CLUSTER_ID}
+    java -cp "${CLASSPATH}" lemontree.modulenetwork.RunCli -task ganesh -data_file "${INPUT_FILE}" -output_file "${OUTPUT_DIR}/Lemon_results/cluster_${CLUSTER_ID}"
     
     JAVA_EXIT_CODE=$?
-    if [ ${JAVA_EXIT_CODE} -ne 0 ]; then
+    if [ "${JAVA_EXIT_CODE}" -ne 0 ]; then
         echo "Error: LemonTree clustering failed with exit code ${JAVA_EXIT_CODE}"
-        exit ${JAVA_EXIT_CODE}
+        exit "${JAVA_EXIT_CODE}"
     fi
 
 else

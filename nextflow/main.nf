@@ -30,14 +30,33 @@ if (!params.input_dir) {
     error "Please provide an input directory with --input_dir"
 }
 
-// Set output directory immediately after input validation
-def finalOutputDir = params.output_dir ?: "${params.input_dir}/results"
-params.output_dir = finalOutputDir
-params.outdir = finalOutputDir  // For backward compatibility
+// Validate key parameters
+def valid_organisms = ['human', 'mouse']
+if (!(params.organism in valid_organisms)) {
+    error "Invalid --organism '${params.organism}'. Must be one of: ${valid_organisms.join(', ')}"
+}
 
-// Set work directory default (actual workDir is configured in nextflow.config)
+def valid_enrichment_methods = ['EnrichR', 'GSEA', 'both', 'auto']
+if (!(params.enrichment_method in valid_enrichment_methods)) {
+    error "Invalid --enrichment_method '${params.enrichment_method}'. Must be one of: ${valid_enrichment_methods.join(', ')}"
+}
+
+def valid_regulator_methods = ['percentage', 'fold_per_module']
+if (!(params.regulator_selection_method in valid_regulator_methods)) {
+    error "Invalid --regulator_selection_method '${params.regulator_selection_method}'. Must be one of: ${valid_regulator_methods.join(', ')}"
+}
+
+if (params.n_clusters < 1) {
+    error "Invalid --n_clusters '${params.n_clusters}'. Must be a positive integer."
+}
+
+if (params.coherence_threshold < 0 || params.coherence_threshold > 1) {
+    error "Invalid --coherence_threshold '${params.coherence_threshold}'. Must be between 0 and 1."
+}
+
+// Compute output/work directories (use def variables, not params mutation)
+def finalOutputDir = params.output_dir ?: "${params.input_dir}/results"
 def finalWorkDir = params.work_dir ?: "${params.input_dir}/work"
-params.work_dir = finalWorkDir
 
 // Prepare display variables (computed after defaults are set)
 def displayInputDir = params.input_dir.toString()
@@ -135,7 +154,7 @@ workflow {
     PREPROCESSING_TFA(input_ch, data_ch, run_id_ch)
     
     // Step 2: Lemonite clustering (parallel jobs)
-    cluster_ids = Channel.from(1..params.n_clusters)
+    cluster_ids = Channel.of(1..params.n_clusters)
     CLUSTERING(PREPROCESSING_TFA.out.preprocessed_data.combine(cluster_ids), run_id_ch)
     
     // Step 3a: Post-clustering analysis

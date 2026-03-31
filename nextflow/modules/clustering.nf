@@ -1,6 +1,5 @@
 process CLUSTERING {
     tag "CLUSTERING $cluster_id"
-    publishDir "${(params.output_dir ?: (params.input_dir ? params.input_dir + '/results' : './results'))}/${(params.computed_run_id ?: (params.run_id ?: 'run_auto'))}/LemonTree/Lemon_out", mode: 'copy', pattern: "Lemon_results/cluster_${cluster_id}"
     
     input:
     tuple path(preprocessed_data), val(cluster_id)

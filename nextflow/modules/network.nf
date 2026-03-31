@@ -1,6 +1,5 @@
 process POST_CLUSTERING {
     tag "LemonTree post-clustering analysis"
-    publishDir "${(params.output_dir ?: (params.input_dir ? params.input_dir + '/results' : './results'))}/${(params.computed_run_id ?: (params.run_id ?: 'run_auto'))}/LemonTree", mode: 'copy', pattern: "Lemon_out/*"
 
     input:
     path lemontree_inputs
@@ -79,7 +78,6 @@ process POST_CLUSTERING {
 
 process NETWORK_GENERATION {
     tag "Network generation and filtering"
-    publishDir "${(params.output_dir ?: (params.input_dir ? params.input_dir + '/results' : './results'))}/${(params.computed_run_id ?: (params.run_id ?: 'run_auto'))}/LemonTree", mode: 'copy'
 
     input:
     path lemontree_outputs
@@ -178,7 +176,6 @@ process NETWORK_GENERATION {
 
 process SUBNETWORK_GRAPHS {
     tag "Creating subnetwork visualization graphs"
-    publishDir "${(params.output_dir ?: (params.input_dir ? params.input_dir + '/results' : './results'))}/${(params.computed_run_id ?: (params.run_id ?: 'run_auto'))}/LemonTree", mode: 'copy'
 
     input:
     path viewer_files

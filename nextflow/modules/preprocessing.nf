@@ -1,6 +1,5 @@
 process PREPROCESSING_TFA {
     tag "Preprocessing and TFA analysis"
-    publishDir "${(params.output_dir ?: (params.input_dir ? params.input_dir + '/results' : './results'))}/${(params.computed_run_id ?: (params.run_id ?: 'run_auto'))}", mode: 'copy'
 
     input:
     path input_dir
@@ -20,24 +19,46 @@ process PREPROCESSING_TFA {
 
     script:
     """
-    # Find the required input files in the data directory
-    EXPRESSION_FILE=\$(find data/ -name "*host_tx_counts.tsv" -o -name "*expression*.tsv" -o -name "*counts*.tsv" -o -name "Counts.tsv" | head -1)
-    METADATA_FILE=\$(find data/ -name "*metadata*.txt" -o -name "*Metadata*.txt" | head -1)
-    PRIOR_NETWORK=\$(find data/ -name "*CollecTRI*.txt" -o -name "*network*.txt" | head -1)    # if nothing found in data, fall back to bundled PKN directory
+    # Resolve expression file: explicit param or auto-detect with uniqueness check
+    if [ -n "${params.expression_file ?: ''}" ]; then
+        EXPRESSION_FILE="${params.expression_file}"
+    else
+        MATCHES=\$(find data/ -name "*host_tx_counts.tsv" -o -name "*expression*.tsv" -o -name "*counts*.tsv" -o -name "Counts.tsv")
+        MATCH_COUNT=\$(echo "\$MATCHES" | grep -c . || true)
+        if [ "\$MATCH_COUNT" -eq 0 ]; then
+            echo "Error: Expression file not found. Provide --expression_file or place a *counts*.tsv / Counts.tsv in data/"
+            find data/ -type f -name "*.tsv" -o -name "*.txt"
+            exit 1
+        elif [ "\$MATCH_COUNT" -gt 1 ]; then
+            echo "Error: Multiple expression files matched (\$MATCH_COUNT). Please specify --expression_file explicitly:"
+            echo "\$MATCHES"
+            exit 1
+        fi
+        EXPRESSION_FILE=\$(echo "\$MATCHES" | head -1)
+    fi
+
+    # Resolve metadata file: explicit param or auto-detect with uniqueness check
+    if [ -n "${params.metadata_file ?: ''}" ]; then
+        METADATA_FILE="${params.metadata_file}"
+    else
+        MATCHES=\$(find data/ -name "*metadata*.txt" -o -name "*Metadata*.txt")
+        MATCH_COUNT=\$(echo "\$MATCHES" | grep -c . || true)
+        if [ "\$MATCH_COUNT" -eq 0 ]; then
+            echo "Error: Metadata file not found. Provide --metadata_file or place a *metadata*.txt in data/"
+            exit 1
+        elif [ "\$MATCH_COUNT" -gt 1 ]; then
+            echo "Error: Multiple metadata files matched (\$MATCH_COUNT). Please specify --metadata_file explicitly:"
+            echo "\$MATCHES"
+            exit 1
+        fi
+        METADATA_FILE=\$(echo "\$MATCHES" | head -1)
+    fi
+
+    # Resolve prior network (optional)
+    PRIOR_NETWORK=\$(find data/ -name "*CollecTRI*.txt" -o -name "*network*.txt" | head -1)
     if [ -z "\$PRIOR_NETWORK" ] && [ -f "${projectDir}/PKN/CollecTRI_network.txt" ]; then
         PRIOR_NETWORK="${projectDir}/PKN/CollecTRI_network.txt"
         echo "Using bundled network from projectDir: \$PRIOR_NETWORK"
-    fi
-    # Check if required files exist
-    if [ -z "\$EXPRESSION_FILE" ]; then
-        echo "Error: Expression file not found"
-        echo "Available files:"
-        find data/ -type f -name "*.tsv" -o -name "*.txt"
-        exit 1
-    fi
-    if [ -z "\$METADATA_FILE" ]; then
-        echo "Error: Metadata file not found in ${data_dir}"
-        exit 1
     fi
 
     echo "Found core files:"
@@ -81,12 +102,12 @@ process PREPROCESSING_TFA {
 
     stub:
     """
-    mkdir -p LemonTree Preprocessing TFA
-    touch LemonTree/LemonPreprocessed_expression.txt
-    touch LemonTree/LemonPreprocessed_complete.txt
-    touch LemonTree/LemonPreprocessed_metabolomics.txt
-    touch LemonTree/DESeq_groups.txt
-    touch LemonTree/lovering_TFs.txt
-    touch LemonTree/metabolites.txt
+    mkdir -p LemonTree/Preprocessing TFA
+    touch LemonTree/Preprocessing/LemonPreprocessed_expression.txt
+    touch LemonTree/Preprocessing/LemonPreprocessed_complete.txt
+    touch LemonTree/Preprocessing/LemonPreprocessed_metabolomics.txt
+    touch LemonTree/Preprocessing/DESeq_groups.txt
+    touch LemonTree/Preprocessing/lovering_TFs.txt
+    touch LemonTree/Preprocessing/metabolites.txt
     """
 }

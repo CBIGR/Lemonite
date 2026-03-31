@@ -1,6 +1,5 @@
 process MODULE_OVERVIEW_INTERACTIVE {
     tag "Interactive module overview"
-    publishDir "${(params.output_dir ?: (params.input_dir ? params.input_dir + '/results' : './results'))}/${(params.computed_run_id ?: (params.run_id ?: 'run_auto'))}/LemonTree", mode: 'copy'
 
     input:
     path viewer_files

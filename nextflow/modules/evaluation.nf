@@ -1,6 +1,5 @@
 process PKN_EVALUATION {
     tag "PKN evaluation"
-    publishDir "${(params.output_dir ?: (params.input_dir ? params.input_dir + '/results' : './results'))}/${(params.computed_run_id ?: (params.run_id ?: 'run_auto'))}/LemonTree", mode: 'copy'
 
     input:
     path networks
