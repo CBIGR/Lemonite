@@ -1,4 +1,4 @@
-# 🍋 Lemonite
+# Lemonite
 
 **Lemonite: identification of regulatory metabolites through data-driven, interpretable integration of transcriptomics and metabolomics data**
 
@@ -15,7 +15,7 @@
 
 **Lemonite** is a comprehensive framework for multi-omics data integration that identifies gene co-expression modules and their regulators, with a particular focus on discovering regulatory metabolites. Building on the [LemonTree algorithm](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003983), Lemonite extends it with support for multiple regulator types (transcription factors, metabolites, lipids...), enhanced regulator selection and network construction, prioritization of modules and regulators, validation against curated prior knowledge networks (PKNs), functional analyses, and rich visualizations.
 
-🌐 **[Visit www.lemonite.ugent.be](http://www.lemonite.ugent.be)**
+**[Visit www.lemonite.ugent.be](http://www.lemonite.ugent.be)**
 
 ### Key Features
 
@@ -26,7 +26,7 @@
 
 ---
 
-## 📦 Repository Structure
+## Repository Structure
 
 ```
 Lemonite/
@@ -56,7 +56,7 @@ Lemonite/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -97,7 +97,7 @@ nextflow run main.nf \
 #### 🔄 Pipeline Workflow
 
 ```
-📊 Input: Transcriptomics + Metabolomics/Lipidomics
+ Input: Transcriptomics + Metabolomics/Lipidomics
          ↓
     1. PREPROCESSING & TFA
        • Normalization & log-transformation
@@ -174,7 +174,7 @@ results/{run_id}/LemonTree/
 
 #### Advanced Usage
 
-📖 **[Complete pipeline documentation & advanced usage →](https://github.com/CBIGR/Lemonite/wiki)**
+**[Complete pipeline documentation & advanced usage →](https://github.com/CBIGR/Lemonite/wiki)**
 
 ---
 
@@ -208,7 +208,7 @@ If you use Lemonite in your research, please cite:
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
