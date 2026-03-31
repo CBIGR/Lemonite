@@ -1,6 +1,6 @@
 # 🍋 Lemonite
 
-**Uncovering regulatory metabolites through interpretable, data-driven multi-omics integration**
+**Lemonite: identification of regulatory metabolites through data-driven, interpretable integration of transcriptomics and metabolomics data**
 
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A525.04.0-brightgreen.svg)](https://www.nextflow.io/)
 [![Docker](https://img.shields.io/badge/docker-available-blue.svg)](https://www.docker.com/)
@@ -20,9 +20,9 @@
 ### Key Features
 
 - **Multi-omics Integration**: Integrate transcriptomics, metabolomics, lipidomics, and other omics data types
-- **Flexible Regulator Assignment**: Support for TFs, metabolites, lipids, and or other omics (binary data currenlty not supported)
+- **Flexible Regulator Assignment**: Support for TFs, metabolites, lipids, and or other omics (binary data currently not supported)
 - **Prior Knowledge Networks**: Lemonite knowledge graph for validation of metabolite-gene and protein-protein interactions
-- **Rich Visualizations**: Interactive network graphs, module heatmaps, in silico validation with knowledge graph,and enrichment results
+- **Rich Visualizations**: Interactive network graphs, module heatmaps, in silico validation with knowledge graph, and enrichment results
 
 ---
 
@@ -176,54 +176,33 @@ results/{run_id}/LemonTree/
 
 📖 **[Complete pipeline documentation & advanced usage →](https://github.com/CBIGR/Lemonite/wiki)**
 
-
 ---
 
-## 📚 Citation
+## Reference
 
-If you use LemonIte in your research, please cite:
+If you use Lemonite in your research, please cite:
 
 ```bibtex
 @article{vandemoortele2025lemonite,
-  title={LemonIte: Interpretable multi-omics integration for regulatory metabolite discovery},
-  author={Vandemoortele, Boris et al},
-  journal={[Journal Name]},
-  year={2025},
-  note={In preparation}
+  title={Lemonite: identification of regulatory metabolites through data-driven, interpretable integration of transcriptomics and metabolomics data},
+  author={Vandemoortele, Boris et al.},
+  journal={[bioRxiv]},
+  year={2026},
+  note={https://doi.org/10.64898/2026.03.27.714373}
 }
 ```
 
-**Original LemonTree algorithm:**
-```bibtex
-@article{bonnet2015lemontree,
-  title={Integrative Multi-omics Module Network Inference with Lemon-Tree},
-  author={Bonnet, Eric and Calzone, Laurence and Michoel, Tom},
-  journal={PLOS Computational Biology},
-  volume={11},
-  number={2},
-  pages={e1003983},
-  year={2015}
-}
-```
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome and appreciated! Send me an email and we can discuss the implementation of your requested feature into the Lemonite pipeline.
 
 
 ## Support & Contact
 
-- **Report Issues**: [GitHub Issues](https://github.com/CBIGR/LemonIte/issues)
-- **Email**: boris.vandemoortele@ugent.be
-- **Lab Website**: [Vermeirssen Lab](https://www.crig.ugent.be/en/prof-vanessa-vermeirssen-phd)
+- **Report Issues**: [GitHub Issues](https://github.com/CBIGR/Lemonite/issues)
 
 ---
 
 ## Acknowledgments
 
-- **LemonTree**: Original algorithm by Bonnet, Calzone & Michoel
+- **Lemon-Tree**: Original algorithm by Eric Bonnet & Tom Michoel: doi:10.1371/journal.pcbi.1003983
 - **Data Sources**: Lloyd-Price et al. (IBD), Wang et al. (GBM)
 - **PKN Databases**: IntAct, STITCH, BioGRID, STRING, UniProtKB, ChEMBL, LINCS, MetalinksDB, Human1-GEM
 
@@ -236,7 +215,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ```
 MIT License
 
-Copyright (c) 2025 vermeirssenlab
+Copyright (c) 2026 CBIGR - Lab Vanessa Vermeirssen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
