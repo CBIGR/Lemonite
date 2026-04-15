@@ -182,9 +182,8 @@ results/{run_id}/LemonTree/
 
 If you use Lemonite in your research, please cite:
 
-```bibtex
 Vandemoortele, B., Devlies, H., Michoel, T., Vanhaecke, L., Vandenbroucke, R. E., Laukens, D., & Vermeirssen, V. (2026). Lemonite: Identification of regulatory metabolites through data-driven, interpretable integration of transcriptomics and metabolomics data. bioRxiv. https://doi.org/10.64898/2026.03.27.714373
-```
+
 
 
 
