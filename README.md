@@ -38,7 +38,7 @@ Lemonite/
 │   ├── PKN/              # Lemonite prior knowledge graph
 │   ├── conf/             # Configuration profiles (Docker, Singularity, HPC)
 │
-├── build_PKN/            # 🕸️ Prior Knowledge Network construction
+├── build_PKN/            # Prior Knowledge Network construction
 │   ├── build_PKN/        # pipeline implementation to build the PKN - UNDER DEVELOPMENT!!!
 │   ├── Collect_PKNdata_metabolites.ipynb
 │   ├── Collect_PKNdata_proteins.ipynb
