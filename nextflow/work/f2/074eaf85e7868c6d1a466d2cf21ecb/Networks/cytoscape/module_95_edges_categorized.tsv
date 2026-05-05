@@ -1,0 +1,16 @@
+Node1	Node2	Source	Type	Category
+myo_inositol	FASN	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	P4HA1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	PKLR	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	FUT1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	ALPL	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	PKM	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+ZBTB40	FASN	BioGRID_genes	PPI	PPI
+FASN	PKM	STRING	PPI	PPI
+FASN	PKLR	STRING	PPI	PPI
+GLI1	P4HA1	BioGRID_genes	PPI	PPI
+MXD4	PKLR	STRING	PPI	PPI
+PKLR	PKM	STRING	PPI	PPI
+DBP	FUT1	STRING	PPI	PPI
+ZHX2	ALPL	STRING	PPI	PPI
+POU5F1B	PKM	STRING	PPI	PPI

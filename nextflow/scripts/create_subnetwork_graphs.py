@@ -282,11 +282,14 @@ def get_regulators(regfile):
 
 
 def draw_subnetwork(module, target_genes, TF_regulators, metabolite_regulators,
-                    PKN_df, PKN_nx, name_to_hmdb, output_dir):
+                    PKN_df, PKN_nx, name_to_hmdb, output_dir, name_lookup=None):
     """
     Draw subnetwork with clearer arrows, dots, and spacing.
     Uses edge categories and node types for styling.
     """
+
+    if name_lookup is None:
+        name_lookup = {}
 
     # === Setup ===
     hmdb_to_name = {v: k for k, v in name_to_hmdb.items()}
@@ -489,11 +492,11 @@ def draw_subnetwork(module, target_genes, TF_regulators, metabolite_regulators,
             )
     
     # === Labels ===
-    metabolite_labels = {n: hmdb_to_name.get(n, n) for n in hmdb_nodes}
+    metabolite_labels = {n: name_lookup.get(hmdb_to_name.get(n, n), hmdb_to_name.get(n, n)) for n in hmdb_nodes}
     nx.draw_networkx_labels(to_draw, pos, labels=metabolite_labels,
                             font_size=6, font_weight='bold',
                             bbox=dict(boxstyle='round,pad=0.4', fc='red', ec='none', alpha=0.7), ax=ax)
-    other_labels = {n: n for n in to_draw if n not in hmdb_nodes}
+    other_labels = {n: name_lookup.get(n, n) for n in to_draw if n not in hmdb_nodes}
     nx.draw_networkx_labels(to_draw, pos, labels=other_labels, font_size=5, font_weight='bold', ax=ax)
 
     # === Legends ===
@@ -533,6 +536,8 @@ def main():
                        help='Path to PKN network file (TSV format)')
     parser.add_argument('--metabolite_mapping', required=False, default=None,
                        help='Path to metabolite name to HMDB ID mapping file (optional, only needed for metabolite regulators)')
+    parser.add_argument('--name_mapping', required=False, default=None,
+                       help='Path to name_mapping.tsv (cleaned->original name mapping for restoring original feature names)')
     parser.add_argument('--output_dir', required=True,
                        help='Output directory for subnetwork graphs')
     
@@ -594,6 +599,17 @@ def main():
     else:
         print("No metabolite mapping provided - metabolite names will not be converted to HMDB IDs")
     
+    # Load name mapping for restoring original feature names
+    name_lookup = {}
+    if args.name_mapping and os.path.exists(args.name_mapping):
+        try:
+            nm_df = pd.read_csv(args.name_mapping, sep='\t')
+            if 'cleaned' in nm_df.columns and 'original' in nm_df.columns:
+                name_lookup = dict(zip(nm_df['cleaned'], nm_df['original']))
+                print(f"Loaded {len(name_lookup)} name mappings for original name restoration")
+        except Exception as e:
+            print(f"Warning: Could not load name mapping: {e}")
+    
     # Create subnetwork graphs for each module
     # Use the first regulator type to determine available modules
     first_reg_type = list(regulator_configs.keys())[0]
@@ -644,7 +660,8 @@ def main():
                 PKN,  # Pass the PKN DataFrame
                 PKN_nx,  # Pass the NetworkX graph
                 name_to_hmdb,
-                args.output_dir
+                args.output_dir,
+                name_lookup=name_lookup
             )
             
             successful += 1

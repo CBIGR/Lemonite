@@ -1,0 +1,7 @@
+Node1	Node2	Source	Type	Category
+capricacid	PPARD	chEMBL	metabolite-gene	Causal
+capricacid	TSHR	chEMBL	metabolite-gene	Causal
+STAT6	PPARD	STRING	PPI	PPI
+STAT6	STAT3	STRING	PPI	PPI
+PPARD	STAT3	BioGRID_genes	PPI	PPI
+STAT3	TSHR	BioGRID_genes	PPI	PPI

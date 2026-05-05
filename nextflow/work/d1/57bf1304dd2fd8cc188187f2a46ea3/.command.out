@@ -1,0 +1,321 @@
+Staged preprocessing files:
+-rw-r--r-- 1 borisvdm users 4264576 Apr 30 15:13 Preprocessing/LemonPreprocessed_complete.txt
+-rw-r--r-- 1 borisvdm users 4080745 Apr 30 15:13 Preprocessing/LemonPreprocessed_expression.txt
+-rw-r--r-- 1 borisvdm users  184436 Apr 30 15:13 Preprocessing/LemonPreprocessed_metabolomics.txt
+Found TFs regulator file: ModuleViewer_files/TFs.selected_regs_list.txt
+Found Metabolites regulator file: ModuleViewer_files/Metabolites.selected_regs_list.txt
+Loaded 0 name mappings from name_mapping.tsv
+Processing ModuleViewer data from: ./ModuleViewer_files
+Output directory: heatmaps
+Regulator files: Metabolites:ModuleViewer_files/Metabolites.selected_regs_list.txt,TFs:ModuleViewer_files/TFs.selected_regs_list.txt
+Found regulator types: ['Metabolites', 'TFs']
+Regulator type -> data file basename mapping: {'TFs': 'lovering_tf_list', 'Metabolites': 'metabolomics'}
+Configured 2 regulator types: ['Metabolites', 'TFs']
+Loading expression data from: ./ModuleViewer_files/../Preprocessing/LemonPreprocessed_expression.txt
+Warning: specific_modules.txt not found - processing all modules
+Processing only requested modules: [81, 18, 82, 83, 68, 0, 89, 8, 71, 5, 3, 11, 4, 73, 55, 70, 40, 24, 10, 33, 43, 13, 9, 1, 72, 34, 90, 50, 6, 29, 7, 2, 23, 57, 28, 49, 14, 12, 21, 63, 26, 19, 61, 17, 41, 65, 15, 45, 36, 51, 78, 44, 58, 67, 37, 101, 86, 96, 38, 39, 42, 47, 20, 95, 32, 52, 103, 30, 25, 27, 46, 53, 16, 74, 59]
+Loaded scores for Metabolites from ./ModuleViewer_files/Metabolites.selected_regulators_scores.txt
+Loaded omics-specific data for Metabolites from ./ModuleViewer_files/../Preprocessing/LemonPreprocessed_metabolomics.txt
+Loaded scores for TFs from ./ModuleViewer_files/TFs.selected_regulators_scores.txt
+Using expression data for TFs regulators
+Displaying 1 annotation track(s): diagnosis
+Loaded 13219 PPI interactions
+Processing module 0...
+  Scaled TFs data using z-score normalization
+  Added 287 PPI connections to visualization
+  Saved module 0
+Processing module 1...
+  Scaled TFs data using z-score normalization
+  Added 77 PPI connections to visualization
+  Saved module 1
+Processing module 2...
+  Scaled TFs data using z-score normalization
+  Added 28 PPI connections to visualization
+  Saved module 2
+Processing module 3...
+  Scaled TFs data using z-score normalization
+  Added 2 PPI connections to visualization
+  Saved module 3
+Processing module 4...
+  Scaled TFs data using z-score normalization
+  Added 306 PPI connections to visualization
+  Saved module 4
+Processing module 5...
+  Scaled TFs data using z-score normalization
+  Added 47 PPI connections to visualization
+  Saved module 5
+Processing module 6...
+  Scaled TFs data using z-score normalization
+  Added 25 PPI connections to visualization
+  Saved module 6
+Processing module 7...
+  Scaled TFs data using z-score normalization
+  Added 175 PPI connections to visualization
+  Saved module 7
+Processing module 8...
+  Scaled TFs data using z-score normalization
+  Added 41 PPI connections to visualization
+  Saved module 8
+Processing module 9...
+  Scaled TFs data using z-score normalization
+  Added 20 PPI connections to visualization
+  Saved module 9
+Processing module 10...
+  Scaled TFs data using z-score normalization
+  Added 55 PPI connections to visualization
+  Saved module 10
+Processing module 11...
+  Scaled TFs data using z-score normalization
+  Added 144 PPI connections to visualization
+  Saved module 11
+Processing module 12...
+  Scaled TFs data using z-score normalization
+  Added 70 PPI connections to visualization
+  Saved module 12
+Processing module 13...
+  Scaled TFs data using z-score normalization
+  Added 124 PPI connections to visualization
+  Saved module 13
+Processing module 14...
+  Scaled TFs data using z-score normalization
+  Added 20 PPI connections to visualization
+  Saved module 14
+Processing module 15...
+  Scaled TFs data using z-score normalization
+  Added 14 PPI connections to visualization
+  Saved module 15
+Processing module 16...
+  Scaled TFs data using z-score normalization
+  Added 74 PPI connections to visualization
+  Saved module 16
+Processing module 17...
+  Scaled TFs data using z-score normalization
+  Added 10 PPI connections to visualization
+  Saved module 17
+Processing module 18...
+  Scaled TFs data using z-score normalization
+  Added 100 PPI connections to visualization
+  Saved module 18
+Processing module 19...
+  Scaled TFs data using z-score normalization
+  Added 7 PPI connections to visualization
+  Saved module 19
+Processing module 20...
+  Scaled TFs data using z-score normalization
+  Added 6 PPI connections to visualization
+  Saved module 20
+Processing module 21...
+  Scaled TFs data using z-score normalization
+  Added 31 PPI connections to visualization
+  Saved module 21
+Processing module 23...
+  Scaled TFs data using z-score normalization
+  Added 6 PPI connections to visualization
+  Saved module 23
+Processing module 24...
+  Scaled TFs data using z-score normalization
+  Added 24 PPI connections to visualization
+  Saved module 24
+Processing module 25...
+  Scaled TFs data using z-score normalization
+  Added 12 PPI connections to visualization
+  Saved module 25
+Processing module 26...
+  Scaled TFs data using z-score normalization
+  Added 26 PPI connections to visualization
+  Saved module 26
+Processing module 27...
+  Scaled TFs data using z-score normalization
+  Added 8 PPI connections to visualization
+  Saved module 27
+Processing module 28...
+  Scaled TFs data using z-score normalization
+  Added 12 PPI connections to visualization
+  Saved module 28
+Processing module 29...
+  Scaled TFs data using z-score normalization
+  Added 13 PPI connections to visualization
+  Saved module 29
+Processing module 30...
+  Scaled TFs data using z-score normalization
+  Added 14 PPI connections to visualization
+  Saved module 30
+Processing module 32...
+  Scaled TFs data using z-score normalization
+  Added 23 PPI connections to visualization
+  Saved module 32
+Processing module 33...
+  Scaled TFs data using z-score normalization
+  Added 82 PPI connections to visualization
+  Saved module 33
+Processing module 34...
+  Scaled TFs data using z-score normalization
+  Added 205 PPI connections to visualization
+  Saved module 34
+Processing module 36...
+  Scaled TFs data using z-score normalization
+  Added 10 PPI connections to visualization
+  Saved module 36
+Processing module 37...
+  Scaled TFs data using z-score normalization
+  Added 1 PPI connections to visualization
+  Saved module 37
+Processing module 38...
+  Scaled TFs data using z-score normalization
+  Added 1 PPI connections to visualization
+  Saved module 38
+Processing module 39...
+  Scaled TFs data using z-score normalization
+  Added 4 PPI connections to visualization
+  Saved module 39
+Processing module 40...
+  Scaled TFs data using z-score normalization
+  Added 7 PPI connections to visualization
+  Saved module 40
+Processing module 41...
+  Scaled TFs data using z-score normalization
+  Added 21 PPI connections to visualization
+  Saved module 41
+Processing module 42...
+  Scaled TFs data using z-score normalization
+  Added 19 PPI connections to visualization
+  Saved module 42
+Processing module 43...
+  Scaled TFs data using z-score normalization
+  Added 18 PPI connections to visualization
+  Saved module 43
+Processing module 44...
+  Scaled TFs data using z-score normalization
+  Added 6 PPI connections to visualization
+  Saved module 44
+Processing module 45...
+  Scaled TFs data using z-score normalization
+  Added 1 PPI connections to visualization
+  Saved module 45
+Processing module 46...
+  Scaled TFs data using z-score normalization
+  Added 34 PPI connections to visualization
+  Saved module 46
+Processing module 47...
+  Scaled TFs data using z-score normalization
+  Added 7 PPI connections to visualization
+  Saved module 47
+Processing module 49...
+  Scaled TFs data using z-score normalization
+  Added 5 PPI connections to visualization
+  Saved module 49
+Processing module 50...
+  Scaled TFs data using z-score normalization
+  Added 13 PPI connections to visualization
+  Saved module 50
+Processing module 51...
+  Scaled TFs data using z-score normalization
+  Added 7 PPI connections to visualization
+  Saved module 51
+Processing module 52...
+  Scaled TFs data using z-score normalization
+  Added 1 PPI connections to visualization
+  Saved module 52
+Processing module 53...
+  Scaled TFs data using z-score normalization
+  Added 4 PPI connections to visualization
+  Saved module 53
+Processing module 55...
+  Scaled TFs data using z-score normalization
+  Added 1 PPI connections to visualization
+  Saved module 55
+Processing module 57...
+  Scaled TFs data using z-score normalization
+  Added 2 PPI connections to visualization
+  Saved module 57
+Processing module 58...
+  Scaled TFs data using z-score normalization
+  Saved module 58
+Processing module 59...
+  Scaled TFs data using z-score normalization
+  Added 7 PPI connections to visualization
+  Saved module 59
+Processing module 61...
+  Scaled TFs data using z-score normalization
+  Added 2 PPI connections to visualization
+  Saved module 61
+Processing module 63...
+  Scaled TFs data using z-score normalization
+  Added 14 PPI connections to visualization
+  Saved module 63
+Processing module 65...
+  Scaled TFs data using z-score normalization
+  Added 10 PPI connections to visualization
+  Saved module 65
+Processing module 67...
+  Scaled TFs data using z-score normalization
+  Added 2 PPI connections to visualization
+  Saved module 67
+Processing module 68...
+  Scaled TFs data using z-score normalization
+  Added 2 PPI connections to visualization
+  Saved module 68
+Processing module 70...
+  Scaled TFs data using z-score normalization
+  Added 41 PPI connections to visualization
+  Saved module 70
+Processing module 71...
+  Scaled TFs data using z-score normalization
+  Added 1 PPI connections to visualization
+  Saved module 71
+Processing module 72...
+  Scaled TFs data using z-score normalization
+  Added 4 PPI connections to visualization
+  Saved module 72
+Processing module 73...
+  Scaled TFs data using z-score normalization
+  Added 15 PPI connections to visualization
+  Saved module 73
+Processing module 74...
+  Scaled TFs data using z-score normalization
+  Saved module 74
+Processing module 78...
+  Scaled TFs data using z-score normalization
+  Added 14 PPI connections to visualization
+  Saved module 78
+Processing module 81...
+  Scaled TFs data using z-score normalization
+  Added 29 PPI connections to visualization
+  Saved module 81
+Processing module 82...
+  Scaled TFs data using z-score normalization
+  Added 106 PPI connections to visualization
+  Saved module 82
+Processing module 83...
+  Scaled TFs data using z-score normalization
+  Added 3 PPI connections to visualization
+  Saved module 83
+Processing module 86...
+  Scaled TFs data using z-score normalization
+  Added 25 PPI connections to visualization
+  Saved module 86
+Processing module 89...
+  Scaled TFs data using z-score normalization
+  Added 6 PPI connections to visualization
+  Saved module 89
+Processing module 90...
+  Scaled TFs data using z-score normalization
+  Added 3 PPI connections to visualization
+  Saved module 90
+Processing module 95...
+  Scaled TFs data using z-score normalization
+  Added 1 PPI connections to visualization
+  Saved module 95
+Processing module 96...
+  Scaled TFs data using z-score normalization
+  Saved module 96
+Processing module 101...
+  Scaled TFs data using z-score normalization
+  Added 1 PPI connections to visualization
+  Saved module 101
+Processing module 103...
+  Scaled TFs data using z-score normalization
+  Saved module 103
+
+Processing complete! Generated heatmaps for 75 modules
+Output directory: heatmaps

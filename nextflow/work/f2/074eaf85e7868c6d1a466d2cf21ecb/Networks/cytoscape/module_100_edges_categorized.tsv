@@ -1,0 +1,5 @@
+Node1	Node2	Source	Type	Category
+L_aspartic_acid	FUT5	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+L_aspartic_acid	AMY1C	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+RFX3	FUT5	STRING	PPI	PPI
+KLF15	AMY1C	BioGRID_genes	PPI	PPI

@@ -1,0 +1,141 @@
+=== LemonTree Clustering Debug Info ===
+Cluster ID: 4
+Input file: LemonPreprocessed_expression.txt
+Output dir: .
+LemonTree JAR: /home/borisvdm/repo/LemonIte/nextflow/LemonTree/lemontree_v3.1.1.jar
+========================================
+Java found: openjdk version "17.0.18" 2026-01-20 LTS
+LemonTree directory: /home/borisvdm/repo/LemonIte/nextflow/LemonTree
+Found lib directory at /home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib
+Classpath includes 11 dependency JARs
+Final classpath: /home/borisvdm/repo/LemonIte/nextflow/LemonTree/lemontree_v3.1.1.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/BiNGO.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/colt.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/commons-cli-1.1.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/cytoscape.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/cytoscape-task.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/epsgraphics-1.0.0.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/epsgraphics-1.1.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/freehep-graphicsio.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/giny.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/xercesImpl.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/xom-1.0a5.jar
+Running LemonTree...
+
+LemonTree - Version 3.1.1
+-------------------------
+
+Parameters
+----------
+task:               ganesh
+data_file:          LemonPreprocessed_expression.txt
+gene_file:          null
+output_file:        ./Lemon_results/cluster_4
+lambda:             0.1
+mu:                 0.0
+alpha:              0.1
+beta:               0.1
+num_steps:          100
+burn_in:            50
+sample_steps:       100
+score_gain:         0.0
+Reading expression data... [ok]
+Number of genes in the data matrix: 3227
+Number of conditions in the data matrix: 75
+Number of missing values in the data matrix: 25057
+Total number of expression values: 242025
+Gibbs sampling modules...
+Initial number of clusters: 1613
+step 1 timestamp: Thu Apr 30 13:04:14 CEST 2026
+step 2 timestamp: Thu Apr 30 13:04:30 CEST 2026
+step 3 timestamp: Thu Apr 30 13:04:42 CEST 2026
+step 4 timestamp: Thu Apr 30 13:04:51 CEST 2026
+step 5 timestamp: Thu Apr 30 13:05:02 CEST 2026
+step 6 timestamp: Thu Apr 30 13:05:11 CEST 2026
+step 7 timestamp: Thu Apr 30 13:05:21 CEST 2026
+step 8 timestamp: Thu Apr 30 13:05:33 CEST 2026
+step 9 timestamp: Thu Apr 30 13:05:46 CEST 2026
+step 10 timestamp: Thu Apr 30 13:05:59 CEST 2026
+step 11 timestamp: Thu Apr 30 13:06:11 CEST 2026
+step 12 timestamp: Thu Apr 30 13:06:24 CEST 2026
+step 13 timestamp: Thu Apr 30 13:06:37 CEST 2026
+step 14 timestamp: Thu Apr 30 13:06:49 CEST 2026
+step 15 timestamp: Thu Apr 30 13:07:13 CEST 2026
+step 16 timestamp: Thu Apr 30 13:07:38 CEST 2026
+step 17 timestamp: Thu Apr 30 13:07:53 CEST 2026
+step 18 timestamp: Thu Apr 30 13:08:07 CEST 2026
+step 19 timestamp: Thu Apr 30 13:08:22 CEST 2026
+step 20 timestamp: Thu Apr 30 13:08:36 CEST 2026
+step 21 timestamp: Thu Apr 30 13:08:55 CEST 2026
+step 22 timestamp: Thu Apr 30 13:09:07 CEST 2026
+step 23 timestamp: Thu Apr 30 13:09:29 CEST 2026
+step 24 timestamp: Thu Apr 30 13:09:40 CEST 2026
+step 25 timestamp: Thu Apr 30 13:09:52 CEST 2026
+step 26 timestamp: Thu Apr 30 13:10:04 CEST 2026
+step 27 timestamp: Thu Apr 30 13:10:16 CEST 2026
+step 28 timestamp: Thu Apr 30 13:10:28 CEST 2026
+step 29 timestamp: Thu Apr 30 13:10:40 CEST 2026
+step 30 timestamp: Thu Apr 30 13:10:53 CEST 2026
+step 31 timestamp: Thu Apr 30 13:11:05 CEST 2026
+step 32 timestamp: Thu Apr 30 13:11:20 CEST 2026
+step 33 timestamp: Thu Apr 30 13:11:36 CEST 2026
+step 34 timestamp: Thu Apr 30 13:12:02 CEST 2026
+step 35 timestamp: Thu Apr 30 13:12:19 CEST 2026
+step 36 timestamp: Thu Apr 30 13:12:43 CEST 2026
+step 37 timestamp: Thu Apr 30 13:13:00 CEST 2026
+step 38 timestamp: Thu Apr 30 13:13:16 CEST 2026
+step 39 timestamp: Thu Apr 30 13:13:30 CEST 2026
+step 40 timestamp: Thu Apr 30 13:13:47 CEST 2026
+step 41 timestamp: Thu Apr 30 13:14:08 CEST 2026
+step 42 timestamp: Thu Apr 30 13:14:30 CEST 2026
+step 43 timestamp: Thu Apr 30 13:14:48 CEST 2026
+step 44 timestamp: Thu Apr 30 13:15:01 CEST 2026
+step 45 timestamp: Thu Apr 30 13:15:12 CEST 2026
+step 46 timestamp: Thu Apr 30 13:15:25 CEST 2026
+step 47 timestamp: Thu Apr 30 13:15:36 CEST 2026
+step 48 timestamp: Thu Apr 30 13:15:49 CEST 2026
+step 49 timestamp: Thu Apr 30 13:16:01 CEST 2026
+step 50 timestamp: Thu Apr 30 13:16:15 CEST 2026
+step 51 timestamp: Thu Apr 30 13:16:29 CEST 2026
+step 52 timestamp: Thu Apr 30 13:16:42 CEST 2026
+step 53 timestamp: Thu Apr 30 13:16:57 CEST 2026
+step 54 timestamp: Thu Apr 30 13:17:21 CEST 2026
+step 55 timestamp: Thu Apr 30 13:17:38 CEST 2026
+step 56 timestamp: Thu Apr 30 13:17:52 CEST 2026
+step 57 timestamp: Thu Apr 30 13:18:07 CEST 2026
+step 58 timestamp: Thu Apr 30 13:18:22 CEST 2026
+step 59 timestamp: Thu Apr 30 13:18:35 CEST 2026
+step 60 timestamp: Thu Apr 30 13:18:52 CEST 2026
+step 61 timestamp: Thu Apr 30 13:19:13 CEST 2026
+step 62 timestamp: Thu Apr 30 13:19:37 CEST 2026
+step 63 timestamp: Thu Apr 30 13:19:52 CEST 2026
+step 64 timestamp: Thu Apr 30 13:20:05 CEST 2026
+step 65 timestamp: Thu Apr 30 13:20:22 CEST 2026
+step 66 timestamp: Thu Apr 30 13:20:39 CEST 2026
+step 67 timestamp: Thu Apr 30 13:20:52 CEST 2026
+step 68 timestamp: Thu Apr 30 13:21:08 CEST 2026
+step 69 timestamp: Thu Apr 30 13:21:33 CEST 2026
+step 70 timestamp: Thu Apr 30 13:21:48 CEST 2026
+step 71 timestamp: Thu Apr 30 13:22:08 CEST 2026
+step 72 timestamp: Thu Apr 30 13:22:27 CEST 2026
+step 73 timestamp: Thu Apr 30 13:22:44 CEST 2026
+step 74 timestamp: Thu Apr 30 13:22:57 CEST 2026
+step 75 timestamp: Thu Apr 30 13:23:12 CEST 2026
+step 76 timestamp: Thu Apr 30 13:23:29 CEST 2026
+step 77 timestamp: Thu Apr 30 13:23:46 CEST 2026
+step 78 timestamp: Thu Apr 30 13:24:06 CEST 2026
+step 79 timestamp: Thu Apr 30 13:24:26 CEST 2026
+step 80 timestamp: Thu Apr 30 13:24:39 CEST 2026
+step 81 timestamp: Thu Apr 30 13:24:56 CEST 2026
+step 82 timestamp: Thu Apr 30 13:25:08 CEST 2026
+step 83 timestamp: Thu Apr 30 13:25:21 CEST 2026
+step 84 timestamp: Thu Apr 30 13:25:34 CEST 2026
+step 85 timestamp: Thu Apr 30 13:25:54 CEST 2026
+step 86 timestamp: Thu Apr 30 13:26:12 CEST 2026
+step 87 timestamp: Thu Apr 30 13:26:30 CEST 2026
+step 88 timestamp: Thu Apr 30 13:26:45 CEST 2026
+step 89 timestamp: Thu Apr 30 13:27:01 CEST 2026
+step 90 timestamp: Thu Apr 30 13:27:15 CEST 2026
+step 91 timestamp: Thu Apr 30 13:27:30 CEST 2026
+step 92 timestamp: Thu Apr 30 13:27:48 CEST 2026
+step 93 timestamp: Thu Apr 30 13:28:05 CEST 2026
+step 94 timestamp: Thu Apr 30 13:28:19 CEST 2026
+step 95 timestamp: Thu Apr 30 13:28:36 CEST 2026
+step 96 timestamp: Thu Apr 30 13:28:55 CEST 2026
+step 97 timestamp: Thu Apr 30 13:29:07 CEST 2026
+step 98 timestamp: Thu Apr 30 13:29:19 CEST 2026
+step 99 timestamp: Thu Apr 30 13:29:30 CEST 2026
+step 100 timestamp: Thu Apr 30 13:29:41 CEST 2026
+sampling...
+[ok]
+Writing clusters to text file ./Lemon_results/cluster_4 [ok]
+LemonTree clustering completed for cluster 4

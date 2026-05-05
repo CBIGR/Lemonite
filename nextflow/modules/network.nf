@@ -57,7 +57,7 @@ process POST_CLUSTERING {
     fi
     bash \$SCRIPT_PATH \
         "${params.regulator_types}" \
-        ${params.lemontree_jar} \
+        "${params.lemontree_jar}" \
         . \
         "${params.organism}"
     
@@ -143,6 +143,16 @@ process NETWORK_GENERATION {
     ls -la Preprocessing/
     echo "================================================="
     
+    # Validate key input files before network generation
+    if [ ! -d "Lemon_out" ] || [ -z "\$(ls -A Lemon_out/)" ]; then
+        echo "Error: Lemon_out directory is missing or empty"
+        exit 1
+    fi
+    if [ ! -d "Preprocessing" ] || [ ! -f "Preprocessing/LemonPreprocessed_expression.txt" ]; then
+        echo "Error: Preprocessing directory or expression file missing"
+        exit 1
+    fi
+
     # Run network generation script
     echo "Running network generation..."
     # Check host script first (allows updates without rebuilding container)
@@ -158,10 +168,10 @@ process NETWORK_GENERATION {
         --input_dir . \
         --output_dir . \
         --run_id ${run_id} \
-        --coherence_threshold ${params.coherence_threshold} \
-        --regulator_selection_method ${params.regulator_selection_method} \
-        --top_n_percent_regulators ${params.top_n_percent_regulators} \
-        --regulator_fold_cutoff ${params.regulator_fold_cutoff} \
+        --coherence_threshold "${params.coherence_threshold}" \
+        --regulator_selection_method "${params.regulator_selection_method}" \
+        --top_n_percent_regulators "${params.top_n_percent_regulators}" \
+        --regulator_fold_cutoff "${params.regulator_fold_cutoff}" \
         --regulator_types "${params.regulator_types}"
     """
 
@@ -224,6 +234,9 @@ process SUBNETWORK_GRAPHS {
         # Find the corresponding regulator file using lowercase prefix
         PREFIX_LOWER=\$(echo "\$PREFIX" | tr '[:upper:]' '[:lower:]')
         REG_FILE=\$(find ModuleViewer_files -name "\${PREFIX}.*" -type f | head -1)
+        if [ \$(find ModuleViewer_files -name "\${PREFIX}.*" -type f | wc -l) -gt 1 ]; then
+            echo "Warning: Multiple files found for \${PREFIX}, using: \${REG_FILE}"
+        fi
         
         if [ -n "\$REG_FILE" ]; then
             if [ -z "\$REGULATOR_FILES" ]; then
@@ -275,11 +288,20 @@ process SUBNETWORK_GRAPHS {
         echo "No metabolite mapping file found - proceeding without metabolite name mapping"
     fi
     
+    # Check if name mapping exists for original name restoration
+    NAME_MAPPING_ARG=""
+    NAME_MAPPING_FILE=\$(find ./Preprocessing -name "name_mapping.tsv" | head -1)
+    if [ -n "\${NAME_MAPPING_FILE}" ] && [ -f "\${NAME_MAPPING_FILE}" ]; then
+        NAME_MAPPING_ARG="--name_mapping \${NAME_MAPPING_FILE}"
+        echo "Using name mapping file for original name restoration: \${NAME_MAPPING_FILE}"
+    fi
+    
     python3 \$SCRIPT_PATH \
         --regulator_files "\$REGULATOR_FILES" \
         --clusters ./Lemon_out/clusters_list.txt \
-        --pkn ${params.pkn_network} \
+        --pkn "${params.pkn_network}" \
         \$METABOLITE_ARG \
+        \$NAME_MAPPING_ARG \
         --output_dir ./Networks/subnetworks
     
     echo "Subnetwork graphs created successfully"

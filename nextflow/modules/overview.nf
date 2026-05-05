@@ -10,6 +10,7 @@ process MODULE_OVERVIEW_INTERACTIVE {
     path deseq_groups_file
     path pkn_file
     path metabolite_mapping
+    path name_mapping
     val run_id
     val regulator_types
 
@@ -22,14 +23,13 @@ process MODULE_OVERVIEW_INTERACTIVE {
     def coherence_threshold = params.coherence_threshold ?: 0.6
     def group_column = params.deseq_contrast1 ?: 'diagnosis'
     def n_clusters = params.overview_n_clusters ?: 5
+    def organism = params.organism ?: 'human'
     // Normalize enrichment method to proper case (enrichr -> EnrichR, gsea -> GSEA)
     def enrichment_input = params.enrichment_method ?: 'auto'
     def enrichment_method = enrichment_input.toLowerCase() == 'enrichr' ? 'EnrichR' : 
                            enrichment_input.toLowerCase() == 'gsea' ? 'GSEA' : 
                            enrichment_input
-    def use_megago = params.use_megago
     def prioritize_by_expression = params.prioritize_by_expression
-    def clustering_method = params.clustering_method ?: 'megago'
     
     """
     # Create working directory
@@ -57,9 +57,9 @@ process MODULE_OVERVIEW_INTERACTIVE {
     echo "Parameters:"
     echo "  Enrichment method: ${enrichment_method}"
     echo "  N clusters: ${n_clusters}"
+    echo "  Organism: ${organism}"
     echo "  Coherence threshold: ${coherence_threshold}"
-    echo "  Use megago: ${use_megago}"
-    echo "  Clustering method: ${clustering_method}"
+    echo "  Clustering workflow: canonical MegaGO top_30 + rrvgo"
     echo "  PKN file: ${pkn_file}"
     echo "  Metabolite mapping: ${metabolite_mapping}"
     # Debug: list enrichment dir if present
@@ -122,12 +122,10 @@ process MODULE_OVERVIEW_INTERACTIVE {
         args="\$args --regulator_score_files \$REGULATOR_SCORE_FILES"
     fi
     
-    # Always pass n_clusters; clustering algorithm is controlled by --clustering_method
+    # Always pass n_clusters for canonical MegaGO top_30 clustering
     args="\$args --n_clusters ${n_clusters}"
-    echo "Functional clustering: method=${clustering_method}, n_clusters=${n_clusters}"
-    
-    # Add clustering method
-    args="\$args --clustering_method ${clustering_method}"
+    args="\$args --organism ${organism}"
+    echo "Functional clustering: canonical MegaGO top_30, n_clusters=${n_clusters}"
     
     # Add PKN file for edge categorization if available
     if [ -f "${pkn_file}" ]; then
@@ -139,6 +137,12 @@ process MODULE_OVERVIEW_INTERACTIVE {
     if [ -f "${metabolite_mapping}" ]; then
         args="\$args --metabolite_mapping ${metabolite_mapping}"
         echo "Metabolite name mapping provided"
+    fi
+    
+    # Add name mapping for restoring original feature names
+    if [ -f "${name_mapping}" ]; then
+        args="\$args --name_mapping ${name_mapping}"
+        echo "Name mapping provided for original name restoration"
     fi
     
     # Expression prioritization is enabled by default but can be disabled
@@ -172,11 +176,17 @@ process MODULE_OVERVIEW_INTERACTIVE {
     stub:
     """
     mkdir -p Module_Overview
+    mkdir -p Module_Overview/top_30
     touch Module_Overview/Module_Overview.csv
     touch Module_Overview/interactive_module_network.html
     touch Module_Overview/interactive_module_network_movable.html
     touch Module_Overview/module_network_edges.txt
     touch Module_Overview/module_network_node_attributes.txt
     touch Module_Overview/module_expression_analysis.csv
+    touch Module_Overview/top_30/bp_terms_top_30.csv
+    touch Module_Overview/top_30/cluster_assignments_top_30.csv
+    touch Module_Overview/top_30/rrvgo_cluster_labels_top_30.csv
+    touch Module_Overview/top_30/rrvgo_module_labels_top_30.csv
+    touch Module_Overview/top_30/rrvgo_reduced_terms_top_30.csv
     """
 }

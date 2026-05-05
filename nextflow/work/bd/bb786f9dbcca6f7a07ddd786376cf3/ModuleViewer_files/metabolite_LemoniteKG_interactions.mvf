@@ -1,0 +1,41 @@
+::TYPE=Lemonite_KG
+::TITLE:Lemonite_KG
+::OBJECT=GENES
+::COLOR=YELLOW
+10	FUT9	glycerol_3_phosphate
+101	LPL|SLC16A7|SLC47A2	creatinine
+101	LPL|SLC13A4|SLC16A7|ST6GALNAC2	myo_inositol
+106	ELOVL2	citricacid
+11	ACP5	galactitol
+117	SLC16A7	2_hydroxyglutaric_acid
+118	BCHE	L_leucine
+12	ALDOC|SLC5A12	D_glucose_6_phosphate
+15	CYP3A43	2_hydroxyglutaric_acid
+19	BCAT1	2_hydroxyglutaric_acid
+19	BCAT1|NOS2|PLA2G5|PNPLA3	L_serine
+2	ENTPD3|SLC4A10	creatinine
+22	BHMT2|EEF1A2|SLC1A2|SLC22A15|SLC4A10|SLC6A11|SLC7A2|ST6GALNAC5|ST8SIA5	myo_inositol
+25	INMT	L_methionine
+25	INMT	L_proline
+26	HAS3	creatinine
+26	HAS3|LPIN3|SLC27A6|ST6GALNAC2	myo_inositol
+26	HAS3|MAOB|SLC27A6	L_aspartic_acid
+3	ANPEP	creatinine
+3	ANPEP	myo_inositol
+36	GPX8	myo_inositol
+36	HPD	2_hydroxyglutaric_acid
+37	FUT9|GAD1|NEU4	myo_inositol
+39	BCHE|EEF1A2|ENTPD2|ENTPD3|KL|MGAM|SLC47A2|SLC4A10	creatinine
+39	AK5|AK7|ALDOC|BCHE|EEF1A2|ENTPD2|ENTPD3|GLS2|KL|MGAM|SLC12A5|SLC22A15|SLC26A8|SLC27A6|SLC4A10|SLC5A12|SLC7A2	fructose
+4	HAS3|SDC1	creatinine
+57	ALDH1A3|GLUD2|GPX3|HAS3|SLC10A6|TDO2	DL_isoleucine
+57	ALDH1A3|GPX3|HAS3|SLC10A6	myo_inositol
+6	ASPA|GPIHBP1|SLC24A2|SLCO1A2	L_valine
+61	ANPEP	myo_inositol
+61	ANPEP	creatinine
+63	BCAT1|CYP19A1|HPD|P4HA3	2_hydroxyglutaric_acid
+84	CYP1B1	2_hydroxyglutaric_acid
+88	SLC16A7	glycerol_3_phosphate
+88	SLC16A7	2_hydroxyglutaric_acid
+96	ALDH1A3	heptadecanoic_acid
+97	HAS2	L_glutamic_acid

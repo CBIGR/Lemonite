@@ -82,9 +82,7 @@ class IntActRetriever(APIRetriever):
         )
         
         response = requests.post(url, timeout=timeout)
-        
-        if response.status_code != 200:
-            raise requests.exceptions.RequestException(f"HTTP {response.status_code}")
+        response.raise_for_status()
         
         data = json.loads(response.text)
         

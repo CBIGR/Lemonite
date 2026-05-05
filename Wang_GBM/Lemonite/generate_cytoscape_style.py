@@ -241,7 +241,7 @@ def main():
     parser.add_argument('--style-name', type=str, default='LemonTree_MegaGO',
                         help='Name of the style inside Cytoscape (default: LemonTree_MegaGO)')
     parser.add_argument('--output-dir', type=str,
-                        default='/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/'
+                default='/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/'
                                 'LemonTree/noProteomics_percentile2_divide_by_sum/'
                                 'Networks/megaGO_exploration',
                         help='Directory to write the style file into (used when --output is not set)')

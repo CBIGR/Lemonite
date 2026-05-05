@@ -1,0 +1,14 @@
+Node	Label	Type
+myo_inositol	myo_inositol	metabolite
+IL4I1	IL4I1	module_gene
+SDS	SDS	module_gene
+ACP5	ACP5	module_gene
+BATF	BATF	TF
+AICDA	AICDA	bridge_node
+VDR	VDR	TF
+ACE	ACE	bridge_node
+ZBTB7B	ZBTB7B	TF
+P4HA3	P4HA3	bridge_node
+STAT6	STAT6	TF
+IRF1	IRF1	TF
+NOS2	NOS2	bridge_node

@@ -1,0 +1,17 @@
+Node1	Node2	Source	Type	Category
+myo_inositol	IL4I1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	SDS	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	ACP5	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	AICDA	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	ACE	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	P4HA3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	NOS2	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+BATF	AICDA	STRING	PPI	PPI
+BATF	IRF1	STRING	PPI	PPI
+BATF	STAT6	STRING	PPI	PPI
+AICDA	STAT6	STRING	PPI	PPI
+VDR	ACE	STRING	PPI	PPI
+ZBTB7B	P4HA3	BioGRID_genes	PPI	PPI
+STAT6	IRF1	STRING	PPI	PPI
+STAT6	NOS2	STRING	PPI	PPI
+IRF1	NOS2	STRING	PPI	PPI

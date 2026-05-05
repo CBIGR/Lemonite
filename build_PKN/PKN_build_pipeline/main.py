@@ -2,7 +2,7 @@
 Main entry point for the PKN (Prior Knowledge Network) pipeline.
 
 This script orchestrates the three-step process:
-1. Collect metabolite-gene interactions from 10 databases
+1. Collect metabolite-gene interactions from multiple databases
 2. Build protein-protein interaction network
 3. Integrate and analyze final PKN
 
@@ -27,6 +27,7 @@ import argparse
 import logging
 import sys
 import os
+import time
 from pathlib import Path
 
 # Add current directory to Python path
@@ -40,9 +41,13 @@ def setup_logging():
     """Configure logging for the pipeline."""
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
     
+    # Remove existing handlers to avoid duplicates on re-run
+    root = logging.getLogger()
+    root.handlers.clear()
+    
     logging.basicConfig(
         level=logging.INFO,
-        format=config.LOG_FORMAT,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
             logging.FileHandler(config.LOG_FILE_PIPELINE),
             logging.StreamHandler(sys.stdout)
@@ -50,7 +55,7 @@ def setup_logging():
     )
 
 
-def run_step1_metabolites(databases=None, resume=False):
+def run_step1_metabolites(databases=None, resume=False, max_metabolites=None):
     """
     Run Step 1: Collect metabolite-gene interactions.
     
@@ -60,6 +65,8 @@ def run_step1_metabolites(databases=None, resume=False):
         List of database names to run (default: all)
     resume : bool
         Whether to resume from checkpoint
+    max_metabolites : int, optional
+        Cap the number of metabolites processed (for test runs)
     """
     from step1_metabolites import preprocessing, integration
     from step1_metabolites.biogrid import BioGRIDRetriever
@@ -68,7 +75,6 @@ def run_step1_metabolites(databases=None, resume=False):
     from step1_metabolites.intact import IntActRetriever
     from step1_metabolites.chembl import ChEMBLRetriever
     from step1_metabolites.lincs import LINCSRetriever
-    from step1_metabolites.l1000 import L1000Retriever
     from step1_metabolites.gem import GEMRetriever
     from step1_metabolites.metalinks import MetalinksRetriever
     
@@ -77,11 +83,20 @@ def run_step1_metabolites(databases=None, resume=False):
     logger.info("STEP 1: COLLECTING METABOLITE-GENE INTERACTIONS")
     logger.info("="*80)
     
+    step_start = time.time()
+    
     # Load metabolites from HMDB
     logger.info("Loading HMDB metabolites...")
+    if not os.path.exists(config.HMDB_METABOLITES_XML):
+        logger.error(f"HMDB metabolites file not found: {config.HMDB_METABOLITES_XML}")
+        return None
     metabolites = load_hmdb_metabolites(config.HMDB_METABOLITES_XML)
     logger.info(f"Loaded {len(metabolites)} metabolites")
-    
+
+    if max_metabolites is not None:
+        metabolites = metabolites[:max_metabolites]
+        logger.info(f"Limiting to first {max_metabolites} metabolites for this run")
+
     # Preprocess metabolites (add ChEMBL IDs, etc.)
     logger.info("\nPreprocessing metabolites...")
     metabolites_df = preprocessing.preprocess_metabolites(metabolites)
@@ -94,7 +109,6 @@ def run_step1_metabolites(databases=None, resume=False):
         'intact': IntActRetriever,
         'chembl': ChEMBLRetriever,
         'lincs': LINCSRetriever,
-        'l1000': L1000Retriever,
         'gem_dist1': lambda: GEMRetriever(distance=1),
         'gem_dist2': lambda: GEMRetriever(distance=2),
         'metalinks': MetalinksRetriever
@@ -152,6 +166,7 @@ def run_step1_metabolites(databases=None, resume=False):
     logger.info(f"{'='*80}")
     logger.info(f"Final network: {len(final_network)} interactions")
     logger.info(f"Saved to: {config.METABOLITE_GENE_PKN}")
+    logger.info(f"Step 1 elapsed time: {time.time() - step_start:.1f}s")
     
     return final_network
 
@@ -165,6 +180,16 @@ def run_step2_proteins():
     logger.info("STEP 2: BUILDING PROTEIN-PROTEIN INTERACTION NETWORK")
     logger.info("="*80)
     
+    # Validate that step 1 output exists
+    if not os.path.exists(config.METABOLITE_GENE_PKN):
+        logger.error(
+            f"Metabolite-gene PKN not found: {config.METABOLITE_GENE_PKN}\n"
+            f"Run step 1 first: python main.py --step 1"
+        )
+        return None
+    
+    step_start = time.time()
+    
     # Run PPI collection
     ppi_network = ppi_integration.build_ppi_network()
     
@@ -172,8 +197,9 @@ def run_step2_proteins():
     logger.info(f"  Total interactions: {len(ppi_network)}")
     logger.info(f"  Unique proteins: {ppi_network[['Node1', 'Node2']].stack().nunique()}")
     logger.info(f"  Output: {config.PPI_OUTPUT_FILE}")
+    logger.info(f"Step 2 elapsed time: {time.time() - step_start:.1f}s")
     
-    logger.info("\n✅ STEP 2 COMPLETE")
+    logger.info("\nSTEP 2 COMPLETE")
 
 
 def run_step3_final():
@@ -184,6 +210,21 @@ def run_step3_final():
     logger.info("\n"+"="*80)
     logger.info("STEP 3: FINAL PKN INTEGRATION AND ANALYSIS")
     logger.info("="*80)
+    
+    # Validate that step 1 and step 2 outputs exist
+    missing = []
+    if not os.path.exists(config.METABOLITE_GENE_PKN):
+        missing.append(f"Metabolite-gene PKN: {config.METABOLITE_GENE_PKN}")
+    if not os.path.exists(config.PPI_NETWORK):
+        missing.append(f"PPI network: {config.PPI_NETWORK}")
+    if missing:
+        logger.error(
+            f"Required input files not found:\n  " + "\n  ".join(missing) +
+            "\nRun steps 1 and 2 first."
+        )
+        return None
+    
+    step_start = time.time()
     
     # Combine networks
     final_pkn = combiner.combine_networks()
@@ -212,6 +253,7 @@ def run_step3_final():
     logger.info(f"Final PKN: {len(final_pkn)} interactions")
     logger.info(f"Saved to: {config.FINAL_PKN_FILE}")
     logger.info(f"With URLs: {config.FINAL_PKN_WITH_LINKS_FILE}")
+    logger.info(f"Step 3 elapsed time: {time.time() - step_start:.1f}s")
     
     return final_pkn
 
@@ -246,11 +288,45 @@ def main():
     parser.add_argument(
         '--resume',
         action='store_true',
-        help='Resume from checkpoint (for L1000 or other long-running tasks)'
+        help='Resume from checkpoint (for long-running API tasks)'
+    )
+
+    parser.add_argument(
+        '--workers',
+        type=int,
+        default=None,
+        metavar='N',
+        help='Number of concurrent worker threads (overrides per-database defaults)'
+    )
+
+    parser.add_argument(
+        '--max-metabolites',
+        type=int,
+        default=None,
+        metavar='N',
+        help='Limit step 1 to the first N metabolites (useful for test runs)'
+    )
+
+    parser.add_argument(
+        '--output-dir',
+        type=str,
+        default=None,
+        metavar='DIR',
+        help='Output directory name (relative to WORKDIR) or absolute path'
     )
     
     args = parser.parse_args()
-    
+
+    # Apply output directory override BEFORE setup_logging so logs land in the right place
+    if args.output_dir:
+        config.reconfigure_output_dir(args.output_dir)
+
+    # Apply workers override to every database entry and the global default
+    if args.workers is not None:
+        config.MAX_WORKERS_DEFAULT = args.workers
+        for db in config.API_RETRY_CONFIG:
+            config.API_RETRY_CONFIG[db]['max_workers'] = args.workers
+
     # Setup logging
     setup_logging()
     logger = logging.getLogger('main')
@@ -267,11 +343,11 @@ def main():
     
     # Run requested steps
     if args.all:
-        run_step1_metabolites(databases=databases, resume=args.resume)
+        run_step1_metabolites(databases=databases, resume=args.resume, max_metabolites=args.max_metabolites)
         run_step2_proteins()
         run_step3_final()
     elif args.step == 1:
-        run_step1_metabolites(databases=databases, resume=args.resume)
+        run_step1_metabolites(databases=databases, resume=args.resume, max_metabolites=args.max_metabolites)
     elif args.step == 2:
         run_step2_proteins()
     elif args.step == 3:

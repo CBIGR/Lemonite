@@ -1,0 +1,10 @@
+Node	Label	Type
+creatinine	creatinine	metabolite
+SLC4A10	SLC4A10	module_gene
+D_mannose	D_mannose	metabolite
+MYT1L	MYT1L	TF
+PXDN	PXDN	bridge_node
+BCL6	BCL6	TF
+AOC3	AOC3	bridge_node
+ZNF512	ZNF512	TF
+GCK	GCK	bridge_node

@@ -30,11 +30,11 @@ STITCH_FILE = '/path/to/your/9606.protein_chemical.links.v5.0.tsv'
 ```bash
 python main.py --all
 ```
-This runs all 3 steps sequentially (~3-5 hours total).
+This runs all 3 steps sequentially (~2-3 hours total).
 
 ### Option 2: Run Individual Steps
 ```bash
-# Step 1: Metabolite-gene interactions (~2-4 hours)
+# Step 1: Metabolite-gene interactions (~1-2 hours)
 python main.py --step 1
 
 # Step 2: PPI network (~30-60 minutes)
@@ -52,7 +52,7 @@ python main.py --step 1 --databases biogrid,stitch,lincs
 
 ### Option 4: Resume from Checkpoint
 ```bash
-# If L1000 or ChEMBL mapping was interrupted
+# If ChEMBL mapping or API queries were interrupted
 python main.py --step 1 --resume
 ```
 
@@ -64,7 +64,6 @@ Each retriever can be tested standalone:
 cd step1_metabolites
 python biogrid.py      # Test BioGRID retriever
 python stitch.py       # Test STITCH retriever
-python l1000.py        # Test L1000 retriever
 # ... etc
 ```
 
@@ -108,17 +107,10 @@ ls -lh output/figures/*.png
 
 ### Problem: Out of Memory
 **Solution**: 
-- L1000 requires ~8GB RAM
 - Close other applications
 - Consider running on a machine with more memory
 
-### Problem: L1000 Takes Too Long
-**Solution**: 
-- L1000 processes ~2.1GB file (1-2 hours is normal)
-- Use `--resume` flag if interrupted
-- Or exclude L1000: `python main.py --step 1 --databases biogrid,stitch,uniprot,...`
-
-### Problem: ChEMBL Mapping Fails
+### Problem: API Rate Limits
 **Solution**:
 - Check internet connection (requires API access)
 - Pipeline caches results to `HMDB_metabolites_ChEMBL_mapping.csv`
@@ -126,11 +118,10 @@ ls -lh output/figures/*.png
 
 ## Performance Tips
 
-1. **Run overnight**: Full pipeline takes 3-5 hours
-2. **Use --resume**: Checkpoints save progress for L1000 and ChEMBL mapping
+1. **Run overnight**: Full pipeline takes 2-3 hours
+2. **Use --resume**: Checkpoints save progress for API queries and ChEMBL mapping
 3. **Check logs**: `pipeline.log` shows detailed progress
-4. **Exclude slow databases**: Use `--databases` flag to skip L1000 if needed
-5. **Run steps separately**: Split into 3 sessions if time is limited
+4. **Run steps separately**: Split into 3 sessions if time is limited
 
 ## Directory Structure After Completion
 
@@ -182,7 +173,6 @@ If you use this pipeline in your research, please cite:
 - IntAct: https://www.ebi.ac.uk/intact/
 - chEMBL: https://www.ebi.ac.uk/chembl/
 - LINCS: https://lincsproject.org/
-- L1000: https://clue.io/
 - Human-GEM: https://metabolicatlas.org/
 - MetalinksDB: http://metalinks.csb.pitt.edu/
 - HuRI: http://www.interactome-atlas.org/

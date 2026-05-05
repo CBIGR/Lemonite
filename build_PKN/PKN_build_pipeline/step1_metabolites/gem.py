@@ -90,17 +90,10 @@ class GEMRetriever(DatabaseRetriever):
         self.logger.info(f"✓ Human-GEM contains {len(self.metabolites_full_name)} unique metabolites")
         
         # Define ubiquitous metabolites to exclude (cofactors, common currency)
-        metabolites_ubiquitous = [
-            'MAM02039', 'MAM02040', 'MAM01371', 'MAM02751', 'MAM01285',
-            'MAM02555', 'MAM0254', 'MAM02630', 'MAM01597', 'MAM02552',
-            'MAM02553', 'MAM02554', 'MAM02759', 'MAM02046', 'MAM01334',
-            '2 MAM02039', '2 MAM02040'
-        ]
-        
         # Add compartment suffixes to exclusion list
         metabolites_to_exclude = []
-        for suffix in ['c', 'g', 'l', 'm', 'n', 'x', 'r', 'e']:
-            for metabolite in metabolites_ubiquitous:
+        for suffix in config.GEM_COMPARTMENT_SUFFIXES:
+            for metabolite in config.GEM_UBIQUITOUS_METABOLITES:
                 metabolites_to_exclude.append(f'{metabolite}{suffix}')
         
         self.logger.info(f"✓ Excluding {len(metabolites_to_exclude)} ubiquitous metabolites")

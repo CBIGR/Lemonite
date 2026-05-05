@@ -1,0 +1,45 @@
+Using bundled network from projectDir: /home/borisvdm/repo/LemonIte/nextflow/PKN/CollecTRI_network.txt
+Found core files:
+Expression: data/Counts.tsv
+Metadata: data/Metadata.txt
+Prior network: /home/borisvdm/repo/LemonIte/nextflow/PKN/CollecTRI_network.txt
+Copied name_map.csv to Preprocessing directory
+WARNING: ignoring environment value of R_HOME
+
+ Regulator types configuration:
+   - TFs: Lovering_TF_list.txt (continuous)
+   - Metabolites: Metabolomics.txt (continuous)
+Metadata columns to include: diagnosis 
+   [OK] Using custom TF list: TFs (data/Lovering_TF_list.txt)
+   [OK] Identified TF list: TFs
+   [OK] Identified regulator data: Metabolites (Metabolomics.txt)
+Starting preprocessing with the following parameters:
+Expression file: data/Counts.tsv 
+Metadata file: data/Metadata.txt 
+TF list file: data/Lovering_TF_list.txt 
+Metabolites file: data/Metabolomics.txt
+Metadata file: data/Metadata.txt 
+Output directory: . 
+Top n variable genes: 2000 
+Perform TFA: TRUE 
+Prior network: /home/borisvdm/repo/LemonIte/nextflow/PKN/CollecTRI_network.txt 
+TF list: data/Lovering_TF_list.txt 
+
+=== TFA ANALYSIS PREREQUISITES CHECK ===
+[OK] Prior network file found: /home/borisvdm/repo/LemonIte/nextflow/PKN/CollecTRI_network.txt 
+[OK] TFA analysis will proceed using available network source
+============================================
+
+=== METADATA REQUIREMENTS VALIDATION ===
+ Expected metadata structure for Lemonite pipeline:
+   - Sample IDs as row names or in column: Sample_ID 
+   - Required columns: diagnosis (or diagnosis )
+   - Optional columns: sex, age, batch, biopsy_location
+   - File format: Tab-separated (.txt)
+   - Output: DESeq_groups.txt for downstream analysis
+=============================================
+
+Reading RNA-seq data...
+Connecting to Ensembl BioMart...
+Trying Ensembl server: https://www.ensembl.org
+Successfully connected to: https://www.ensembl.org

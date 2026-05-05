@@ -19,6 +19,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import LinearSegmentedColormap
 import networkx as nx
+import openpyxl  # noqa: F401 — required by pandas .to_excel()
+
+
+def _save_excel(df, txt_path):
+    """Save a DataFrame as .xlsx alongside its .txt counterpart."""
+    xlsx_path = os.path.splitext(txt_path)[0] + '.xlsx'
+    df.to_excel(xlsx_path, index=False)
 
 
 class RegulatorConfig:
@@ -301,6 +308,7 @@ def main():
     coherence_df = pd.DataFrame(list(coherence_scores.items()), columns=['Module', 'Coherence_Score'])
     coherence_df = coherence_df.sort_values('Coherence_Score', ascending=False)
     coherence_df.to_csv(f'./Networks/Module_coherence_scores.txt', sep='\t', index=False)
+    _save_excel(coherence_df, './Networks/Module_coherence_scores.txt')
     print(f"Saved coherence scores to: ./Networks/Module_coherence_scores.txt")
     
     # Step 8: Prioritize modules
@@ -511,7 +519,12 @@ def selectregulators_scorecutoff_permodule(allregfile, randomregfile, fold_cutof
 
 
     all_scores.sort(reverse=True)
-    print(all_scores)
+
+    # Pre-compute rank lookup (O(n) instead of O(n²) .index() calls)
+    score_ranks = {}
+    for i, s in enumerate(all_scores):
+        if s not in score_ranks:
+            score_ranks[s] = i + 1
     
     # Convert regulator ensembl id's to gene symbols, store mapping in dictionary
     ensemble_mapping = {}
@@ -523,8 +536,8 @@ def selectregulators_scorecutoff_permodule(allregfile, randomregfile, fold_cutof
                 ensembl = line[0]
                 symbol = line[1]
                 ensemble_mapping[ensembl] = symbol
-    except:
-        pass
+    except (FileNotFoundError, IOError) as e:
+        print(f"Warning: Could not load Ensembl mapping: {e}")
     
     # Create output regulator file and print some diagnosticsModules
     with open(outfile, 'w') as handle3:
@@ -535,7 +548,7 @@ def selectregulators_scorecutoff_permodule(allregfile, randomregfile, fold_cutof
             for reg in regs_for_module:
                 regulator = reg.split('|')[0]
                 score = reg.split('|')[1]
-                rank = str(all_scores.index(float(score)) + 1)
+                rank = str(score_ranks.get(float(score), len(all_scores)))
                 if ensemble_to_symbol == False:
                     out = out + regulator + '\t' + element + '\t' + score + '\t' + rank +'\n'
                 else:
@@ -571,18 +584,17 @@ def normalize_selected_regulators_sum(selected_file):
     orig_max = selected['Score'].max()
     orig_sum = selected['Score'].sum()
     
-    # Apply GLOBAL sum normalization: divide by total sum across all modules and scale by 100
+    # Apply GLOBAL sum normalization: divide by total sum across all modules and scale by 1000
     total_sum = selected['Score'].sum()
     if total_sum > 0:
         selected['Score'] = selected['Score'] / total_sum * 1000.0
-        # round to nearest integer
-        selected['Score'] = selected['Score'].round()
     else:
-        # Edge case: if total sum is zero, distribute 100 equally across entries
+        # Edge case: if total sum is zero, distribute 1000 equally across entries
         selected['Score'] = 1000.0 / len(selected)
     
     # Save normalized scores back to the SAME file
     selected.to_csv(selected_file, sep='\t', index=False)
+    _save_excel(selected, selected_file)
     
     print(f"  Normalized {len(selected)} selected regulator-module pairs")
     print(f"  Original range: [{orig_min:.4f}, {orig_max:.4f}]")
@@ -635,7 +647,12 @@ def selectregulators_percentage(allregfile, randomregfile, outfile, percentage, 
 
     
     all_scores.sort(reverse=True)
-    print(all_scores)
+
+    # Pre-compute rank lookup (O(n) instead of O(n²) .index() calls)
+    score_ranks = {}
+    for i, s in enumerate(all_scores):
+        if s not in score_ranks:
+            score_ranks[s] = i + 1
     
     # Convert regulator ensembl id's to gene symbols, store mapping in dictionary
     ensemble_mapping = {}
@@ -647,8 +664,8 @@ def selectregulators_percentage(allregfile, randomregfile, outfile, percentage, 
                 ensembl = line[0]
                 symbol = line[1]
                 ensemble_mapping[ensembl] = symbol
-    except:
-        pass
+    except (FileNotFoundError, IOError) as e:
+        print(f"Warning: Could not load Ensembl mapping: {e}")
     
     # Create output regulator file and print some diagnosticsModules
     with open(outfile, 'w') as handle3:
@@ -659,7 +676,7 @@ def selectregulators_percentage(allregfile, randomregfile, outfile, percentage, 
             for reg in regs_for_module:
                 regulator = reg.split('|')[0]
                 score = reg.split('|')[1]
-                rank = str(all_scores.index(float(score)) + 1)
+                rank = str(score_ranks.get(float(score), len(all_scores)))
                 if ensemble_to_symbol == False:
                     out = out + regulator + '\t' + element + '\t' + str(score) + '\t' + rank +'\n'
                 else:
@@ -693,7 +710,7 @@ def create_regulator_heatmap(method_suffix):
         cmap = LinearSegmentedColormap.from_list('custom_cmap', ['white', 'red'])
 
         # Set annotations: show value only if it's not zero
-        annot = heatmap_df.applymap(lambda x: '' if x == 0 else f'{x:.2f}')
+        annot = heatmap_df.map(lambda x: '' if x == 0 else f'{x:.2f}')
 
         # Plot heatmap
         plt.figure(figsize=(9, 12))
@@ -890,6 +907,7 @@ def Prioritize_modules_coherence(coherence_scores, filtered_modules):
     df = pd.DataFrame(list(modules_ordered.items()), columns=['Module', 'coherence_score'])
     print(df)
     df.to_csv(f'Module_prioritization_coherence.txt', sep='\t', index=False)
+    _save_excel(df, 'Module_prioritization_coherence.txt')
     return modules_ordered
 
 def print_summary(coherence_scores, low_coherence_modules, cluster2gene, specific_modules, coherence_threshold, method_suffix, regulator_selection_method):
@@ -982,8 +1000,10 @@ def build_network(reg_files, cluster2gene, regulator_configs, specific_modules_l
         network_df = pd.DataFrame(columns=['Regulator', 'Target', 'Score', 'Lemon_module', 'Type'])
 
     # Write to file with method_suffix
-    network_df.to_csv(f'./Networks/LemonNetwork_{method_suffix}_{modules_name}modules.txt', sep='\t', index=False)
-    print(f"Network saved to: ./Networks/LemonNetwork_{method_suffix}_{modules_name}modules.txt")
+    txt_path = f'./Networks/LemonNetwork_{method_suffix}_{modules_name}modules.txt'
+    network_df.to_csv(txt_path, sep='\t', index=False)
+    _save_excel(network_df, txt_path)
+    print(f"Network saved to: {txt_path}")
     
     # Print network statistics
     print(f'The network contains {network_df["Target"].nunique()} unique genes.')
@@ -1039,6 +1059,7 @@ def save_regulator_targets(regulator_mappings, method_suffix, actual_n_modules, 
         file_prefix = type_to_prefix.get(reg_type, reg_type)
         output_file = f'./Networks/{file_prefix}2targets_{method_suffix}_{actual_n_modules}_modules.txt'
         df.to_csv(output_file, sep='\t', index=False)
+        _save_excel(df, output_file)
         print(f"  {reg_type}: {len(df)} regulators -> {output_file}")
 
 def create_ranked_reg_file(network, n_modules_actual, regulator_mappings, regulator2module, method_suffix):
@@ -1073,6 +1094,7 @@ def create_ranked_reg_file(network, n_modules_actual, regulator_mappings, regula
     # Write to file
     output_file = f'./Networks/Network_{method_suffix}_{n_modules_actual}_modules_{type_name}_ranked_regulators.txt'
     sum_scores_df.to_csv(output_file, sep='\t', index=False)
+    _save_excel(sum_scores_df, output_file)
     print(f"  Saved: {output_file}")
 
 def createCytoscapeFiles(modules_to_use=None, reg_files=None, method_suffix='top2pct', regulator_mappings=None):
@@ -1110,6 +1132,7 @@ def createCytoscapeFiles(modules_to_use=None, reg_files=None, method_suffix='top
             combined_data = pd.concat(data_frames, ignore_index=True)
             # Write the dataframe to a file
             combined_data.to_csv(handle, sep='\t', index=False)
+            _save_excel(combined_data, f'./Networks/Cytoscape_network_{n_modules}_modules_{method_suffix}_filtered.txt')
             
             # Now we need to create an attributes file
             regulators = combined_data['Regulator'].unique().tolist()
@@ -1136,6 +1159,20 @@ def createCytoscapeFiles(modules_to_use=None, reg_files=None, method_suffix='top
                 # Write module types
                 for target in targets:
                     handle2.write(str(target) + '\t' + 'Module' + '\n')
+            
+            # Also save attributes as Excel
+            attr_rows = []
+            for regulator in regulators:
+                reg_type_label = 'Unknown'
+                if regulator_mappings:
+                    for reg_type, reg_dict in regulator_mappings.items():
+                        if regulator in reg_dict.keys():
+                            reg_type_label = reg_type.replace('-gene', '')
+                            break
+                attr_rows.append({'Name': regulator, 'Type': reg_type_label})
+            for target in targets:
+                attr_rows.append({'Name': target, 'Type': 'Module'})
+            _save_excel(pd.DataFrame(attr_rows), f'./Networks/Cytoscape_attributes_{n_modules}_modules_filtered.txt')
             
             print(f"Created Cytoscape files for {len(regulators)} regulators and {len(targets)} modules")
         else:

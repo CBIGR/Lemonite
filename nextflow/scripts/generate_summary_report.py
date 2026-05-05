@@ -24,6 +24,7 @@ warnings.filterwarnings('ignore')
 
 import pandas as pd
 import numpy as np
+import openpyxl  # noqa: F401 — required by pandas .to_excel()
 
 # Try to import optional dependencies
 try:
@@ -46,6 +47,7 @@ def parse_arguments():
                        help='Regulator types configuration')
     parser.add_argument('--parameters_file', default=None, help='Path to pipeline_parameters_log.txt')
     parser.add_argument('--organism', default='human', help='Organism (human/mouse)')
+    parser.add_argument('--name_mapping', default=None, help='Path to name_mapping.tsv for restoring original feature names')
     args = parser.parse_args()
     return args
 
@@ -1176,7 +1178,7 @@ def collect_regulator_rankings(output_dir, run_id, regulator_configs):
     return regulator_rankings
 
 
-def generate_regulator_ranking_section(regulator_rankings):
+def generate_regulator_ranking_section(regulator_rankings, name_lookup=None):
     """Generate HTML for regulator ranking tables section."""
     if not regulator_rankings:
         return '<p>No regulator score data available.</p>'
@@ -1206,7 +1208,7 @@ def generate_regulator_ranking_section(regulator_rankings):
             overall_rank = item.get('Overall_rank', 'N/A')
             parts.append(
                 f'<tr><td>{rank}</td>'
-                f'<td>{item.get("Regulator", "N/A")}</td>'
+                f'<td>{name_lookup.get(item.get("Regulator", "N/A"), item.get("Regulator", "N/A")) if name_lookup else item.get("Regulator", "N/A")}</td>'
                 f'<td>Module {item.get("Module", "N/A")}</td>'
                 f'<td style="{score_style}">{score:.0f}</td>'
                 f'<td>{overall_rank}</td></tr>'
@@ -1230,7 +1232,7 @@ def generate_regulator_ranking_section(regulator_rankings):
             score_style = 'color:#27ae60;font-weight:600;' if total_score > 0 else 'color:#e74c3c;'
             parts.append(
                 f'<tr><td>{rank}</td>'
-                f'<td>{item.get("Regulator", "N/A")}</td>'
+                f'<td>{name_lookup.get(item.get("Regulator", "N/A"), item.get("Regulator", "N/A")) if name_lookup else item.get("Regulator", "N/A")}</td>'
                 f'<td style="{score_style}">{total_score:.0f}</td>'
                 f'<td>{item.get("N_Modules", 0)}</td>'
                 f'<td style="font-size:0.9em;max-width:400px;word-wrap:break-word;">{item.get("Target_Modules", "")}</td></tr>'
@@ -1928,7 +1930,7 @@ def generate_html_report(all_stats, output_path):
         </button>
         <div class="collapsible-content">
             <div class="param-list" style="padding: 1rem;">
-                {generate_param_items(params, ['enrichment_method', 'enrichr_libraries', 'pkn_network', 'use_megago', 'prioritize_by_expression', 'overview_n_clusters'])}
+                {generate_param_items(params, ['enrichment_method', 'enrichr_libraries', 'pkn_network', 'prioritize_by_expression', 'overview_n_clusters'])}
             </div>
         </div>
     </section>
@@ -2213,7 +2215,7 @@ def generate_html_report(all_stats, output_path):
             <h2>Regulator Rankings</h2>
         </div>
         <p style="margin-bottom:1rem;">Regulator-module pairs ranked by LemonTree association score. Higher scores indicate stronger predicted regulatory relationships. Only coherence-filtered modules are included.</p>
-        {generate_regulator_ranking_section(regulator_rankings)}
+        {generate_regulator_ranking_section(regulator_rankings, name_lookup=all_stats.get('name_lookup'))}
     </section>
     """)
     
@@ -2438,6 +2440,62 @@ def generate_ranking_table(rankings, score_col):
     '''
 
 
+def _save_tsv_and_excel(df, base_path):
+    """Save a DataFrame as both TSV and Excel (.xlsx)."""
+    tsv_path = base_path if base_path.endswith('.tsv') else os.path.splitext(base_path)[0] + '.tsv'
+    xlsx_path = os.path.splitext(tsv_path)[0] + '.xlsx'
+    df.to_csv(tsv_path, sep='\t', index=False)
+    df.to_excel(xlsx_path, index=False)
+    return tsv_path, xlsx_path
+
+
+def export_data_tables(all_stats, output_dir):
+    """Export key data tables as TSV + Excel files alongside the HTML report."""
+    tables_dir = os.path.join(output_dir, 'report_tables')
+    os.makedirs(tables_dir, exist_ok=True)
+    exported = []
+
+    name_lookup = all_stats.get('name_lookup') or {}
+
+    # --- Regulator rankings ---
+    regulator_rankings = all_stats.get('regulator_rankings', {})
+    for reg_type, data in regulator_rankings.items():
+        # Pairs table
+        if data.get('pairs'):
+            df = pd.DataFrame(data['pairs'])
+            if name_lookup and 'Regulator' in df.columns:
+                df['Regulator'] = df['Regulator'].map(lambda r: name_lookup.get(r, r))
+            path = os.path.join(tables_dir, f'regulator_pairs_{reg_type}')
+            exported.extend(_save_tsv_and_excel(df, path))
+        # Summary table
+        if data.get('summary'):
+            df = pd.DataFrame(data['summary'])
+            if name_lookup and 'Regulator' in df.columns:
+                df['Regulator'] = df['Regulator'].map(lambda r: name_lookup.get(r, r))
+            path = os.path.join(tables_dir, f'regulator_summary_{reg_type}')
+            exported.extend(_save_tsv_and_excel(df, path))
+
+    # --- Module rankings ---
+    rankings = all_stats.get('rankings', {})
+    ranking_keys = {
+        'by_coherence': 'module_ranking_by_coherence',
+        'by_de': 'module_ranking_by_de',
+        'by_size': 'module_ranking_by_size',
+        'by_ppi_enrichment': 'module_ranking_by_ppi_enrichment',
+        'by_metgene_enrichment': 'module_ranking_by_metgene_enrichment',
+    }
+    for key, filename in ranking_keys.items():
+        data = rankings.get(key, [])
+        if data:
+            df = pd.DataFrame(data)
+            path = os.path.join(tables_dir, filename)
+            exported.extend(_save_tsv_and_excel(df, path))
+
+    if exported:
+        print(f"Exported {len(exported)} data table files to {tables_dir}")
+    return exported
+
+
 def main():
     args = parse_arguments()
     
@@ -2448,6 +2506,17 @@ def main():
     print(f"Output directory: {args.output_dir}")
     print(f"Run ID: {args.run_id}")
     print("="*60)
+    
+    # Load name mapping for restoring original feature names
+    name_lookup = {}
+    if args.name_mapping and os.path.exists(args.name_mapping):
+        try:
+            nm_df = pd.read_csv(args.name_mapping, sep='\t')
+            if 'cleaned' in nm_df.columns and 'original' in nm_df.columns:
+                name_lookup = dict(zip(nm_df['cleaned'], nm_df['original']))
+                print(f"Loaded {len(name_lookup)} name mappings for original name restoration")
+        except Exception as e:
+            print(f"Warning: Could not load name mapping: {e}")
     
     # Parse regulator types
     regulator_configs = parse_regulator_types(args.regulator_types)
@@ -2460,6 +2529,7 @@ def main():
         'run_id': args.run_id,
         'organism': args.organism,
         'input': input_stats,
+        'name_lookup': name_lookup,
     }
     gc.collect()
     
@@ -2512,6 +2582,12 @@ def main():
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     
     generate_html_report(all_stats, output_path)
+    gc.collect()
+    
+    # Export key data tables as TSV + Excel
+    print("Exporting data tables...")
+    report_dir = os.path.join(args.output_dir, args.run_id)
+    export_data_tables(all_stats, report_dir)
     gc.collect()
     
     print("\n" + "="*60)

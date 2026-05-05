@@ -1,0 +1,17 @@
+Node1	Node2	Source	Type	Category
+L_glutamic_acid	GYS2	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+L_glutamic_acid	ACSL1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+L_glutamic_acid	SLC9A8	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+L_glutamic_acid	ATP1A1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+L_glutamic_acid	CYP2C9	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+L_glutamic_acid	LDHB	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+2_hydroxyglutaric_acid	LDHB	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+2_hydroxyglutaric_acid	CYP2C9	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+TEAD2	GYS2	STRING	PPI	PPI
+TEAD2	LDHB	STRING	PPI	PPI
+GYS2	LDHB	STRING	PPI	PPI
+GYS2	ACSL1	STRING	PPI	PPI
+STOX2	ACSL1	STRING	PPI	PPI
+ZNF182	SLC9A8	BioGRID_genes	PPI	PPI
+NFKB2	ATP1A1	BioGRID_genes	PPI	PPI
+NFKB2	CYP2C9	STRING	PPI	PPI

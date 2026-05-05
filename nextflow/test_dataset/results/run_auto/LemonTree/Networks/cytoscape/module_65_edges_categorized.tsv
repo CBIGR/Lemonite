@@ -1,0 +1,8 @@
+Node1	Node2	Source	Type	Category
+2_hydroxyglutaric_acid	CYP19A1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+2_hydroxyglutaric_acid	SLC25A1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+2_hydroxyglutaric_acid	GAD1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+SOX9	CYP19A1	STRING	PPI	PPI
+SOX9	FOXG1	STRING	PPI	PPI
+TBX1	SLC25A1	STRING	PPI	PPI
+FOXG1	GAD1	STRING	PPI	PPI

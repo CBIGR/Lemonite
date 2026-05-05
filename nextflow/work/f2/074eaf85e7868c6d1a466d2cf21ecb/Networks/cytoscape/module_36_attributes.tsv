@@ -1,0 +1,6 @@
+Node	Label	Type
+D_glucose_6_phosphate	D_glucose_6_phosphate	metabolite
+FOXP4	FOXP4	TF
+NME1	NME1	bridge_node
+CREB3L4	CREB3L4	TF
+GANAB	GANAB	bridge_node

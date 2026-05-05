@@ -1,0 +1,1 @@
+/home/borisvdm/repo/LemonIte/nextflow/work/76/174d067205f77b10ad2e5a53a2db6e/pipeline_parameters_log.txt

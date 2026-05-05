@@ -99,6 +99,55 @@ parse_regulator_types <- function(regulator_types_str) {
   return(configs)
 }
 
+empty_formatted_results <- function() {
+  data.frame(
+    Module = character(0),
+    Database = character(0),
+    Term = character(0),
+    p.adjust = numeric(0),
+    stringsAsFactors = FALSE
+  )
+}
+
+standardize_formatted_results <- function(results_df) {
+  required_columns <- c("Module", "Database", "Term", "p.adjust")
+
+  if (is.null(results_df) || nrow(results_df) == 0) {
+    return(empty_formatted_results())
+  }
+
+  for (column_name in required_columns) {
+    if (!column_name %in% colnames(results_df)) {
+      results_df[[column_name]] <- if (column_name == "p.adjust") numeric(nrow(results_df)) else character(nrow(results_df))
+    }
+  }
+
+  standardized <- results_df[, required_columns, drop = FALSE]
+  standardized$Module <- as.character(standardized$Module)
+  standardized$Database <- as.character(standardized$Database)
+  standardized$Term <- as.character(standardized$Term)
+  standardized$p.adjust <- as.numeric(standardized$p.adjust)
+  standardized <- standardized[!is.na(standardized$p.adjust), , drop = FALSE]
+
+  if (nrow(standardized) == 0) {
+    return(empty_formatted_results())
+  }
+
+  standardized[order(standardized$Module, standardized$Database, standardized$p.adjust, standardized$Term), , drop = FALSE]
+}
+
+select_top_n_results <- function(results_df, top_n = 10L) {
+  standardized <- standardize_formatted_results(results_df)
+
+  if (nrow(standardized) == 0 || is.na(top_n) || top_n <= 0) {
+    return(standardized)
+  }
+
+  group_key <- paste(standardized$Module, standardized$Database, sep = "__")
+  rank_within_group <- ave(seq_len(nrow(standardized)), group_key, FUN = seq_along)
+  standardized[rank_within_group <= top_n, , drop = FALSE]
+}
+
 if (is.null(opt$input_dir)){
   print_help(opt_parser)
   stop("Input directory must be supplied", call.=FALSE)
@@ -397,17 +446,18 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
   }
 
   process_gsea_result <- function(result, cluster, db) {
-    extract_top <- function(subset, direction) {
+    extract_formatted <- function(subset) {
       if (nrow(subset) == 0) return(data.frame())
-      subset <- subset[order(-abs(subset$NES)), ][1:10, ]
       subset <- subset[subset$p.adjust <= 0.05, ]
+      if (nrow(subset) == 0) return(data.frame())
+      subset <- subset[order(subset$p.adjust, -abs(subset$NES), subset$Description), ]
       subset$Module <- cluster
       subset$Database <- db
       subset$Term <- paste(subset$ID, subset$Description, sep = " - ")
       subset[, c("Module", "Database", "Term", "p.adjust")]
     }
-    up <- tryCatch(extract_top(result[result$NES > 0, ], "up"), error = function(e) data.frame())
-    down <- tryCatch(extract_top(result[result$NES < 0, ], "down"), error = function(e) data.frame())
+    up <- tryCatch(extract_formatted(result[result$NES > 0, ]), error = function(e) data.frame())
+    down <- tryCatch(extract_formatted(result[result$NES < 0, ]), error = function(e) data.frame())
     list(up, down)
   }
 
@@ -501,75 +551,31 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
   )
 
   # Split up/down results
-  top_pathways_list_up <- lapply(gsea_results, `[[`, 1)
-  top_pathways_list_down <- lapply(gsea_results, `[[`, 2)
+  all_pathways_list_up <- lapply(gsea_results, `[[`, 1)
+  all_pathways_list_down <- lapply(gsea_results, `[[`, 2)
 
   # Combine into data.frames
-  top_pathways_df_up <- do.call(rbind, top_pathways_list_up)
-  top_pathways_df_down <- do.call(rbind, top_pathways_list_down)
-
-  # Remove NA and ensure proper structure
-  if (nrow(top_pathways_df_up) > 0) {
-    top_pathways_df_up <- top_pathways_df_up[!is.na(top_pathways_df_up$p.adjust), ]
-  } else {
-    top_pathways_df_up <- data.frame(
-      Module = character(0),
-      Database = character(0), 
-      Term = character(0),
-      p.adjust = numeric(0),
-      stringsAsFactors = FALSE
-    )
-  }
-  
-  if (nrow(top_pathways_df_down) > 0) {
-    top_pathways_df_down <- top_pathways_df_down[!is.na(top_pathways_df_down$p.adjust), ]
-  } else {
-    top_pathways_df_down <- data.frame(
-      Module = character(0),
-      Database = character(0), 
-      Term = character(0),
-      p.adjust = numeric(0),
-      stringsAsFactors = FALSE
-    )
-  }
+  all_pathways_df_up <- standardize_formatted_results(do.call(rbind, all_pathways_list_up))
+  all_pathways_df_down <- standardize_formatted_results(do.call(rbind, all_pathways_list_down))
+  top_pathways_df_up <- select_top_n_results(all_pathways_df_up, top_n = 10L)
+  top_pathways_df_down <- select_top_n_results(all_pathways_df_down, top_n = 10L)
   
   cat("GSEA results summary:\n")
-  cat("- Up-regulated pathways:", nrow(top_pathways_df_up), "entries\n")
-  cat("- Down-regulated pathways:", nrow(top_pathways_df_down), "entries\n")
+  cat("- Up-regulated pathways (all):", nrow(all_pathways_df_up), "entries\n")
+  cat("- Down-regulated pathways (all):", nrow(all_pathways_df_down), "entries\n")
+  cat("- Up-regulated pathways (top 10 per module/database):", nrow(top_pathways_df_up), "entries\n")
+  cat("- Down-regulated pathways (top 10 per module/database):", nrow(top_pathways_df_down), "entries\n")
 
   # Save GSEA results in format compatible with Module_Overview_Generator
   cat("Saving GSEA results to:", output_dir, "\n")
+  cat("All up results file:", file.path(output_dir, "GSEA_all_enriched_pathways_up_per_module.csv"), "\n")
+  cat("All down results file:", file.path(output_dir, "GSEA_all_enriched_pathways_down_per_module.csv"), "\n")
   cat("Up results file:", file.path(output_dir, "GSEA_top_10_enriched_pathways_up_per_module.csv"), "\n")
   cat("Down results file:", file.path(output_dir, "GSEA_top_10_enriched_pathways_down_per_module.csv"), "\n")
-  
-  # Ensure consistent column structure for compatibility
-  required_columns <- c("Module", "Database", "Term", "p.adjust")
-  
-  # Verify and standardize up results
-  if (nrow(top_pathways_df_up) > 0) {
-    # Ensure all required columns exist
-    for (col in required_columns) {
-      if (!col %in% colnames(top_pathways_df_up)) {
-        cat("Warning: Missing column", col, "in GSEA up results\n")
-      }
-    }
-    # Select only required columns in correct order
-    top_pathways_df_up <- top_pathways_df_up[, required_columns, drop = FALSE]
-  }
-  
-  # Verify and standardize down results
-  if (nrow(top_pathways_df_down) > 0) {
-    # Ensure all required columns exist
-    for (col in required_columns) {
-      if (!col %in% colnames(top_pathways_df_down)) {
-        cat("Warning: Missing column", col, "in GSEA down results\n")
-      }
-    }
-    # Select only required columns in correct order
-    top_pathways_df_down <- top_pathways_df_down[, required_columns, drop = FALSE]
-  }
-  
+
   # Save GSEA results with consistent naming pattern
+  fwrite(all_pathways_df_up, file.path(output_dir, "GSEA_all_enriched_pathways_up_per_module.csv"))
+  fwrite(all_pathways_df_down, file.path(output_dir, "GSEA_all_enriched_pathways_down_per_module.csv"))
   fwrite(top_pathways_df_up, file.path(output_dir, "GSEA_top_10_enriched_pathways_up_per_module.csv"))
   fwrite(top_pathways_df_down, file.path(output_dir, "GSEA_top_10_enriched_pathways_down_per_module.csv"))
   
@@ -610,6 +616,20 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
 
 if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
   cat("\n=== Running EnrichR Analysis ===\n")
+  
+  # Pre-check: verify EnrichR API is reachable
+  enrichr_available <- tryCatch({
+    con <- url("https://maayanlab.cloud/Enrichr", open = "r")
+    close(con)
+    TRUE
+  }, error = function(e) {
+    FALSE
+  })
+  
+  if (!enrichr_available) {
+    cat("[WARNING] EnrichR API is not reachable (no internet?). Skipping EnrichR analysis.\n")
+    cat("[INFO] Consider using --enrichment_method GSEA for offline analysis.\n")
+  } else {
   
   # Create output directory for EnrichR
   enrichr_output_dir <- file.path(workdir, 'Modules_enrichr')
@@ -655,7 +675,7 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
     module_dir <- file.path(enrichr_output_dir, paste0("module_", cluster))
     dir.create(module_dir, showWarnings = FALSE)
     
-    module_results <- data.frame()
+    module_all_results <- data.frame()
     total_enrichment_results <- 0
     total_significant_results <- 0
     
@@ -686,12 +706,11 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
           }
           
           if (nrow(sig_results) > 0) {
-            # Take top 10 results
-            top_results <- head(sig_results[order(sig_results$Adjusted.P.value), ], 10)
-            
+            sig_results <- sig_results[order(sig_results$Adjusted.P.value, sig_results$Term), , drop = FALSE]
+
             # Add metadata
-            top_results$Module <- cluster
-            top_results$Database <- case_when(
+            sig_results$Module <- cluster
+            sig_results$Database <- case_when(
               grepl("Biological_Process", db) ~ "BP",
               grepl("Molecular_Function", db) ~ "MF", 
               grepl("Cellular_Component", db) ~ "CC",
@@ -701,27 +720,27 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
             )
             
             # Create Term column compatible with GSEA format
-            top_results$Term <- paste(top_results$Term)
+            sig_results$Term <- paste(sig_results$Term)
             
             # Rename p.adjust column to match GSEA format
-            colnames(top_results)[colnames(top_results) == "Adjusted.P.value"] <- "p.adjust"
+            colnames(sig_results)[colnames(sig_results) == "Adjusted.P.value"] <- "p.adjust"
             
             # Select relevant columns
-            formatted_results <- top_results[, c("Module", "Database", "Term", "p.adjust")]
-            module_results <- rbind(module_results, formatted_results)
+            formatted_results <- sig_results[, c("Module", "Database", "Term", "p.adjust")]
+            module_all_results <- rbind(module_all_results, formatted_results)
           }
         }
       }
       
       cat("Module", cluster, "- Total enrichment results:", total_enrichment_results, 
           ", Significant results (p.adj <= 0.05):", total_significant_results, 
-          ", Final formatted results:", nrow(module_results), "\n")
+          ", Final formatted results:", nrow(module_all_results), "\n")
       
     }, error = function(e) {
       cat("Error processing module", cluster, ":", e$message, "\n")
     })
     
-    return(list(up = module_results, down = data.frame()))
+    return(list(up = module_all_results, down = data.frame()))
   }
   
   # Run enrichment analysis
@@ -740,29 +759,27 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
     }
   }
   
+  enrichr_up_results <- standardize_formatted_results(enrichr_up_results)
+  enrichr_down_results <- empty_formatted_results()
+  enrichr_top_up_results <- select_top_n_results(enrichr_up_results, top_n = 10L)
+  enrichr_top_down_results <- empty_formatted_results()
+
   cat("EnrichR results summary:\n")
   cat("- Total enrichr_results processed:", length(enrichr_results), "\n")
-  cat("- Final enrichr_up_results rows:", nrow(enrichr_up_results), "\n")
-  
-  # Ensure we always have properly structured results, even if empty
-  if (nrow(enrichr_up_results) == 0) {
-    cat("No EnrichR results found. Creating empty results with proper structure.\n")
-    enrichr_up_results <- data.frame(
-      Module = character(0),
-      Database = character(0), 
-      Term = character(0),
-      p.adjust = numeric(0),
-      stringsAsFactors = FALSE
-    )
-  }
+  cat("- Final EnrichR up rows (all):", nrow(enrichr_up_results), "\n")
+  cat("- Final EnrichR up rows (top 10 per module/database):", nrow(enrichr_top_up_results), "\n")
   
   # Save EnrichR results in GSEA-compatible format
   cat("Saving EnrichR results to:", enrichr_output_dir, "\n")
+  cat("All up results file:", file.path(enrichr_output_dir, "Enrichr_all_enriched_pathways_up_per_module.csv"), "\n")
+  cat("All down results file:", file.path(enrichr_output_dir, "Enrichr_all_enriched_pathways_down_per_module.csv"), "\n")
   cat("Up results file:", file.path(enrichr_output_dir, "Enrichr_top_10_enriched_pathways_up_per_module.csv"), "\n")
   cat("Down results file:", file.path(enrichr_output_dir, "Enrichr_top_10_enriched_pathways_down_per_module.csv"), "\n")
   
-  # Save the up results
-  fwrite(enrichr_up_results, file.path(enrichr_output_dir, "Enrichr_top_10_enriched_pathways_up_per_module.csv"))
+  # Save the all-results and top-results views
+  fwrite(enrichr_up_results, file.path(enrichr_output_dir, "Enrichr_all_enriched_pathways_up_per_module.csv"))
+  fwrite(enrichr_down_results, file.path(enrichr_output_dir, "Enrichr_all_enriched_pathways_down_per_module.csv"))
+  fwrite(enrichr_top_up_results, file.path(enrichr_output_dir, "Enrichr_top_10_enriched_pathways_up_per_module.csv"))
   
   # Verify the file was created and check its size
   up_file <- file.path(enrichr_output_dir, "Enrichr_top_10_enriched_pathways_up_per_module.csv")
@@ -780,20 +797,7 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
   }
   
   # Create properly structured empty down-regulated file for consistency
-  # Use the same column structure as the up results
-  if (nrow(enrichr_up_results) > 0) {
-    empty_down_results <- enrichr_up_results[FALSE, ]  # Create empty dataframe with same structure
-  } else {
-    # If no up results either, create minimal required structure
-    empty_down_results <- data.frame(
-      Module = character(0),
-      Database = character(0), 
-      Term = character(0),
-      p.adjust = numeric(0),
-      stringsAsFactors = FALSE
-    )
-  }
-  fwrite(empty_down_results, file.path(enrichr_output_dir, "Enrichr_top_10_enriched_pathways_down_per_module.csv"))
+  fwrite(enrichr_top_down_results, file.path(enrichr_output_dir, "Enrichr_top_10_enriched_pathways_down_per_module.csv"))
   
   # Verify the down file was created
   down_file <- file.path(enrichr_output_dir, "Enrichr_top_10_enriched_pathways_down_per_module.csv")
@@ -806,6 +810,7 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
   
   cat("EnrichR Analysis completed!\n")
   cat("Results saved to:", enrichr_output_dir, "\n")
+  }  # end of enrichr_available check
 }
 
 ############################################################################################################################################

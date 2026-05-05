@@ -1,0 +1,8 @@
+Node	Label	Type
+glycerol_3_phosphate	glycerol_3_phosphate	metabolite
+VDR	VDR	TF
+ACE	ACE	bridge_node
+NFIL3	NFIL3	TF
+FUCA2	FUCA2	bridge_node
+BHLHE40	BHLHE40	TF
+SCD	SCD	bridge_node

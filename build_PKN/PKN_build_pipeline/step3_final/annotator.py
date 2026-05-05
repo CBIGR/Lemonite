@@ -104,8 +104,6 @@ def annotate_pkn() -> pd.DataFrame:
             pkn.at[idx, 'URL'] = f"http://stitch.embl.de/cgi/network.pl?identifiers={hmdb_id}"
         elif 'MetalinksDB' in source:
             pkn.at[idx, 'URL'] = f"http://metalinks.csb.pitt.edu/"
-        elif 'L1000' in source:
-            pkn.at[idx, 'URL'] = f"https://clue.io/"
         elif 'GEM' in source:
             pkn.at[idx, 'URL'] = f"https://metabolicatlas.org/"
     

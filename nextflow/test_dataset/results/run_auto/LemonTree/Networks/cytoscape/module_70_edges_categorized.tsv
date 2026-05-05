@@ -1,0 +1,9 @@
+Node1	Node2	Source	Type	Category
+D_glucose_6_phosphate	NME1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+D_glucose_6_phosphate	MOGS	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+fumaric_acid	PLOD1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+fumaric_acid	ALAS1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+FOXJ1	PLOD1	STRING	PPI	PPI
+RORB	NME1	STRING	PPI	PPI
+RORB	ALAS1	STRING	PPI	PPI
+POU6F2	MOGS	STRING	PPI	PPI

@@ -15,6 +15,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.pipeline import LocalFileRetriever
+from utils.api_retry import retry_api_call
 import config
 
 
@@ -49,28 +50,40 @@ class STITCHRetriever(LocalFileRetriever):
         dict
             Mapping of protein_id → gene_symbol
         """
-        import mygene
-        
         self.logger.info(f"Mapping {len(protein_ids)} Ensembl protein IDs to gene symbols...")
         
-        mg = mygene.MyGeneInfo()
-        result = mg.querymany(
-            protein_ids, 
-            scopes='ensembl.protein', 
-            fields='symbol', 
-            species='human'
-        )
-        
         protein_to_symbol = {}
-        for item in result:
-            protein = item.get('query')
-            symbol = item.get('symbol', np.nan)
-            protein_to_symbol[protein] = symbol
+        # Process in chunks to be gentle on the API
+        chunk_size = 1000
+        for i in range(0, len(protein_ids), chunk_size):
+            chunk = protein_ids[i:i + chunk_size]
+            result = self._query_mygene(chunk)
+            if result is not None:
+                for item in result:
+                    protein = item.get('query')
+                    symbol = item.get('symbol', np.nan)
+                    protein_to_symbol[protein] = symbol
+            else:
+                self.logger.warning(f"MyGene query failed for chunk {i//chunk_size + 1}")
+                for pid in chunk:
+                    protein_to_symbol[pid] = np.nan
         
         mapped_count = sum(1 for v in protein_to_symbol.values() if pd.notna(v))
         self.logger.info(f"Mapped {mapped_count}/{len(protein_ids)} proteins to gene symbols")
         
         return protein_to_symbol
+    
+    @retry_api_call(db_name='MyGene')
+    def _query_mygene(self, protein_ids: List[str]):
+        """Query MyGene.info API with retry logic."""
+        import mygene
+        mg = mygene.MyGeneInfo()
+        return mg.querymany(
+            protein_ids,
+            scopes='ensembl.protein',
+            fields='symbol',
+            species='human'
+        )
     
     def parse_file(self) -> pd.DataFrame:
         """

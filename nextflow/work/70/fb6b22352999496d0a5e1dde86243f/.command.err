@@ -1,0 +1,5 @@
+org.apache.commons.cli.UnrecognizedOptionException: Unrecognized option: -seed
+	at org.apache.commons.cli.Parser.processOption(Parser.java:379)
+	at org.apache.commons.cli.Parser.parse(Parser.java:193)
+	at org.apache.commons.cli.Parser.parse(Parser.java:71)
+	at lemontree.modulenetwork.RunCli.main(RunCli.java:142)

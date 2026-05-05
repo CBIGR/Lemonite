@@ -1,0 +1,576 @@
+=== Available network files ===
+Networks/LemonNetwork_top2.0pct_75modules.txt
+Networks/Metabolites2targets_top2.0pct_75_modules.txt
+Networks/TFs2targets_top2.0pct_75_modules.txt
+=================================
+Warning: Found 2 clusters_list.txt files, using first match
+./clusters_list.txt
+./ModuleViewer_files/clusters_list.txt
+Found LemonNetwork file: Networks/LemonNetwork_top2.0pct_75modules.txt
+Found TFs regulator file: ./TFs.selected_regs_list.txt
+Found Metabolites regulator file: ./Metabolites.selected_regs_list.txt
+Found PKN file: /home/borisvdm/repo/LemonIte/nextflow/PKN/Lemonite_PKN.tsv
+Found metabolite interactions file: /home/borisvdm/repo/LemonIte/nextflow/PKN/metabolite_gene_PKN.tsv
+Running PKN evaluation...
+Network file: Networks/LemonNetwork_top2.0pct_75modules.txt
+Regulator types: TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt
+Metabolites regulator file: ./Metabolites.selected_regs_list.txt
+TFs regulator file: ./TFs.selected_regs_list.txt
+Cluster file: ./clusters_list.txt
+Metabolite mapping file: data/name_map.csv
+Working directory: /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c
+Metabolites regulator file found (96 lines)
+First few lines:
+0	creatinine
+1	creatinine
+10	homocysteine
+TFs regulator file found (104 lines)
+First few lines:
+0	MYT1L|ZNF619
+1	KCNIP3|MYT1L|SOX10|ZNF534|TFAP2E|ZNF215|ZNF727
+10	ZNF704|PURG|KLF12|STOX2|ZBTB12|CSRNP3|PATZ1|STAT6|RELB|SOX8|ZBTB7B
+PKN evaluation configured to use 4 cores (multiprocessing ready)
+Configured regulator types: ['Metabolites', 'TFs']
+Loading LemonTree network...
+Found network file: LemonNetwork_top2.0pct_75modules.txt
+Loaded full network with 28385 interactions
+
+Extracting regulator-gene interactions by type:
+  Metabolites: Found 6174 interactions
+  TFs: Found 22211 interactions
+There are 2197 genes in the dataset
+Loading module regulators...
+Loaded Metabolites regulators for 96 modules
+Loaded TFs regulators for 104 modules
+Loaded 104 modules
+Loading PKN interactions...
+Loaded 405661 PKN interactions
+Metabolite interactions file columns: ['Metabolite', 'Gene', 'Source']
+Converting metabolite interactions format from Metabolite-Gene to HMDB-based format...
+Converted to 8849 unique HMDB entries with gene interactions
+Metabolite mapping file columns: ['Query', 'Match', 'HMDB', 'PubChem', 'ChEBI', 'KEGG', 'METLIN', 'SMILES', 'Comment']
+Loaded 74 metabolite mappings
+Loading PKN network...
+Loaded PKN network with 2558081 interactions
+Created PKN graph with 41132 nodes and 1955194 edges
+74 metabolites in this dataset are mapped to a HMDB id
+67 metabolites in the interactions file are in the dataset
+67 metabolites in the dataset are in the interactions file
+Generating ModuleViewer file: /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/metabolite_LemoniteKG_interactions.mvf
+Checking 96 modules with metabolite regulators and 0 modules with lipid regulators...
+  Module 0: 1 metabolites, 71 genes
+    creatinine (HMDB0000562) has 0 interactions with genes in module 0
+  Module 1: 1 metabolites, 68 genes
+    creatinine (HMDB0000562) has 0 interactions with genes in module 1
+  Module 10: 1 metabolites, 53 genes
+    homocysteine (HMDB0000742) has 0 interactions with genes in module 10
+  Module 100: 2 metabolites, 15 genes
+    L_aspartic_acid (HMDB0000191) has 0 interactions with genes in module 100
+    homocysteine (HMDB0000742) has 0 interactions with genes in module 100
+  Module 101: 1 metabolites, 10 genes
+    glycerol_3_phosphate (HMDB0000126) has 0 interactions with genes in module 101
+  Module 102: 2 metabolites, 11 genes
+    Metabolite Unknown_042: No HMDB mapping found
+    glycerol_3_phosphate (HMDB0000126) has 0 interactions with genes in module 102
+  Module 103: 1 metabolites, 10 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 103
+  Module 11: 3 metabolites, 45 genes
+    Metabolite N_formylglycine (HMDB0255145): No PKN interactions found
+    Metabolite phosphoric_acid_(spectral_match): No HMDB mapping found
+    creatinine (HMDB0000562) has 0 interactions with genes in module 11
+  Module 12: 3 metabolites, 66 genes
+    homocysteine (HMDB0000742) has 0 interactions with genes in module 12
+    Metabolite Unknown_015: No HMDB mapping found
+    Metabolite Unknown_042: No HMDB mapping found
+  Module 13: 5 metabolites, 91 genes
+    L_mimosine (HMDB0015188) has 0 interactions with genes in module 13
+    cholesterol_(spectral_match) (HMDB0000067) has 0 interactions with genes in module 13
+    propylene_glycol (HMDB0001881) has 0 interactions with genes in module 13
+    heptadecanoic_acid (HMDB0002259) has 2 interactions with genes in module 13
+    Metabolite Unknown_006: No HMDB mapping found
+  Module 14: 2 metabolites, 35 genes
+    Metabolite L_alanine: No HMDB mapping found
+    creatinine (HMDB0000562) has 0 interactions with genes in module 14
+  Module 15: 4 metabolites, 50 genes
+    pyrophosphate (HMDB0000250) has 0 interactions with genes in module 15
+    Metabolite Unknown_050: No HMDB mapping found
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 15
+    propylene_glycol (HMDB0001881) has 0 interactions with genes in module 15
+  Module 16: 3 metabolites, 159 genes
+    creatinine (HMDB0000562) has 1 interactions with genes in module 16
+    Metabolite Unknown_011: No HMDB mapping found
+    Metabolite DL_3_aminoisobutyric_acid__(spectral_match): No HMDB mapping found
+  Module 17: 3 metabolites, 42 genes
+    propylene_glycol (HMDB0001881) has 0 interactions with genes in module 17
+    fructose (HMDB0000660) has 0 interactions with genes in module 17
+    myo_inositol (HMDB0000211) has 0 interactions with genes in module 17
+  Module 18: 2 metabolites, 26 genes
+    hypotaurine (HMDB0000965) has 0 interactions with genes in module 18
+    Metabolite DL_3_aminoisobutyric_acid__(spectral_match): No HMDB mapping found
+  Module 19: 3 metabolites, 43 genes
+    homocysteine (HMDB0000742) has 0 interactions with genes in module 19
+    Metabolite Unknown_046: No HMDB mapping found
+    pyrophosphate (HMDB0000250) has 0 interactions with genes in module 19
+  Module 2: 3 metabolites, 65 genes
+    creatinine (HMDB0000562) has 2 interactions with genes in module 2
+    D_mannose (HMDB0000169) has 0 interactions with genes in module 2
+    L_threonine (HMDB0000167) has 4 interactions with genes in module 2
+  Module 20: 3 metabolites, 36 genes
+    myo_inositol (HMDB0000211) has 1 interactions with genes in module 20
+    Metabolite Unknown_017: No HMDB mapping found
+    3_phosphoglycerate (HMDB0000807) has 0 interactions with genes in module 20
+  Module 21: 1 metabolites, 48 genes
+    creatinine (HMDB0000562) has 1 interactions with genes in module 21
+  Module 22: 4 metabolites, 124 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 3 interactions with genes in module 22
+    L_serine (HMDB0000187) has 8 interactions with genes in module 22
+    glycerol_3_phosphate (HMDB0000126) has 3 interactions with genes in module 22
+    Metabolite O_phosphocolamine: No HMDB mapping found
+  Module 23: 5 metabolites, 42 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 23
+    creatinine (HMDB0000562) has 0 interactions with genes in module 23
+    scyllo_inositol (HMDB0006088) has 0 interactions with genes in module 23
+    glycerol_3_phosphate (HMDB0000126) has 1 interactions with genes in module 23
+    Metabolite Unknown_031: No HMDB mapping found
+  Module 24: 1 metabolites, 27 genes
+    Metabolite Unknown_027: No HMDB mapping found
+  Module 25: 2 metabolites, 29 genes
+    myo_inositol (HMDB0000211) has 0 interactions with genes in module 25
+    scyllo_inositol (HMDB0006088) has 0 interactions with genes in module 25
+  Module 27: 1 metabolites, 31 genes
+    Metabolite Unknown_015: No HMDB mapping found
+  Module 28: 6 metabolites, 27 genes
+    Metabolite D_ribose_5_phosphate: No HMDB mapping found
+    fumaric_acid (HMDB0000134) has 0 interactions with genes in module 28
+    pyrophosphate (HMDB0000250) has 0 interactions with genes in module 28
+    Metabolite O_phosphocolamine: No HMDB mapping found
+    Metabolite Unknown_017: No HMDB mapping found
+    sucrose (HMDB0000258) has 1 interactions with genes in module 28
+  Module 29: 1 metabolites, 21 genes
+    L_2_aminoadipic_acid (HMDB0000510) has 0 interactions with genes in module 29
+  Module 3: 1 metabolites, 61 genes
+    Metabolite Unknown_004: No HMDB mapping found
+  Module 31: 2 metabolites, 101 genes
+    myo_inositol (HMDB0000211) has 3 interactions with genes in module 31
+    Metabolite phosphoric_acid_(spectral_match): No HMDB mapping found
+  Module 32: 2 metabolites, 32 genes
+    Metabolite D_fructose_6_phosphate (HMDB0304311): No PKN interactions found
+    fructose (HMDB0000660) has 0 interactions with genes in module 32
+  Module 33: 2 metabolites, 17 genes
+    creatinine (HMDB0000562) has 0 interactions with genes in module 33
+    Metabolite Unknown_021: No HMDB mapping found
+  Module 34: 3 metabolites, 35 genes
+    galactitol (HMDB0000107) has 0 interactions with genes in module 34
+    Metabolite L_alanine: No HMDB mapping found
+    DL_isoleucine (HMDB0000172) has 0 interactions with genes in module 34
+  Module 35: 3 metabolites, 31 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 35
+    creatinine (HMDB0000562) has 0 interactions with genes in module 35
+    Metabolite N_formylglycine (HMDB0255145): No PKN interactions found
+  Module 36: 4 metabolites, 29 genes
+    Metabolite Unknown_002: No HMDB mapping found
+    Metabolite N_formylglycine (HMDB0255145): No PKN interactions found
+    Metabolite Unknown_013: No HMDB mapping found
+    D_glucose_6_phosphate (HMDB0001401) has 0 interactions with genes in module 36
+  Module 37: 1 metabolites, 28 genes
+    Metabolite Unknown_004: No HMDB mapping found
+  Module 38: 2 metabolites, 31 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 38
+    glycerol_3_phosphate (HMDB0000126) has 0 interactions with genes in module 38
+  Module 39: 2 metabolites, 26 genes
+    L_glutamic_acid (HMDB0000148) has 0 interactions with genes in module 39
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 39
+  Module 4: 2 metabolites, 62 genes
+    myo_inositol (HMDB0000211) has 1 interactions with genes in module 4
+    creatinine (HMDB0000562) has 1 interactions with genes in module 4
+  Module 40: 1 metabolites, 21 genes
+    glycerol_3_phosphate (HMDB0000126) has 0 interactions with genes in module 40
+  Module 41: 2 metabolites, 26 genes
+    Metabolite Unknown_035: No HMDB mapping found
+    hypotaurine (HMDB0000965) has 0 interactions with genes in module 41
+  Module 42: 2 metabolites, 33 genes
+    scyllo_inositol (HMDB0006088) has 0 interactions with genes in module 42
+    L_methionine (HMDB0000696) has 0 interactions with genes in module 42
+  Module 43: 3 metabolites, 20 genes
+    Metabolite Unknown_015: No HMDB mapping found
+    putrescine (HMDB0001414) has 1 interactions with genes in module 43
+    L_aspartic_acid (HMDB0000191) has 1 interactions with genes in module 43
+  Module 44: 3 metabolites, 32 genes
+    homocysteine (HMDB0000742) has 0 interactions with genes in module 44
+    pyrophosphate (HMDB0000250) has 0 interactions with genes in module 44
+    Metabolite Unknown_046: No HMDB mapping found
+  Module 45: 3 metabolites, 18 genes
+    homocysteine (HMDB0000742) has 0 interactions with genes in module 45
+    D_mannose (HMDB0000169) has 0 interactions with genes in module 45
+    putrescine (HMDB0001414) has 0 interactions with genes in module 45
+  Module 46: 1 metabolites, 66 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 1 interactions with genes in module 46
+  Module 47: 2 metabolites, 44 genes
+    creatinine (HMDB0000562) has 1 interactions with genes in module 47
+    D_mannose (HMDB0000169) has 0 interactions with genes in module 47
+  Module 48: 1 metabolites, 46 genes
+    creatinine (HMDB0000562) has 1 interactions with genes in module 48
+  Module 49: 3 metabolites, 16 genes
+    heptadecanoic_acid (HMDB0002259) has 0 interactions with genes in module 49
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 49
+    pyrophosphate (HMDB0000250) has 0 interactions with genes in module 49
+  Module 5: 3 metabolites, 47 genes
+    creatinine (HMDB0000562) has 0 interactions with genes in module 5
+    L_cysteine (HMDB0000192) has 1 interactions with genes in module 5
+    capricacid (HMDB0000511) has 0 interactions with genes in module 5
+  Module 50: 2 metabolites, 29 genes
+    fructose (HMDB0000660) has 0 interactions with genes in module 50
+    myo_inositol (HMDB0000211) has 0 interactions with genes in module 50
+  Module 51: 3 metabolites, 19 genes
+    sucrose (HMDB0000258) has 0 interactions with genes in module 51
+    scyllo_inositol (HMDB0006088) has 0 interactions with genes in module 51
+    Metabolite Unknown_050: No HMDB mapping found
+  Module 52: 4 metabolites, 18 genes
+    Metabolite Unknown_023: No HMDB mapping found
+    heptadecanoic_acid (HMDB0002259) has 1 interactions with genes in module 52
+    Metabolite Unknown_028: No HMDB mapping found
+    Metabolite D_ribose_5_phosphate: No HMDB mapping found
+  Module 53: 3 metabolites, 22 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 53
+    glycerol_3_phosphate (HMDB0000126) has 0 interactions with genes in module 53
+    Metabolite D_fructose_6_phosphate (HMDB0304311): No PKN interactions found
+  Module 54: 4 metabolites, 183 genes
+    creatinine (HMDB0000562) has 0 interactions with genes in module 54
+    homocysteine (HMDB0000742) has 0 interactions with genes in module 54
+    D_sorbitol (HMDB0000247) has 1 interactions with genes in module 54
+    myo_inositol (HMDB0000211) has 3 interactions with genes in module 54
+  Module 55: 1 metabolites, 10 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 55
+  Module 56: 5 metabolites, 141 genes
+    Metabolite Unknown_015: No HMDB mapping found
+    myo_inositol (HMDB0000211) has 3 interactions with genes in module 56
+    creatinine (HMDB0000562) has 1 interactions with genes in module 56
+    galactitol (HMDB0000107) has 1 interactions with genes in module 56
+    L_aspartic_acid (HMDB0000191) has 5 interactions with genes in module 56
+  Module 57: 3 metabolites, 23 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 57
+    heptadecanoic_acid (HMDB0002259) has 0 interactions with genes in module 57
+    pyrophosphate (HMDB0000250) has 0 interactions with genes in module 57
+  Module 6: 3 metabolites, 65 genes
+    Metabolite Unknown_004: No HMDB mapping found
+    Metabolite D_fructose_6_phosphate (HMDB0304311): No PKN interactions found
+    capricacid (HMDB0000511) has 0 interactions with genes in module 6
+  Module 60: 3 metabolites, 1040 genes
+    creatinine (HMDB0000562) has 6 interactions with genes in module 60
+    glycerol_3_phosphate (HMDB0000126) has 16 interactions with genes in module 60
+    pyrophosphate (HMDB0000250) has 0 interactions with genes in module 60
+  Module 61: 3 metabolites, 11 genes
+    Metabolite Unknown_046: No HMDB mapping found
+    myo_inositol (HMDB0000211) has 0 interactions with genes in module 61
+    scyllo_inositol (HMDB0006088) has 0 interactions with genes in module 61
+  Module 62: 1 metabolites, 96 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 62
+  Module 63: 2 metabolites, 29 genes
+    L_leucine (HMDB0000687) has 2 interactions with genes in module 63
+    homocysteine (HMDB0000742) has 0 interactions with genes in module 63
+  Module 64: 2 metabolites, 40 genes
+    myo_inositol (HMDB0000211) has 0 interactions with genes in module 64
+    creatinine (HMDB0000562) has 0 interactions with genes in module 64
+  Module 65: 1 metabolites, 11 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 65
+  Module 66: 3 metabolites, 131 genes
+    galactitol (HMDB0000107) has 2 interactions with genes in module 66
+    homocysteine (HMDB0000742) has 0 interactions with genes in module 66
+    Metabolite Unknown_039: No HMDB mapping found
+  Module 67: 3 metabolites, 12 genes
+    phosphoenolpyruvic_acid (HMDB0000263) has 0 interactions with genes in module 67
+    scyllo_inositol (HMDB0006088) has 0 interactions with genes in module 67
+    DL_isoleucine (HMDB0000172) has 1 interactions with genes in module 67
+  Module 68: 4 metabolites, 19 genes
+    3_phosphoglycerate (HMDB0000807) has 0 interactions with genes in module 68
+    Metabolite Unknown_046: No HMDB mapping found
+    linoleic_acid (HMDB0000673) has 0 interactions with genes in module 68
+    Metabolite D_ribulose_5_phosphate: No HMDB mapping found
+  Module 69: 2 metabolites, 108 genes
+    myo_inositol (HMDB0000211) has 1 interactions with genes in module 69
+    scyllo_inositol (HMDB0006088) has 0 interactions with genes in module 69
+  Module 7: 6 metabolites, 58 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 1 interactions with genes in module 7
+    Metabolite porphine (HMDB0000839): No PKN interactions found
+    Metabolite Unknown_019: No HMDB mapping found
+    Metabolite phosphoric_acid_(spectral_match): No HMDB mapping found
+    Metabolite Unknown_042: No HMDB mapping found
+    Metabolite Unknown_044: No HMDB mapping found
+  Module 70: 4 metabolites, 46 genes
+    Metabolite N_formylglycine (HMDB0255145): No PKN interactions found
+    D_glucose_6_phosphate (HMDB0001401) has 0 interactions with genes in module 70
+    Metabolite D_fructose_6_phosphate (HMDB0304311): No PKN interactions found
+    fumaric_acid (HMDB0000134) has 0 interactions with genes in module 70
+  Module 71: 2 metabolites, 39 genes
+    Metabolite Unknown_004: No HMDB mapping found
+    Metabolite Unknown_010: No HMDB mapping found
+  Module 72: 4 metabolites, 13 genes
+    myo_inositol (HMDB0000211) has 0 interactions with genes in module 72
+    pyrophosphate (HMDB0000250) has 0 interactions with genes in module 72
+    homocysteine (HMDB0000742) has 0 interactions with genes in module 72
+    pantothenic_acid (HMDB0000210) has 0 interactions with genes in module 72
+  Module 73: 1 metabolites, 16 genes
+    Metabolite Unknown_021: No HMDB mapping found
+  Module 75: 5 metabolites, 35 genes
+    Metabolite Unknown_017: No HMDB mapping found
+    creatinine (HMDB0000562) has 1 interactions with genes in module 75
+    Metabolite N_formylglycine (HMDB0255145): No PKN interactions found
+    Metabolite O_phosphocolamine: No HMDB mapping found
+    Metabolite phosphoric_acid_(spectral_match): No HMDB mapping found
+  Module 76: 2 metabolites, 22 genes
+    Metabolite Unknown_031: No HMDB mapping found
+    glycine (HMDB0000123) has 0 interactions with genes in module 76
+  Module 77: 1 metabolites, 18 genes
+    Metabolite Unknown_046: No HMDB mapping found
+  Module 78: 2 metabolites, 35 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 78
+    glycerol_3_phosphate (HMDB0000126) has 0 interactions with genes in module 78
+  Module 79: 3 metabolites, 553 genes
+    propylene_glycol (HMDB0001881) has 0 interactions with genes in module 79
+    Metabolite phosphoric_acid_(spectral_match): No HMDB mapping found
+    creatinine (HMDB0000562) has 6 interactions with genes in module 79
+  Module 8: 2 metabolites, 37 genes
+    Metabolite N_formylglycine (HMDB0255145): No PKN interactions found
+    L_serine (HMDB0000187) has 0 interactions with genes in module 8
+  Module 80: 2 metabolites, 13 genes
+    Metabolite Unknown_004: No HMDB mapping found
+    glycerol_3_phosphate (HMDB0000126) has 0 interactions with genes in module 80
+  Module 81: 3 metabolites, 11 genes
+    Metabolite L_alanine: No HMDB mapping found
+    Metabolite O_phosphocolamine: No HMDB mapping found
+    Metabolite Unknown_022: No HMDB mapping found
+  Module 82: 1 metabolites, 27 genes
+    Metabolite DL_3_aminoisobutyric_acid__(spectral_match): No HMDB mapping found
+  Module 85: 5 metabolites, 384 genes
+    myo_inositol (HMDB0000211) has 1 interactions with genes in module 85
+    fructose (HMDB0000660) has 1 interactions with genes in module 85
+    Metabolite Unknown_025: No HMDB mapping found
+    Metabolite Unknown_004: No HMDB mapping found
+    D_malic_acid (HMDB0031518) has 0 interactions with genes in module 85
+  Module 86: 1 metabolites, 27 genes
+    Metabolite Unknown_050: No HMDB mapping found
+  Module 87: 3 metabolites, 16 genes
+    L_mimosine (HMDB0015188) has 0 interactions with genes in module 87
+    propylene_glycol (HMDB0001881) has 0 interactions with genes in module 87
+    heptadecanoic_acid (HMDB0002259) has 1 interactions with genes in module 87
+  Module 88: 2 metabolites, 147 genes
+    homocysteine (HMDB0000742) has 0 interactions with genes in module 88
+    2_hydroxyglutaric_acid (HMDB0059655) has 2 interactions with genes in module 88
+  Module 89: 1 metabolites, 15 genes
+    Metabolite DL_3_aminoisobutyric_acid__(spectral_match): No HMDB mapping found
+  Module 9: 2 metabolites, 94 genes
+    Metabolite Unknown_004: No HMDB mapping found
+    Metabolite Unknown_050: No HMDB mapping found
+  Module 90: 3 metabolites, 16 genes
+    L_2_aminoadipic_acid (HMDB0000510) has 0 interactions with genes in module 90
+    fructose (HMDB0000660) has 1 interactions with genes in module 90
+    Metabolite DL_2_Aminoadipic_acid_(spectral_match): No HMDB mapping found
+  Module 91: 3 metabolites, 13 genes
+    Metabolite Unknown_021: No HMDB mapping found
+    creatinine (HMDB0000562) has 0 interactions with genes in module 91
+    glycerol_3_phosphate (HMDB0000126) has 1 interactions with genes in module 91
+  Module 92: 2 metabolites, 13 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 92
+    myo_inositol (HMDB0000211) has 0 interactions with genes in module 92
+  Module 93: 3 metabolites, 11 genes
+    Metabolite L_alanine: No HMDB mapping found
+    Metabolite Unknown_022: No HMDB mapping found
+    Metabolite Unknown_018: No HMDB mapping found
+  Module 94: 2 metabolites, 15 genes
+    creatinine (HMDB0000562) has 1 interactions with genes in module 94
+    Metabolite D_fructose_6_phosphate (HMDB0304311): No PKN interactions found
+  Module 95: 1 metabolites, 10 genes
+    myo_inositol (HMDB0000211) has 0 interactions with genes in module 95
+  Module 96: 1 metabolites, 11 genes
+    D_mannose (HMDB0000169) has 0 interactions with genes in module 96
+  Module 98: 1 metabolites, 17 genes
+    2_hydroxyglutaric_acid (HMDB0059655) has 0 interactions with genes in module 98
+  Module 99: 1 metabolites, 13 genes
+    Metabolite Unknown_023: No HMDB mapping found
+ModuleViewer file generation summary:
+  - File created: /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/metabolite_LemoniteKG_interactions.mvf
+  - Modules with metabolites checked: 96
+  - Modules with lipids checked: 0
+  - Total metabolites checked: 233
+  - PKN-supported interactions found: 43
+
+============================================================
+Generating PPI interactions MVF file for ModuleViewer...
+============================================================
+Total unique genes across all modules: 2945
+Total PPI pairs in PKN (filtered for module genes): 39906
+Total PPI pairs (bidirectional): 79412
+Module 0: Found 287 PPIs between module genes
+Module 1: Found 77 PPIs between module genes
+Module 2: Found 28 PPIs between module genes
+Module 3: Found 2 PPIs between module genes
+Module 4: Found 306 PPIs between module genes
+Module 5: Found 47 PPIs between module genes
+Module 6: Found 25 PPIs between module genes
+Module 7: Found 175 PPIs between module genes
+Module 8: Found 41 PPIs between module genes
+Module 9: Found 20 PPIs between module genes
+Module 10: Found 55 PPIs between module genes
+Module 11: Found 144 PPIs between module genes
+Module 12: Found 70 PPIs between module genes
+Module 13: Found 124 PPIs between module genes
+Module 14: Found 20 PPIs between module genes
+Module 15: Found 14 PPIs between module genes
+Module 16: Found 74 PPIs between module genes
+Module 17: Found 10 PPIs between module genes
+Module 18: Found 100 PPIs between module genes
+Module 19: Found 7 PPIs between module genes
+Module 20: Found 6 PPIs between module genes
+Module 21: Found 31 PPIs between module genes
+Module 22: Found 72 PPIs between module genes
+Module 23: Found 6 PPIs between module genes
+Module 24: Found 24 PPIs between module genes
+Module 25: Found 12 PPIs between module genes
+Module 26: Found 26 PPIs between module genes
+Module 27: Found 8 PPIs between module genes
+Module 28: Found 12 PPIs between module genes
+Module 29: Found 13 PPIs between module genes
+Module 30: Found 14 PPIs between module genes
+Module 31: Found 87 PPIs between module genes
+Module 32: Found 23 PPIs between module genes
+Module 33: Found 82 PPIs between module genes
+Module 34: Found 205 PPIs between module genes
+Module 35: Found 14 PPIs between module genes
+Module 36: Found 10 PPIs between module genes
+Module 37: Found 1 PPIs between module genes
+Module 38: Found 1 PPIs between module genes
+Module 39: Found 4 PPIs between module genes
+Module 40: Found 7 PPIs between module genes
+Module 41: Found 21 PPIs between module genes
+Module 42: Found 19 PPIs between module genes
+Module 43: Found 18 PPIs between module genes
+Module 44: Found 6 PPIs between module genes
+Module 45: Found 1 PPIs between module genes
+Module 46: Found 34 PPIs between module genes
+Module 47: Found 7 PPIs between module genes
+Module 48: Found 16 PPIs between module genes
+Module 49: Found 5 PPIs between module genes
+Module 50: Found 13 PPIs between module genes
+Module 51: Found 7 PPIs between module genes
+Module 52: Found 1 PPIs between module genes
+Module 53: Found 4 PPIs between module genes
+Module 54: Found 338 PPIs between module genes
+Module 55: Found 1 PPIs between module genes
+Module 56: Found 689 PPIs between module genes
+Module 57: Found 2 PPIs between module genes
+Module 59: Found 7 PPIs between module genes
+Module 60: Found 5389 PPIs between module genes
+Module 61: Found 2 PPIs between module genes
+Module 62: Found 56 PPIs between module genes
+Module 63: Found 14 PPIs between module genes
+Module 64: Found 23 PPIs between module genes
+Module 65: Found 10 PPIs between module genes
+Module 66: Found 176 PPIs between module genes
+Module 67: Found 2 PPIs between module genes
+Module 68: Found 2 PPIs between module genes
+Module 69: Found 55 PPIs between module genes
+Module 70: Found 41 PPIs between module genes
+Module 71: Found 1 PPIs between module genes
+Module 72: Found 4 PPIs between module genes
+Module 73: Found 15 PPIs between module genes
+Module 75: Found 45 PPIs between module genes
+Module 76: Found 2 PPIs between module genes
+Module 77: Found 5 PPIs between module genes
+Module 78: Found 14 PPIs between module genes
+Module 79: Found 2912 PPIs between module genes
+Module 81: Found 29 PPIs between module genes
+Module 82: Found 106 PPIs between module genes
+Module 83: Found 3 PPIs between module genes
+Module 84: Found 1 PPIs between module genes
+Module 85: Found 583 PPIs between module genes
+Module 86: Found 25 PPIs between module genes
+Module 87: Found 1 PPIs between module genes
+Module 88: Found 175 PPIs between module genes
+Module 89: Found 6 PPIs between module genes
+Module 90: Found 3 PPIs between module genes
+Module 91: Found 7 PPIs between module genes
+Module 92: Found 3 PPIs between module genes
+Module 93: Found 29 PPIs between module genes
+Module 95: Found 1 PPIs between module genes
+Module 98: Found 4 PPIs between module genes
+Module 100: Found 1 PPIs between module genes
+Module 101: Found 1 PPIs between module genes
+
+PPI MVF file generation summary:
+  - File created: /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/PPI_interactions.mvf
+  - Total PPIs written: 13219
+  - Modules with PPIs: 95/104
+PPI MVF file successfully created with size: 196795 bytes
+
+============================================================
+Calculating PPI enrichment for modules...
+============================================================
+Total genes in modules: 2945
+Total possible gene pairs: 4335040
+Total PPIs in PKN among module genes: 39706
+Overall PPI density: 0.0092
+
+PPI Enrichment Results (top 10 most enriched modules):
+   Module  N_genes  N_PPIs_observed  N_PPIs_expected  Fold_enrichment        P_value  PPI_density            FDR
+56     56      141              689        90.402446         7.621475   0.000000e+00     0.069807   0.000000e+00
+79     79      553             2912      1397.968039         2.083023  1.151599e-289     0.019079  5.988317e-288
+4       4       62              306        17.320266        17.667165  3.165306e-269     0.161819  1.097306e-267
+34     34       35              205         5.449793        37.616109  2.298170e-255     0.344538  5.975242e-254
+0       0       71              287        22.760900        12.609343  3.261194e-210     0.115493  6.783284e-209
+33     33       17               82         1.245667        65.828190  1.402936e-129     0.602941  2.431756e-128
+82     82       27              106         3.214920        32.971273  9.343715e-126     0.301994  1.388209e-124
+7       7       58              175        15.140349        11.558518  2.052642e-122     0.105868  2.668435e-121
+11     11       45              144         9.067723        15.880504  8.444519e-121     0.145455  9.758111e-120
+18     18       26              100         2.976778        33.593373  1.111964e-119     0.307692  1.156443e-118
+
+Number of modules significantly enriched for PPIs (FDR < 0.05): 55 / 104
+Mean fold enrichment: 5.93
+Median fold enrichment: 2.43
+
+PPI enrichment results saved to: /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/PPI_enrichment_results.csv
+  - Total modules analyzed: 104
+  - Significantly enriched modules (FDR < 0.05): 55
+
+============================================================
+Calculating metabolite-gene interaction enrichment for modules...
+============================================================
+Total known metabolite/lipid-gene interactions in PKN: 371270
+Total metabolite/lipid regulators across modules: 39
+Total genes across modules: 2945
+Total possible regulator-gene pairs: 114855
+Total known interactions among module regulators and genes: 1349
+Overall interaction density: 0.011745
+
+Metabolite-Gene Interaction Enrichment Results (top 10):
+   Module  N_metabolites  N_genes  N_interactions_observed  N_interactions_expected  Fold_enrichment   P_value  Interaction_density       FDR
+20     22              3      124                       14                 4.369231         3.204225  0.000161             0.037634  0.013223
+2       2              3       65                        6                 2.290323         2.619718  0.028490             0.030769  1.000000
+36     43              2       20                        2                 0.469810         4.257042  0.080234             0.050000  1.000000
+25     31              1      101                        3                 1.186270         2.528936  0.116432             0.029703  1.000000
+49     56              4      141                       10                 6.624318         1.509589  0.131746             0.017730  1.000000
+54     63              2       29                        2                 0.681224         2.935891  0.148619             0.034483  1.000000
+45     52              1       18                        1                 0.211414         4.730047  0.191586             0.055556  1.000000
+72     91              2       13                        1                 0.305376         3.274648  0.264509             0.038462  1.000000
+74     94              2       15                        1                 0.352357         2.838028  0.298467             0.033333  1.000000
+71     90              2       16                        1                 0.375848         2.660651  0.314854             0.031250  1.000000
+
+Modules significantly enriched (FDR < 0.05): 1 / 82
+Mean fold enrichment: 0.63
+Median fold enrichment: 0.00
+
+Metabolite-gene enrichment results saved to: /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/Metabolite_Gene_enrichment_results.csv
+  - Total modules analyzed: 82
+  - Significantly enriched modules (FDR < 0.05): 1
+Copied sample_mapping.mvf from /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/sample_mapping.mvf to /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files
+
+Generating subnetwork visualizations...
+Subnetwork visualization summary:
+  - Modules processed: 104
+  - Subnetworks generated: 0
+  - Output directory: /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/Networks/subnetworks
+Evaluation summary written to: /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/evaluation_summary.txt
+PKN evaluation completed successfully!
+Copied metabolite_LemoniteKG_interactions.mvf from ModuleViewer_files to results/ModuleViewer_files
+PPI_interactions.mvf generated successfully
+cp: '/home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/PPI_interactions.mvf' and 'ModuleViewer_files/PPI_interactions.mvf' are the same file
+PKN evaluation completed

@@ -13,6 +13,25 @@ library(caret)
 setwd('/home/borisvdm/Documents/PhD/Lemonite/Lloyd-Price_IBD/results')
 base_dir <- "/home/borisvdm/Documents/PhD/Lemonite/Lloyd-Price_IBD/"
 
+# Load name mapping for display of original metabolite names
+if (!exists('name_lookup')) {
+  name_mapping_file <- paste0(base_dir, 'data/name_mapping.tsv')
+  if (file.exists(name_mapping_file)) {
+    name_mapping_df <- read.table(name_mapping_file, sep='\t', header=TRUE, stringsAsFactors=FALSE)
+    name_lookup <- setNames(name_mapping_df$original, name_mapping_df$cleaned)
+    message(paste("Loaded name mapping:", length(name_lookup), "entries"))
+  } else {
+    name_lookup <- NULL
+    warning("name_mapping.tsv not found")
+  }
+}
+
+restore_names <- function(nms) {
+  if (is.null(name_lookup)) return(nms)
+  restored <- name_lookup[nms]
+  ifelse(is.na(restored), nms, restored)
+}
+
 ###########################################################################################
 #### Input files and metadata
 ###########################################################################################
@@ -286,6 +305,15 @@ save(final.diablo.model, file = './final.diablo.model.RData')
 # read in the final model
 load('./final.diablo.model.RData')
 
+# Restore original metabolite names in model for display
+if (!is.null(name_lookup)) {
+  rownames(final.diablo.model$loadings$Metabolomics) <- restore_names(rownames(final.diablo.model$loadings$Metabolomics))
+  colnames(final.diablo.model$X$Metabolomics) <- restore_names(colnames(final.diablo.model$X$Metabolomics))
+  if (!is.null(final.diablo.model$names$colnames$Metabolomics)) {
+    final.diablo.model$names$colnames$Metabolomics <- restore_names(final.diablo.model$names$colnames$Metabolomics)
+  }
+  message("Restored original metabolite names in DIABLO model for display")
+}
 
 # the features selected to form the first component
 selectVar(final.diablo.model, block = 'Transcriptomics', comp = 1)$Transcriptomics$name 
@@ -294,7 +322,7 @@ selectVar(final.diablo.model, block = 'Metabolomics', comp = 1)$Metabolomics$nam
 
 
 
-for (comp in 1:final.diablo.model$ncomp) {
+for (comp in 1:final.diablo.model$ncomp[[1]]) {
   pdf(paste0(base_dir, 'results/MixOmics/Diablo_final_plotDiablo_comp', comp, '.pdf'), width = 8, height = 6)
   plotDiablo(final.diablo.model, ncomp = comp)
   dev.off()
@@ -327,7 +355,7 @@ circosPlot(final.diablo.model, cutoff = 0.7, line = TRUE,
 dev.off()
 
 # Create cimDIABLO plots for each component
-for (comp in 1:final.diablo.model$ncomp) {
+for (comp in 1:final.diablo.model$ncomp[[1]]) {
   png(paste0(base_dir, 'results/MixOmics/Diablo_final_cimDiablo_comp', comp, '.png'), width = 1200, height = 700)
   cimDiablo(final.diablo.model, color.blocks = c('darkorchid', 'brown1'),
             comp = comp, margin=c(8,20), legend.position = "right", size.legend=0.7)
@@ -335,7 +363,7 @@ for (comp in 1:final.diablo.model$ncomp) {
 }
 
 # Create circosPlot for each component
-for (comp in 1:final.diablo.model$ncomp) {
+for (comp in 1:final.diablo.model$ncomp[[1]]) {
   png(paste0(base_dir, 'results/MixOmics/Diablo_final_circosPlot_comp', comp, '.png'), width = 600, height = 600)
   circosPlot(final.diablo.model, cutoff = 0.7, line = TRUE,
              color.blocks= c('darkorchid', 'brown1'),
@@ -346,7 +374,7 @@ for (comp in 1:final.diablo.model$ncomp) {
 # network(final.diablo.model, blocks = c(1,2),
 #         color.node = c('darkorchid', 'brown1'), cutoff = 0.4)
 
-for (comp in 1:final.diablo.model$ncomp) {
+for (comp in 1:final.diablo.model$ncomp[[1]]) {
   pdf(paste0(base_dir, 'results/MixOmics/Diablo_loadings_comp', comp, '.pdf'), width = 10, height = 10)
   plotLoadings(final.diablo.model, comp = comp, contrib = 'max', method = 'median', 
                size.name = 1,  # Reduced font size for feature names
@@ -381,7 +409,7 @@ gsea_dir <- paste0(base_dir, 'results/MixOmics/GSEA_all_components')
 dir.create(gsea_dir, showWarnings = FALSE, recursive = TRUE)
 
 # Get the number of components
-n_components <- final.diablo.model$ncomp
+n_components <- final.diablo.model$ncomp[[1]]
 
 # Run GSEA for all components
 for (comp in 1:n_components) {
@@ -577,7 +605,7 @@ if (length(agg_list) > 0) {
 ###########################################################################################
 
 # Get the number of components
-n_components <- final.diablo.model$ncomp
+n_components <- final.diablo.model$ncomp[[1]]
 
 # Initialize lists to store all feature weights
 all_mrna_weights <- list()

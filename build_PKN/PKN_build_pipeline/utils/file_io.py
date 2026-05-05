@@ -102,7 +102,7 @@ def load_progress(progress_file: str) -> Dict:
     """
     Load processing progress from JSON file.
     
-    Used for resuming long-running operations (e.g., L1000 processing).
+    Used for resuming long-running operations.
     
     Returns:
     --------

@@ -1,0 +1,16 @@
+Node	Label	Type
+glycine	glycine	metabolite
+POU6F2	POU6F2	TF
+GLRA1	GLRA1	bridge_node
+ZNF366	ZNF366	TF
+SPR	SPR	bridge_node
+ZNF169	ZNF169	TF
+ASS1	ASS1	bridge_node
+TBX3	TBX3	TF
+KMT2C	KMT2C	bridge_node
+DACH1	DACH1	TF
+SLC7A9	SLC7A9	bridge_node
+FOXO4	FOXO4	TF
+CAT	CAT	bridge_node
+THAP1	THAP1	TF
+NTAQ1	NTAQ1	bridge_node

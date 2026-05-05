@@ -1,0 +1,7 @@
+Node	Label	Type
+capricacid	capricacid	metabolite
+D_gluconic_acid	D_gluconic_acid	metabolite
+HHEX	HHEX	TF
+FABP2	FABP2	bridge_node
+PBX4	PBX4	TF
+LIPC	LIPC	bridge_node

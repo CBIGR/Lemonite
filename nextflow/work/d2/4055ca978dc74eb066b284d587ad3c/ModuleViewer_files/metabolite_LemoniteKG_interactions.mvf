@@ -1,0 +1,47 @@
+::TYPE=Lemonite_KG
+::TITLE:Lemonite_KG
+::OBJECT=GENES
+::COLOR=YELLOW
+13	GPIHBP1|SLCO1A2	heptadecanoic_acid
+16	PLA2G7	creatinine
+2	ENTPD3|SLC4A10	creatinine
+2	ENTPD3|GDA|SLC26A8|SLC4A10	L_threonine
+20	LPIN3	myo_inositol
+21	EEF1A2	creatinine
+22	ALDH1L1|BCAT1|SLC1A2	2_hydroxyglutaric_acid
+22	ACSBG1|ALDH1L1|BCAT1|ELOVL2|PLA2G5|PNPLA3|SLC1A2|SLC6A11	L_serine
+22	ELOVL2|PNPLA3|SLC1A2	glycerol_3_phosphate
+23	NEU4	glycerol_3_phosphate
+28	SLC10A6	sucrose
+31	ACP5|IL4I1|SDS	myo_inositol
+4	ANPEP	myo_inositol
+4	ANPEP	creatinine
+43	LOX	putrescine
+43	HMOX1	L_aspartic_acid
+46	SLC22A15	2_hydroxyglutaric_acid
+47	SLC4A10	creatinine
+48	ENTPD3	creatinine
+5	GAD1	L_cysteine
+52	HAS2	heptadecanoic_acid
+54	SLC5A12	D_sorbitol
+54	NEU4|SLC24A3|SLC5A12	myo_inositol
+56	ANPEP|CP|HK3	myo_inositol
+56	ANPEP	creatinine
+56	ANPEP	galactitol
+56	ANPEP|CP|FOSL1|HK3|HMOX1	L_aspartic_acid
+60	BCHE|EEF1A2|ENTPD2|ENTPD3|MGAM|SLC16A7	creatinine
+60	AK5|ALDOC|B3GNT4|B4GALNT1|BCHE|EEF1A2|ENPP6|ENTPD2|ENTPD3|GPD1|MGAM|NEU4|PRODH|SLC16A7|ST6GALNAC5|ST8SIA5	glycerol_3_phosphate
+63	SDC1|TDO2	L_leucine
+66	HAS2|HAS3	galactitol
+67	CYP3A5	DL_isoleucine
+69	LPL	myo_inositol
+7	CYP1B1	2_hydroxyglutaric_acid
+75	ACP5	creatinine
+79	ALDH1A3|GPX8|NT5E|PLA2G7|PNPLA3|SLC47A2	creatinine
+85	MGAM	myo_inositol
+85	MGAM	fructose
+87	GPIHBP1	heptadecanoic_acid
+88	ALDH1L1|SLC1A2	2_hydroxyglutaric_acid
+90	RBAK	fructose
+91	PHOSPHO1	glycerol_3_phosphate
+94	GPX3	creatinine

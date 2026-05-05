@@ -3,7 +3,7 @@
 ############################################################################################################################################
 #### This is a script for performing gsea enrichment analysis on LemonTree modules
 ############################################################################################################################################
-
+ 
 library(data.table)
 library(fgsea)
 library(stringr)
@@ -29,8 +29,33 @@ USE_CUSTOM_ENRICHR_PLOTTING <- TRUE
 # CHOOSE ANALYSIS METHOD: "GSEA", "EnrichR", or "both"
 ANALYSIS_METHOD <- "GSEA"  # Change this to choose your analysis method
 
+# GSEA ranking scope: choose which genes to rank against module eigengene
+# Options: "all_genes" (all genes in expression matrix),
+#          "module_members" (genes that are members of any module),
+#          "specific_module_genes" (genes in the specific module being analyzed)
+GSEA_SCOPE <- "all_genes"
+
 # Base directory - UPDATE THIS PATH for IBD Lloyd-Price data
 base_dir <- '/home/borisvdm/Documents/PhD/Lemonite/Lloyd-Price_IBD/results/LemonTree/'
+
+# Load name mapping for display of original metabolite names
+if (!exists('name_lookup')) {
+  name_mapping_file <- paste0(base_dir, '../../data/name_mapping.tsv')
+  if (file.exists(name_mapping_file)) {
+    name_mapping_df <- read.table(name_mapping_file, sep='\t', header=TRUE, stringsAsFactors=FALSE)
+    name_lookup <- setNames(name_mapping_df$original, name_mapping_df$cleaned)
+    message(paste("Loaded name mapping:", length(name_lookup), "entries"))
+  } else {
+    name_lookup <- NULL
+    warning("name_mapping.tsv not found")
+  }
+}
+
+restore_names <- function(nms) {
+  if (is.null(name_lookup)) return(nms)
+  restored <- name_lookup[nms]
+  ifelse(is.na(restored), nms, restored)
+}
 
 # Parameters that should match your LemonTree_to_network.ipynb settings
 percentile <- 2
@@ -38,7 +63,7 @@ fold <- percentile  # Changed fold parameter to percentile
 n_modules_name <- '87'  # This should match the output from LemonTree_to_network.ipynb
 coherence_threshold <- 0.5
 organism <- org.Hs.eg.db
-n_threads <- 6
+n_threads <- 5
 set.seed(1234)
 
 # File paths (these should match LemonTree_to_network.ipynb outputs)
@@ -118,9 +143,12 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
   #plan(multisession, workers = 1)
   register(MulticoreParam(workers = n_threads))
     
-  # Output directory
-  output_dir <- paste0(base_dir, 'Enrichment/Modules_gsea')
+  # Output directory (includes scope subfolder)
+  output_base_dir <- paste0(base_dir, 'Enrichment/Modules_gsea')
+  output_dir <- paste0(output_base_dir, '/', GSEA_SCOPE)
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+  cat("GSEA scope:", GSEA_SCOPE, "\n")
+  cat("Results will be saved to:", output_dir, "\n")
 
   # ######################################################################################################################################
   # #### GSEA analysis per module: rank genes based on coexpression with module eigengene - parallel
@@ -152,6 +180,15 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
   # (No additional sourcing needed here)
 
   process_gsea_result <- function(result, cluster, db) {
+    extract_all_significant <- function(subset, direction) {
+      if (nrow(subset) == 0) return(data.frame())
+      subset <- subset[subset$p.adjust <= 0.05, ]
+      subset <- subset[order(-abs(subset$NES)), ]
+      subset$Module <- cluster
+      subset$Database <- db
+      subset$Term <- paste(subset$ID, subset$Description, sep = " - ")
+      subset[, c("Module", "Database", "Term", "p.adjust")]
+    }
     extract_top <- function(subset, direction) {
       if (nrow(subset) == 0) return(data.frame())
       subset <- subset[order(-abs(subset$NES)), ][1:10, ]
@@ -161,12 +198,15 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
       subset$Term <- paste(subset$ID, subset$Description, sep = " - ")
       subset[, c("Module", "Database", "Term", "p.adjust")]
     }
+    up_all <- tryCatch(extract_all_significant(result[result$NES > 0, ], "up"), error = function(e) data.frame())
+    down_all <- tryCatch(extract_all_significant(result[result$NES < 0, ], "down"), error = function(e) data.frame())
     up <- tryCatch(extract_top(result[result$NES > 0, ], "up"), error = function(e) data.frame())
     down <- tryCatch(extract_top(result[result$NES < 0, ], "down"), error = function(e) data.frame())
-    list(up, down)
+    list(up, down, up_all, down_all)
   }
 
-  run_all_gsea <- function(cluster, dbs, organism, module_eigengenes, expression, output_dir) {
+  run_all_gsea <- function(cluster, dbs, organism, module_eigengenes, expression, output_dir,
+                           clusters_to_genes = NULL, gsea_scope = "all_genes") {
 
     #cluster <- '20'
 
@@ -175,7 +215,22 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
     dir.create(dir_name, showWarnings = FALSE)
 
     eigengene <- module_eigengenes[, paste0("ME", cluster)]
-    correlations <- cor(t(expression), eigengene, use = "pairwise.complete.obs")
+
+    # Select genes for correlation based on gsea_scope
+    expr_for_cor <- if (gsea_scope == "specific_module_genes" && !is.null(clusters_to_genes)) {
+      # Only genes in this specific module
+      module_genes <- intersect(clusters_to_genes[[cluster]], rownames(expression))
+      expression[module_genes, , drop = FALSE]
+    } else if (gsea_scope == "module_members" && !is.null(clusters_to_genes)) {
+      # All genes that are members of any module
+      all_module_genes <- intersect(unlist(clusters_to_genes), rownames(expression))
+      expression[all_module_genes, , drop = FALSE]
+    } else {
+      # gsea_scope == "all_genes": use all genes in expression matrix
+      expression
+    }
+
+    correlations <- cor(t(expr_for_cor), eigengene, use = "pairwise.complete.obs")
 
     ranked_genes <- correlations[, 1]
     names(ranked_genes) <- rownames(correlations)
@@ -183,6 +238,8 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
 
     local_up <- list()
     local_down <- list()
+    local_up_all <- list()
+    local_down_all <- list()
 
     # --- GO-based GSEA ---
     for (db in dbs) {
@@ -206,6 +263,8 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
         res <- process_gsea_result(result, cluster, db)
         local_up <- append(local_up, list(res[[1]]))
         local_down <- append(local_down, list(res[[2]]))
+        local_up_all <- append(local_up_all, list(res[[3]]))
+        local_down_all <- append(local_down_all, list(res[[4]]))
       }, error = function(e) message(paste("GO GSEA error in", cluster, "db:", db, e$message)))
     }
 
@@ -226,6 +285,8 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
       res <- process_gsea_result(kegg@result, cluster, "KEGG")
       local_up <- append(local_up, list(res[[1]]))
       local_down <- append(local_down, list(res[[2]]))
+      local_up_all <- append(local_up_all, list(res[[3]]))
+      local_down_all <- append(local_down_all, list(res[[4]]))
     }, error = function(e) message(paste("KEGG error in", cluster, e$message)))
 
     # --- Reactome ---
@@ -242,9 +303,11 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
       res <- process_gsea_result(reactome@result, cluster, "Reactome")
       local_up <- append(local_up, list(res[[1]]))
       local_down <- append(local_down, list(res[[2]]))
+      local_up_all <- append(local_up_all, list(res[[3]]))
+      local_down_all <- append(local_down_all, list(res[[4]]))
     }, error = function(e) message(paste("Reactome error in", cluster, e$message)))
 
-    list(do.call(rbind, local_up), do.call(rbind, local_down))
+    list(do.call(rbind, local_up), do.call(rbind, local_down), do.call(rbind, local_up_all), do.call(rbind, local_down_all))
 
   }
 
@@ -260,24 +323,34 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
     organism = organism,
     module_eigengenes = module_eigengenes,
     expression = expression,
-    output_dir = output_dir
+    output_dir = output_dir,
+    clusters_to_genes = clusters_to_genes,
+    gsea_scope = GSEA_SCOPE
   )
 
   # Split up/down results
   top_pathways_list_up <- lapply(gsea_results, `[[`, 1)
   top_pathways_list_down <- lapply(gsea_results, `[[`, 2)
+  all_pathways_list_up <- lapply(gsea_results, `[[`, 3)
+  all_pathways_list_down <- lapply(gsea_results, `[[`, 4)
 
   # Combine into data.frames
   top_pathways_df_up <- do.call(rbind, top_pathways_list_up)
   top_pathways_df_down <- do.call(rbind, top_pathways_list_down)
+  all_pathways_df_up <- do.call(rbind, all_pathways_list_up)
+  all_pathways_df_down <- do.call(rbind, all_pathways_list_down)
 
   # Remove NA
   top_pathways_df_up <- top_pathways_df_up[!is.na(top_pathways_df_up$p.adjust), ]
   top_pathways_df_down <- top_pathways_df_down[!is.na(top_pathways_df_down$p.adjust), ]
+  all_pathways_df_up <- all_pathways_df_up[!is.na(all_pathways_df_up$p.adjust), ]
+  all_pathways_df_down <- all_pathways_df_down[!is.na(all_pathways_df_down$p.adjust), ]
 
   # Save GSEA results in format compatible with Module_Overview_Generator
   fwrite(top_pathways_df_up, file.path(output_dir, "Gsea_top_10_enriched_pathways_up_per_module.csv"))
   fwrite(top_pathways_df_down, file.path(output_dir, "Gsea_top_10_enriched_pathways_down_per_module.csv"))
+  fwrite(all_pathways_df_up, file.path(output_dir, "Gsea_all_enriched_pathways_up_per_module.csv"))
+  fwrite(all_pathways_df_down, file.path(output_dir, "Gsea_all_enriched_pathways_down_per_module.csv"))
 
   cat("GSEA Analysis completed!\n")
   cat("Results saved to:", output_dir, "\n")
@@ -305,6 +378,7 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
   
   # Initialize dataframes to store results
   enrichr_up_results <- data.frame()
+  enrichr_up_results_all <- data.frame()
   enrichr_down_results <- data.frame()
   
   cat("Running EnrichR for", length(clusters_to_genes), "modules...\n")
@@ -349,12 +423,13 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
           sig_results <- enrichment[[db]][enrichment[[db]]$Adjusted.P.value <= 0.05, ]
           
           if (nrow(sig_results) > 0) {
+            all_results <- sig_results[order(sig_results$Adjusted.P.value), ]
             # Take top 10 results
-            top_results <- head(sig_results[order(sig_results$Adjusted.P.value), ], 10)
+            top_results <- head(all_results, 10)
             
             # Add metadata
-            top_results$Module <- cluster
-            top_results$Database <- case_when(
+            all_results$Module <- cluster
+            all_results$Database <- case_when(
               grepl("Biological_Process", db) ~ "BP",
               grepl("Molecular_Function", db) ~ "MF", 
               grepl("Cellular_Component", db) ~ "CC",
@@ -362,17 +437,23 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
               grepl("Reactome", db) ~ "Reactome",
               TRUE ~ db
             )
+            top_results$Module <- cluster
+            top_results$Database <- all_results$Database
             
             # Create Term column compatible with GSEA format
+            all_results$Term <- paste(all_results$Term)
             top_results$Term <- paste(top_results$Term)
             
             # Rename p.adjust column to match GSEA format
+            colnames(all_results)[colnames(all_results) == "Adjusted.P.value"] <- "p.adjust"
             colnames(top_results)[colnames(top_results) == "Adjusted.P.value"] <- "p.adjust"
             
             # Select relevant columns
+            formatted_all_results <- all_results[, c("Module", "Database", "Term", "p.adjust")]
             formatted_results <- top_results[, c("Module", "Database", "Term", "p.adjust")]
             
             # For EnrichR, we'll treat all results as "up" since it doesn't distinguish direction
+            enrichr_up_results_all <- rbind(enrichr_up_results_all, formatted_all_results)
             enrichr_up_results <- rbind(enrichr_up_results, formatted_results)
           }
         }
@@ -384,7 +465,9 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
   }
   
   # Save EnrichR results in GSEA-compatible format
+  fwrite(enrichr_up_results_all, file.path(enrichr_output_dir, "Enrichr_all_enriched_pathways_up_per_module.csv"))
   fwrite(enrichr_up_results, file.path(enrichr_output_dir, "Enrichr_top_10_enriched_pathways_up_per_module.csv"))
+  fwrite(data.frame(), file.path(enrichr_output_dir, "Enrichr_all_enriched_pathways_down_per_module.csv"))
   # Create empty down-regulated file for consistency
   fwrite(data.frame(), file.path(enrichr_output_dir, "Enrichr_top_10_enriched_pathways_down_per_module.csv"))
   
@@ -417,6 +500,8 @@ if (ANALYSIS_METHOD == "GSEA") {
   cat("- Use: enrichment_up_file = base_dir + '/Enrichment/Modules_gsea/Gsea_top_10_enriched_pathways_up_per_module.csv'\n")
   cat("- Use: enrichment_down_file = base_dir + '/Enrichment/Modules_gsea/Gsea_top_10_enriched_pathways_down_per_module.csv'\n")
 } else if (ANALYSIS_METHOD == "EnrichR") {
+  cat("- Use: enrichment_up_file = base_dir + '/Enrichment/Modules_enrichr/Enrichr_all_enriched_pathways_up_per_module.csv' for top_30 or larger downstream term sets\n")
+  cat("- Use: enrichment_down_file = base_dir + '/Enrichment/Modules_enrichr/Enrichr_all_enriched_pathways_down_per_module.csv'\n")
   cat("- Use: enrichment_up_file = base_dir + '/Enrichment/Modules_enrichr/Enrichr_top_10_enriched_pathways_up_per_module.csv'\n")
   cat("- Use: enrichment_down_file = base_dir + '/Enrichment/Modules_enrichr/Enrichr_top_10_enriched_pathways_down_per_module.csv'\n")
 }

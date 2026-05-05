@@ -1,0 +1,14 @@
+Node1	Node2	Source	Type	Category
+hypotaurine	EHMT2	chEMBL	metabolite-gene	Causal
+hypotaurine	SLC6A1	UniProtKB	metabolite-gene	Ambiguous
+hypotaurine	CPA5	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+hypotaurine	PRDX1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+hypotaurine	TMPPE	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+ATF7	EHMT2	STRING	PPI	PPI
+EHMT2	RREB1	BioGRID_genes	PPI	PPI
+EHMT2	NFIC	BioGRID_genes	PPI	PPI
+NFIC	SLC6A1	STRING	PPI	PPI
+NFIC	RREB1	BioGRID_genes	PPI	PPI
+SP2	CPA5	STRING	PPI	PPI
+SKI	PRDX1	BioGRID_genes	PPI	PPI
+ZNF319	TMPPE	STRING	PPI	PPI

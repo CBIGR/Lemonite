@@ -126,15 +126,23 @@ process SUMMARY_REPORT {
         exit 1
     fi
     
+    # Build name mapping argument — find it from staged preprocessing results
+    NAME_MAPPING_ARG=""
+    NAME_MAPPING_FILE=\$(find ./LemonTree/Preprocessing -name "name_mapping.tsv" 2>/dev/null | head -1)
+    if [ -n "\${NAME_MAPPING_FILE}" ] && [ -f "\${NAME_MAPPING_FILE}" ]; then
+        NAME_MAPPING_ARG="--name_mapping \${NAME_MAPPING_FILE}"
+    fi
+    
     # Pass current directory as output_dir with run_id="." so script looks for LemonTree directly
     # The LemonTree directory is already copied to the current working directory by this point
     python3 \$SCRIPT_PATH \\
-        --input_dir ${params.input_dir} \\
+        --input_dir "${params.input_dir}" \\
         --output_dir . \\
         --run_id . \\
         --regulator_types "${regulator_types}" \\
         --parameters_file ./pipeline_parameters_log.txt \\
-        --organism ${params.organism}
+        --organism "${params.organism}" \\
+        \$NAME_MAPPING_ARG
     
     # Move the report to the expected output location
     if [ -f "${run_id}/Lemonite_Summary_Report.html" ]; then

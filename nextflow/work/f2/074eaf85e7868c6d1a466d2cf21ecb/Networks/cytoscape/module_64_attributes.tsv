@@ -1,0 +1,15 @@
+Node	Label	Type
+myo_inositol	myo_inositol	metabolite
+creatinine	creatinine	metabolite
+ELK3	ELK3	TF
+HAL	HAL	bridge_node
+SOX4	SOX4	TF
+PLCB1	PLCB1	bridge_node
+FASN	FASN	bridge_node
+PLAGL2	PLAGL2	TF
+PLCG2	PLCG2	bridge_node
+EEF1A2	EEF1A2	bridge_node
+KLF17	KLF17	TF
+SLC5A5	SLC5A5	bridge_node
+ZNF217	ZNF217	TF
+ACE2	ACE2	bridge_node

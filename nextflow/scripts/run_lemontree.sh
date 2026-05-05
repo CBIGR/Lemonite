@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # LemonTree clustering script for Nextflow
 # Adapted from lemon_cluster.pbs
@@ -8,6 +9,9 @@ CLUSTER_ID=$1
 INPUT_FILE=$2
 OUTPUT_DIR=$3
 LEMONTREE_JAR=$4
+
+# LemonTree ganesh task does not support a seed argument.
+# We keep the cluster ID for logging and reproducibility tracking only.
 
 echo "=== LemonTree Clustering Debug Info ==="
 echo "Cluster ID: ${CLUSTER_ID}"

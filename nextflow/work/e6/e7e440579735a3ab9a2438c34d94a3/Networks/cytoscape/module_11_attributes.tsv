@@ -1,0 +1,8 @@
+Node	Label	Type
+galactitol	galactitol	metabolite
+ACP5	ACP5	module_gene
+MAFB	MAFB	TF
+RPL36A	RPL36A	bridge_node
+VDR	VDR	TF
+ACE	ACE	bridge_node
+SPI1	SPI1	TF

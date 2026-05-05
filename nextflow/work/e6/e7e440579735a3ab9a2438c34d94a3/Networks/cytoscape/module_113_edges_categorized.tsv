@@ -1,0 +1,5 @@
+Node1	Node2	Source	Type	Category
+glycerol_3_phosphate	AQP3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+glycerol_3_phosphate	EEF1A2	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+POU2F2	AQP3	BioGRID_genes	PPI	PPI
+PLAGL2	EEF1A2	BioGRID_genes	PPI	PPI

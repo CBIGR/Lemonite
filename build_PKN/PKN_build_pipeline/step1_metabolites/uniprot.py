@@ -81,9 +81,7 @@ class UniProtRetriever(APIRetriever):
             )
         
         response = requests.get(url, timeout=timeout)
-        
-        if response.status_code != 200:
-            raise requests.exceptions.RequestException(f"HTTP {response.status_code}")
+        response.raise_for_status()
         
         # Parse TSV response
         data = response.text.strip().split('\n')

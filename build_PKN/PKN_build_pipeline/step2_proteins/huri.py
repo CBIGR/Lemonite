@@ -14,10 +14,9 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import config
-from utils.pipeline import LocalFileRetriever
 
 
-class HuRIRetriever(LocalFileRetriever):
+class HuRIRetriever:
     """
     Retrieve protein-protein interactions from HuRI database.
     
@@ -29,11 +28,15 @@ class HuRIRetriever(LocalFileRetriever):
     
     def __init__(self):
         """Initialize HuRI retriever."""
-        super().__init__()
         self.logger = logging.getLogger('huri')
         self.file_path = config.HURI_FILE
         self.ensembl_mapping_file = config.ENSEMBL_MAPPING_FILE
         self.ensembl_to_symbol = None
+        
+        if not os.path.exists(self.file_path):
+            raise FileNotFoundError(f"HuRI file not found: {self.file_path}")
+        if not os.path.exists(self.ensembl_mapping_file):
+            raise FileNotFoundError(f"Ensembl mapping file not found: {self.ensembl_mapping_file}")
     
     def _load_ensembl_mapping(self) -> Dict[str, str]:
         """

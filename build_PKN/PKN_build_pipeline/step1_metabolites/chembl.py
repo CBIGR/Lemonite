@@ -56,7 +56,7 @@ class ChEMBLRetriever(APIRetriever):
         
         chembl_id = metabolite.get('ChEMBL_id')
         
-        if chembl_id == 'none' or pd.isna(chembl_id) or chembl_id == '' or chembl_id == 'NA':
+        if not chembl_id or chembl_id == 'none' or pd.isna(chembl_id) or chembl_id == 'NA':
             return []
         
         # Query activities for this compound in human (tax_id 9606)
@@ -70,12 +70,17 @@ class ChEMBLRetriever(APIRetriever):
         
         # Filter by interaction confidence
         if 'activity_comment' in dat.columns:
-            dat = dat[dat['activity_comment'].str.lower().isin(['active', 'substrate'])]
+            filtered = dat[dat['activity_comment'].str.lower().isin(['active', 'substrate'])]
+            if not filtered.empty:
+                dat = filtered
+            else:
+                self.logger.debug(
+                    f"No 'active'/'substrate' entries for {chembl_id}, using all {len(dat)} activities"
+                )
         else:
-            self.logger.warning(
-                f"No 'activity_comment' column found in chEMBL data for ChEMBL_ID: {chembl_id}"
+            self.logger.debug(
+                f"No 'activity_comment' column for {chembl_id}, using all {len(dat)} activities"
             )
-            return []
         
         if dat.empty:
             return []

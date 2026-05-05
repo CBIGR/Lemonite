@@ -1,0 +1,8 @@
+Node	Label	Type
+2_hydroxyglutaric_acid	2_hydroxyglutaric_acid	metabolite
+SOX9	SOX9	TF
+CYP19A1	CYP19A1	bridge_node
+TBX1	TBX1	TF
+SLC25A1	SLC25A1	bridge_node
+FOXG1	FOXG1	TF
+GAD1	GAD1	bridge_node

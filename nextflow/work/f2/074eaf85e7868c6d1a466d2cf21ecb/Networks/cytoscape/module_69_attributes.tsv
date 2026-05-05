@@ -1,0 +1,5 @@
+Node	Label	Type
+myo_inositol	myo_inositol	metabolite
+LPL	LPL	module_gene
+ATF2	ATF2	TF
+ANXA3	ANXA3	bridge_node

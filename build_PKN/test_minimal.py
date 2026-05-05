@@ -113,7 +113,6 @@ def test_imports_step1():
     from step1_metabolites.chembl import ChEMBLRetriever                 # noqa
     from step1_metabolites.intact import IntActRetriever                 # noqa
     from step1_metabolites.gem import GEMRetriever                       # noqa
-    from step1_metabolites.l1000 import L1000Retriever                   # noqa
     from step1_metabolites.uniprot import UniProtRetriever               # noqa
 
 

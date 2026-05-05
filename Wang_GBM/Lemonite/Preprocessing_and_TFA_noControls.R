@@ -65,6 +65,7 @@ if (!dir.exists(TFA_dir)) {dir.create(TFA_dir)}
 if (!dir.exists(file.path(base_dir, 'results/LemonTree'))) {dir.create(file.path(base_dir, 'results/LemonTree'))}
 
 run_id <- paste0('Variability_', variability_threshold)
+data_dir <- paste0(base_dir, 'data/')  # Keep reference to data directory for name mapping
 base_dir <- paste0(base_dir, 'results/LemonTree/', run_id, '/')
 
 if (!dir.exists(base_dir)) {dir.create(base_dir)}
@@ -328,10 +329,16 @@ abundancies <- fread(metabolomics, data.table = FALSE, header = TRUE)
 rownames(abundancies) <- abundancies$Metabolite; abundancies$Metabolite <- NULL
 #abundancies <- abundancies %>% mutate_all(na_if, "") # Change empty entries to NA
 
+# Capture original metabolite names before cleaning
+original_met_names <- rownames(abundancies)
+
 rownames(abundancies) <- str_replace_all(rownames(abundancies), ' ', '_')
 rownames(abundancies) <- str_replace_all(rownames(abundancies), '-', '_')
 rownames(abundancies) <- str_replace_all(rownames(abundancies), ':', '_')
 rownames(abundancies) <- str_replace_all(rownames(abundancies), '\\+', '_')
+
+# Build metabolite name mapping (cleaned -> original)
+met_mapping <- data.frame(cleaned = rownames(abundancies), original = original_met_names, type = 'metabolite', stringsAsFactors = FALSE)
 
 # Select samples
 abundancies <- abundancies[, colnames(abundancies) %in% samples]
@@ -362,11 +369,18 @@ lipids_neg_names <- lipidomics_neg$Lipid
 
 # Concatenate lipid names
 lipids_names <- c(lipids_pos_names, lipids_neg_names)
+
+# Capture original lipid names before cleaning
+original_lip_names <- lipids_names
+
 # Replace weird characters
 lipids_names <- str_replace_all(lipids_names, ' ', '_')
 lipids_names <- str_replace_all(lipids_names, '-', '_')
 lipids_names <- str_replace_all(lipids_names, ':', '_')
 lipids_names <- str_replace_all(lipids_names, '\\+', '_')
+
+# Build lipid name mapping (cleaned -> original)
+lip_mapping <- data.frame(cleaned = lipids_names, original = original_lip_names, type = 'lipid', stringsAsFactors = FALSE)
 
 # Select samples
 lipidomics_pos <- lipidomics_pos[, colnames(lipidomics_pos) %in% samples]
@@ -428,6 +442,17 @@ complete_df <- complete_df[-nrow(complete_df),]
 write.table(complete_df, paste0(base_dir, 'Preprocessing/LemonPreprocessed_complete.txt'), sep = '\t', quote=FALSE, row.names=FALSE)
 write.table(lipidomics$symbol, paste0(base_dir, 'Preprocessing/lipids.txt'), quote = FALSE, row.names = FALSE, col.names=FALSE)
 write.table(abundancies$symbol, paste0(base_dir, 'Preprocessing/metabolites.txt'), quote = FALSE, row.names = FALSE, col.names=FALSE)
+
+# Write name mapping table (cleaned -> original) for metabolites and lipids
+name_mapping <- rbind(met_mapping, lip_mapping)
+if (any(duplicated(name_mapping$cleaned))) {
+  warning('Duplicate cleaned names found! Multiple original names map to the same cleaned name.')
+  print(name_mapping[name_mapping$cleaned %in% name_mapping$cleaned[duplicated(name_mapping$cleaned)], ])
+}
+write.table(name_mapping, paste0(base_dir, 'Preprocessing/name_mapping.tsv'), sep = '\t', quote = FALSE, row.names = FALSE)
+# Also save to data directory for use by scripts outside the LemonTree run directory
+write.table(name_mapping, paste0(data_dir, 'name_mapping.tsv'), sep = '\t', quote = FALSE, row.names = FALSE)
+
 write.table(DESeq_groups, paste0(base_dir, 'Preprocessing/DESeq_groups.txt'), quote=FALSE, sep='\t', row.names = TRUE)
 
 

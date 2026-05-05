@@ -1,0 +1,75 @@
+=== Files staged by Nextflow ===
+total 32
+drwxr-xr-x 4 borisvdm users  4096 Apr 30 09:55 .
+drwxr-xr-x 3 borisvdm users    44 Apr 30 09:55 ..
+lrwxrwxrwx 1 borisvdm users    98 Apr 30 09:55 clusterfile -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Lemon_out/clusterfile
+-rw-r--r-- 1 borisvdm users     0 Apr 30 09:55 .command.begin
+-rw-r--r-- 1 borisvdm users     0 Apr 30 09:55 .command.err
+-rw-r--r-- 1 borisvdm users    33 Apr 30 09:55 .command.log
+-rw-r--r-- 1 borisvdm users    33 Apr 30 09:55 .command.out
+-rw-r--r-- 1 borisvdm users 14217 Apr 30 09:55 .command.run
+-rw-r--r-- 1 borisvdm users  3017 Apr 30 09:55 .command.sh
+-rw-r--r-- 1 borisvdm users     0 Apr 30 09:55 .command.trace
+lrwxrwxrwx 1 borisvdm users   107 Apr 30 09:55 DESeq_groups.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Preprocessing/DESeq_groups.txt
+lrwxrwxrwx 1 borisvdm users   124 Apr 30 09:55 expression_variance_histogram.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Preprocessing/expression_variance_histogram.pdf
+drwxr-xr-x 2 borisvdm users     6 Apr 30 09:55 Lemon_out
+lrwxrwxrwx 1 borisvdm users   121 Apr 30 09:55 LemonPreprocessed_complete.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Preprocessing/LemonPreprocessed_complete.txt
+lrwxrwxrwx 1 borisvdm users   123 Apr 30 09:55 LemonPreprocessed_expression.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Preprocessing/LemonPreprocessed_expression.txt
+lrwxrwxrwx 1 borisvdm users   125 Apr 30 09:55 LemonPreprocessed_metabolomics.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Preprocessing/LemonPreprocessed_metabolomics.txt
+lrwxrwxrwx 1 borisvdm users   100 Apr 30 09:55 Lemon_results -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Lemon_out/Lemon_results
+lrwxrwxrwx 1 borisvdm users   109 Apr 30 09:55 Metabolites.allreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Lemon_out/Metabolites.allreg.txt
+lrwxrwxrwx 1 borisvdm users   112 Apr 30 09:55 Metabolites.randomreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Lemon_out/Metabolites.randomreg.txt
+lrwxrwxrwx 1 borisvdm users   109 Apr 30 09:55 Metabolites.topreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Lemon_out/Metabolites.topreg.txt
+lrwxrwxrwx 1 borisvdm users   106 Apr 30 09:55 metabolites.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Preprocessing/metabolites.txt
+lrwxrwxrwx 1 borisvdm users   105 Apr 30 09:55 Metabolites.xml.gz -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Lemon_out/Metabolites.xml.gz
+lrwxrwxrwx 1 borisvdm users   103 Apr 30 09:55 name_map.csv -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Preprocessing/name_map.csv
+lrwxrwxrwx 1 borisvdm users   107 Apr 30 09:55 name_mapping.tsv -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Preprocessing/name_mapping.tsv
+lrwxrwxrwx 1 borisvdm users   117 Apr 30 09:55 Normalized_metabolites.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Preprocessing/Normalized_metabolites.pdf
+lrwxrwxrwx 1 borisvdm users   110 Apr 30 09:55 PCA_metabolites.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Preprocessing/PCA_metabolites.pdf
+lrwxrwxrwx 1 borisvdm users   114 Apr 30 09:55 PCA_transcriptomics.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Preprocessing/PCA_transcriptomics.pdf
+drwxr-xr-x 2 borisvdm users     6 Apr 30 09:55 Preprocessing
+lrwxrwxrwx 1 borisvdm users   101 Apr 30 09:55 TFs.allreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Lemon_out/TFs.allreg.txt
+lrwxrwxrwx 1 borisvdm users   104 Apr 30 09:55 TFs.randomreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Lemon_out/TFs.randomreg.txt
+lrwxrwxrwx 1 borisvdm users   101 Apr 30 09:55 TFs.topreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Lemon_out/TFs.topreg.txt
+lrwxrwxrwx 1 borisvdm users    98 Apr 30 09:55 tfs.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Preprocessing/tfs.txt
+lrwxrwxrwx 1 borisvdm users    97 Apr 30 09:55 TFs.xml.gz -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Lemon_out/TFs.xml.gz
+lrwxrwxrwx 1 borisvdm users   105 Apr 30 09:55 tight_clusters.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/eb/9934e014711f91bf4eefab93c63d43/Lemon_out/tight_clusters.txt
+=================================
+=== Available files before network generation ===
+=== Lemon_out contents ===
+total 15768
+drwxr-xr-x 3 borisvdm users    4096 Apr 30 09:55 .
+drwxr-xr-x 4 borisvdm users    4096 Apr 30 09:55 ..
+-rw-r--r-- 1 borisvdm users     240 Apr 30 09:55 clusterfile
+drwxr-xr-x 2 borisvdm users      91 Apr 30 09:55 Lemon_results
+-rw-r--r-- 1 borisvdm users  437610 Apr 30 09:55 Metabolites.allreg.txt
+-rw-r--r-- 1 borisvdm users  466000 Apr 30 09:55 Metabolites.randomreg.txt
+-rw-r--r-- 1 borisvdm users    4537 Apr 30 09:55 Metabolites.topreg.txt
+-rw-r--r-- 1 borisvdm users 6048055 Apr 30 09:55 Metabolites.xml.gz
+-rw-r--r-- 1 borisvdm users 1062317 Apr 30 09:55 TFs.allreg.txt
+-rw-r--r-- 1 borisvdm users 1603962 Apr 30 09:55 TFs.randomreg.txt
+-rw-r--r-- 1 borisvdm users   10667 Apr 30 09:55 TFs.topreg.txt
+-rw-r--r-- 1 borisvdm users 6428862 Apr 30 09:55 TFs.xml.gz
+-rw-r--r-- 1 borisvdm users   54844 Apr 30 09:55 tight_clusters.txt
+Lemon_out/Metabolites.allreg.txt
+Lemon_out/Metabolites.topreg.txt
+Lemon_out/TFs.allreg.txt
+Lemon_out/TFs.topreg.txt
+=== Preprocessing contents ===
+total 8424
+drwxr-xr-x 2 borisvdm users    4096 Apr 30 09:55 .
+drwxr-xr-x 4 borisvdm users    4096 Apr 30 09:55 ..
+-rw-r--r-- 1 borisvdm users    1156 Apr 30 09:55 DESeq_groups.txt
+-rw-r--r-- 1 borisvdm users   10194 Apr 30 09:55 expression_variance_histogram.pdf
+-rw-r--r-- 1 borisvdm users 4264628 Apr 30 09:55 LemonPreprocessed_complete.txt
+-rw-r--r-- 1 borisvdm users 4080797 Apr 30 09:55 LemonPreprocessed_expression.txt
+-rw-r--r-- 1 borisvdm users  184436 Apr 30 09:55 LemonPreprocessed_metabolomics.txt
+-rw-r--r-- 1 borisvdm users    1908 Apr 30 09:55 metabolites.txt
+-rwxr-xr-x 1 borisvdm users    8995 Apr 30 09:55 name_map.csv
+-rw-r--r-- 1 borisvdm users      17 Apr 30 09:55 name_mapping.tsv
+-rw-r--r-- 1 borisvdm users    3611 Apr 30 09:55 Normalized_metabolites.pdf
+-rw-r--r-- 1 borisvdm users   10159 Apr 30 09:55 PCA_metabolites.pdf
+-rw-r--r-- 1 borisvdm users   10327 Apr 30 09:55 PCA_transcriptomics.pdf
+-rw-r--r-- 1 borisvdm users    9088 Apr 30 09:55 tfs.txt
+=================================================
+Running network generation...

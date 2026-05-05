@@ -30,9 +30,9 @@ USER_SPACE=$(df -h "$PWD" | awk 'NR==2 {print $4}')
 echo "Available space in user directory: $USER_SPACE"
 
 # Build the image
-echo "Building Singularity image: lemontree-pipeline.sif"
+echo "Building Singularity image: lemontree-pipeline_v1.0.0.sif"
 echo "Note: Building without sudo using --fakeroot (requires user namespace support)"
-singularity build --fakeroot --bind "${PWD}/.singularity/tmp:/tmp" lemontree-pipeline.sif Singularity.def
+singularity build --fakeroot --bind "${PWD}/.singularity/tmp:/tmp" lemontree-pipeline_v1.0.0.sif Singularity.def
 
 # Cleanup function
 cleanup_cache() {
@@ -45,16 +45,16 @@ cleanup_cache() {
 }
 
 # Verify the build
-if [ -f "lemontree-pipeline.sif" ]; then
+if [ -f "lemontree-pipeline_v1.0.0.sif" ]; then
     echo ""
     echo "✅ Singularity image built successfully!"
-    echo "Image size: $(du -h lemontree-pipeline.sif | cut -f1)"
+    echo "Image size: $(du -h lemontree-pipeline_v1.0.0.sif | cut -f1)"
     echo ""
     cleanup_cache
     echo ""
     echo "Test the image with:"
-    echo "singularity exec lemontree-pipeline.sif R --version"
-    echo "singularity exec lemontree-pipeline.sif python3 --version"
+    echo "singularity exec lemontree-pipeline_v1.0.0.sif R --version"
+    echo "singularity exec lemontree-pipeline_v1.0.0.sif python3 --version"
     echo ""
     echo "Run the pipeline with:"
     echo "nextflow run main.nf -profile singularity --input_dir /path/to/data"

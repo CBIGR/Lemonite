@@ -1,0 +1,13 @@
+Node	Label	Type
+creatinine	creatinine	metabolite
+GPX3	GPX3	module_gene
+GTF2I	GTF2I	TF
+ACE2	ACE2	bridge_node
+STAT6	STAT6	TF
+EEF1A1	EEF1A1	bridge_node
+ZBTB8B	ZBTB8B	TF
+CPA2	CPA2	bridge_node
+NR5A2	NR5A2	TF
+CEL	CEL	bridge_node
+NFIA	NFIA	TF
+SLC1A3	SLC1A3	bridge_node

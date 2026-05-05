@@ -1,0 +1,15 @@
+Node	Label	Type
+creatinine	creatinine	metabolite
+LPL	LPL	module_gene
+SLC47A2	SLC47A2	module_gene
+SLC16A7	SLC16A7	module_gene
+myo_inositol	myo_inositol	metabolite
+ST6GALNAC2	ST6GALNAC2	module_gene
+SLC13A4	SLC13A4	module_gene
+MYT1L	MYT1L	TF
+PXDN	PXDN	bridge_node
+GAD2	GAD2	bridge_node
+MYT1	MYT1	TF
+PI4KA	PI4KA	bridge_node
+SOX8	SOX8	TF
+SLC38A2	SLC38A2	bridge_node

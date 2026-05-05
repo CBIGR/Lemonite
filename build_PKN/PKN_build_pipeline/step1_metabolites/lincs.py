@@ -88,7 +88,9 @@ class LINCSRetriever(LocalFileRetriever):
         )
         
         # Convert IC50 to nM (standardize units)
-        biochem_data.loc[biochem_data['value_unit'] == 'uM', 'value'] *= 1000
+        biochem_data['value_unit_lower'] = biochem_data['value_unit'].str.lower().str.strip()
+        biochem_data.loc[biochem_data['value_unit_lower'].isin(['um', 'µm']), 'value'] *= 1000
+        biochem_data.drop(columns=['value_unit_lower'], inplace=True)
         self.logger.info(f"✓ Loaded {len(biochem_data)} biochemical interactions")
         
         # Filter for human targets if requested
@@ -136,7 +138,7 @@ class LINCSRetriever(LocalFileRetriever):
         list of str
             Gene symbols passing IC50 threshold
         """
-        if pd.isna(chembl_id) or chembl_id == 'none' or chembl_id == '':
+        if pd.isna(chembl_id) or not chembl_id or chembl_id == 'none' or chembl_id == '':
             return []
         
         # Ensure lookups are initialized

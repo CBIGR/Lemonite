@@ -1,0 +1,7 @@
+Node	Label	Type
+2_hydroxyglutaric_acid	2_hydroxyglutaric_acid	metabolite
+SLC22A15	SLC22A15	module_gene
+STAT6	STAT6	TF
+PSAT1	PSAT1	bridge_node
+NFE2L2	NFE2L2	TF
+CYP1A1	CYP1A1	bridge_node

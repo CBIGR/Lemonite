@@ -1,0 +1,12 @@
+Using bundled network from projectDir: /home/borisvdm/repo/LemonIte/nextflow/PKN/CollecTRI_network.txt
+Found core files:
+Expression: data/Counts.tsv
+Metadata: data/Metadata.txt
+Prior network: /home/borisvdm/repo/LemonIte/nextflow/PKN/CollecTRI_network.txt
+Copied name_map.csv to Preprocessing directory
+WARNING: ignoring environment value of R_HOME
+
+ Regulator types configuration:
+   - TFs: Lovering_TF_list.txt (continuous)
+   - Metabolites: Metabolomics.txt (continuous)
+Metadata columns to include: diagnosis 

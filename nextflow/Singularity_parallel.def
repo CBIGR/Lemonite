@@ -1,0 +1,399 @@
+Bootstrap: docker
+From: rocker/r-ver:4.3.0
+
+%labels
+    Author Boris Vandemoortele
+    Description Lemonite multi-omics analysis pipeline
+    Version 1.0.0
+
+%help
+    This container provides the complete environment for running the Lemonite pipeline.
+    
+    Usage:
+    singularity exec lemontree-pipeline.sif Rscript /path/to/script.R
+    singularity exec lemontree-pipeline.sif python3 /path/to/script.py
+
+%post
+    set -e  # Abort build on any error
+    
+    # Use up to 6 cores for parallel compilation and R installs
+    PARALLEL_CORES=$(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN || echo 1)
+    PARALLEL_CORES=$(( PARALLEL_CORES > 8 ? 6 : (PARALLEL_CORES > 2 ? PARALLEL_CORES - 2 : 1) ))
+    export MAKEFLAGS="-j${PARALLEL_CORES}"
+    export CFLAGS="-O2 -march=native"
+    export CXXFLAGS="-O2 -march=native"
+    export FFLAGS="-O2 -march=native"
+    echo "Parallel build using ${PARALLEL_CORES} cores"
+
+    # Configure R to use the same number of cores for package installation
+    mkdir -p /root
+    cat >> /root/.Rprofile << 'RPROFILE_EOF'
+options(Ncpus = min(6, pmax(1, parallel::detectCores() - 2)))
+RPROFILE_EOF
+    export R_PROFILE_USER=/root/.Rprofile
+
+    # Update and install system dependencies including GLPK
+    # Note: apt-get commands separated (not chained with &&) so set -e catches failures
+    apt-get update || { echo "apt-get update failed, retrying..."; apt-get update; }
+    apt-get install -y --no-install-recommends \
+        wget \
+        curl \
+      pkg-config \
+        build-essential \
+        gfortran \
+        libblas-dev \
+        liblapack-dev \
+        openjdk-17-jdk \
+        python3 \
+        python3-pip \
+        python3-dev \
+        libxml2-dev \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        libharfbuzz-dev \
+        libfribidi-dev \
+        libfreetype6-dev \
+        libpng-dev \
+        libtiff5-dev \
+        libjpeg-dev \
+        libglpk-dev \
+        libglpk40 \
+        glpk-utils \
+        libgmp-dev \
+        libmpfr-dev \
+        libuv1-dev \
+        cmake \
+        libbz2-dev \
+        libfontconfig1-dev \
+        libcairo2-dev \
+        libwebp-dev
+    rm -rf /var/lib/apt/lists/*
+    apt-get clean
+        
+    # Ensure GLPK libraries are findable
+    ldconfig
+    
+    # Create symlinks if needed
+    ln -sf /usr/lib/x86_64-linux-gnu/libglpk.so.40 /usr/lib/libglpk.so.40 || true
+
+    # Set R C++ compilation standard to C++17 for all C++ variants.
+    # BH >= 1.87 uses C++17 features (enable_if_t, common_type_t, is_final, variable templates)
+    # that fail to compile under C++14 or C++11 mode.
+    # fgsea declares itself as a CXX11 package in its Makevars, so CXX11 must also be
+    # overridden here — otherwise fgsea compiles in C++11 mode and BH headers error out.
+    #
+    # Use THREE layers to guarantee the setting is picked up:
+    #   1. /root/.R/Makevars      — user-level, HIGHEST priority for R CMD INSTALL
+    #   2. Makevars.site          — site-level override (fresh write, not append)
+    #   3. Direct sed on Makeconf — patches the base R configuration in-place
+    mkdir -p /root/.R
+    cat > /root/.R/Makevars << 'MAKEVARS_EOF'
+CXX = g++ -std=gnu++17
+CXXSTD = -std=gnu++17
+CXX11 = g++ -std=gnu++17
+CXX11STD = -std=gnu++17
+CXX11FLAGS = -g -O2
+CXX11PICFLAGS = -fPIC
+CXX14 = g++ -std=gnu++17
+CXX14STD = -std=gnu++17
+CXX14FLAGS = -g -O2
+CXX14PICFLAGS = -fPIC
+CXX17 = g++ -std=gnu++17
+CXX17STD = -std=gnu++17
+CXX17FLAGS = -g -O2
+CXX17PICFLAGS = -fPIC
+MAKEVARS_EOF
+    mkdir -p /usr/local/lib/R/etc
+    cat > /usr/local/lib/R/etc/Makevars.site << 'MKVSITE_EOF'
+CXX = g++ -std=gnu++17
+CXXSTD = -std=gnu++17
+CXX11 = g++ -std=gnu++17
+CXX11STD = -std=gnu++17
+CXX11FLAGS = -g -O2
+CXX11PICFLAGS = -fPIC
+CXX14 = g++ -std=gnu++17
+CXX14STD = -std=gnu++17
+CXX14FLAGS = -g -O2
+CXX14PICFLAGS = -fPIC
+CXX17 = g++ -std=gnu++17
+CXX17STD = -std=gnu++17
+CXX17FLAGS = -g -O2
+CXX17PICFLAGS = -fPIC
+MKVSITE_EOF
+    # Also patch Makeconf directly so R CMD config reflects the changes
+    R_MAKECONF=$(R RHOME)/etc/Makeconf
+    sed -i 's|^CXXSTD =.*|CXXSTD = -std=gnu++17|'   "${R_MAKECONF}" || true
+    grep -q '^CXXSTD = '   "${R_MAKECONF}" || echo 'CXXSTD = -std=gnu++17'   >> "${R_MAKECONF}"
+    sed -i 's|^CXX11 =.*|CXX11 = g++ -std=gnu++17|' "${R_MAKECONF}" || true
+    grep -q '^CXX11 = '   "${R_MAKECONF}" || echo 'CXX11 = g++ -std=gnu++17' >> "${R_MAKECONF}"
+    sed -i 's|^CXX11STD =.*|CXX11STD = -std=gnu++17|' "${R_MAKECONF}" || true
+    grep -q '^CXX11STD = ' "${R_MAKECONF}" || echo 'CXX11STD = -std=gnu++17' >> "${R_MAKECONF}"
+    sed -i 's|^CXX14 =.*|CXX14 = g++ -std=gnu++17|' "${R_MAKECONF}" || true
+    grep -q '^CXX14 = '   "${R_MAKECONF}" || echo 'CXX14 = g++ -std=gnu++17' >> "${R_MAKECONF}"
+    sed -i 's|^CXX14STD =.*|CXX14STD = -std=gnu++17|' "${R_MAKECONF}" || true
+    grep -q '^CXX14STD = ' "${R_MAKECONF}" || echo 'CXX14STD = -std=gnu++17' >> "${R_MAKECONF}"
+    sed -i 's|^CXX17 =.*|CXX17 = g++ -std=gnu++17|' "${R_MAKECONF}" || true
+    grep -q '^CXX17 = '   "${R_MAKECONF}" || echo 'CXX17 = g++ -std=gnu++17' >> "${R_MAKECONF}"
+    sed -i 's|^CXX17STD =.*|CXX17STD = -std=gnu++17|' "${R_MAKECONF}" || true
+    grep -q '^CXX17STD = ' "${R_MAKECONF}" || echo 'CXX17STD = -std=gnu++17' >> "${R_MAKECONF}"
+    # Verify — CXX11STD must show gnu++17, not gnu++11
+    echo "R CXXSTD   = $(R CMD config CXXSTD)"
+    echo "R CXX11STD = $(R CMD config CXX11STD)"
+    echo "R CXX17    = $(R CMD config CXX17)"
+
+    # Install Python packages
+    pip3 install --no-cache-dir \
+        pandas==1.5.3 \
+        numpy==1.24.3 \
+        scipy==1.10.1 \
+        matplotlib==3.7.1 \
+        seaborn==0.12.2 \
+        networkx==3.1 \
+        scikit-learn==1.2.2 \
+        statsmodels==0.14.0 \
+        plotly==5.14.1 \
+        megago \
+        openpyxl \
+        argparse
+
+    # Install BiocManager first
+    R -e "install.packages('BiocManager', repos='https://cran.rstudio.com')"
+    
+    # CRITICAL: Fix Rprofile.site repos — rocker/r-ver sets a date-pinned CRAN-only
+    # repo that overrides BiocManager's Bioconductor repositories. Without this fix,
+    # BiocManager::install() cannot find Bioconductor packages (e.g. treeio, ggtree,
+    # clusterProfiler, enrichplot, ReactomePA).
+    cat > /tmp/fix_repos.R << 'REOF'
+cat("Fixing Rprofile.site to include Bioconductor repositories...\n")
+rprofile <- "/usr/local/lib/R/etc/Rprofile.site"
+lines <- readLines(rprofile)
+# Remove the rocker CRAN-only repos line
+lines <- lines[!grepl("options\\(repos\\s*=", lines)]
+# Add proper repos: Bioconductor + current CRAN
+new_line <- "options(repos = BiocManager::repositories())"
+writeLines(c(lines, new_line), rprofile)
+# Verify
+source(rprofile)
+cat("Repos set to:", paste(names(getOption("repos")), collapse=", "), "\n")
+REOF
+    Rscript /tmp/fix_repos.R
+    
+    # Verify BiocManager version and repos
+    R -e "BiocManager::version()"
+    R -e "cat('Active repos:', paste(names(getOption('repos')), collapse=', '), '\\n')"
+
+    # Prefer the bundled libuv if detection is flaky under fakeroot builds.
+    export USE_BUNDLED_LIBUV=1
+    
+    # Install CRAN packages (without igraph first)
+    R -e "install.packages(c( \
+        'optparse', \
+        'data.table', \
+        'tidyverse', \
+        'dplyr', \
+        'ggplot2', \
+        'pheatmap', \
+        'stringr', \
+        'parallel', \
+        'ggrepel', \
+        'enrichR', \
+        'future.apply', \
+        'future', \
+        'doParallel', \
+        'httr', \
+        'jsonlite', \
+        'plotly', \
+        'htmlwidgets', \
+        'DT', \
+        'RColorBrewer', \
+        'devtools', \
+        'Hmisc', \
+        'foreach' \
+    ), repos='https://cran.rstudio.com', dependencies=TRUE, force=TRUE)"
+    
+    # Install igraph first (needed by many packages)
+    R -e "install.packages('igraph', repos='https://cran.rstudio.com', dependencies=TRUE)"
+    
+    # Install Bioconductor packages in dependency order
+    R -e "BiocManager::install(c( \
+        'BiocGenerics', \
+        'S4Vectors', \
+        'IRanges', \
+        'GenomeInfoDb', \
+        'GenomicRanges', \
+        'Biobase', \
+        'SummarizedExperiment', \
+        'DESeq2', \
+        'biomaRt', \
+        'decoupleR', \
+        'OmnipathR', \
+        'AnnotationDbi', \
+        'org.Hs.eg.db', \
+        'org.Mm.eg.db', \
+        'BiocParallel', \
+        'impute', \
+        'preprocessCore', \
+        'GO.db', \
+        'limma', \
+        'edgeR', \
+        'GSVA' \
+    ), ask=FALSE, force=TRUE)"
+    
+    # Install WGCNA separately (it has special dependencies)
+    R -e "BiocManager::install('WGCNA', ask=FALSE, force=TRUE)"
+    R -e "library(WGCNA); cat('WGCNA loaded successfully\\n')"
+    
+    # Download CollecTRI network during build to avoid runtime download issues on HPC
+    # (allowed to fail — pipeline will download at runtime if needed)
+    mkdir -p /opt/lemonite_data
+    R -e "library(decoupleR); \
+      cat('Downloading CollecTRI network for offline use...\\n'); \
+      net <- tryCatch({ \
+        get_collectri(organism='human', split_complexes=FALSE) \
+      }, error = function(e) { \
+        cat('Error downloading CollecTRI:', e\$message, '\\n'); \
+        return(NULL); \
+      }); \
+      if (!is.null(net)) { \
+        saveRDS(net, '/opt/lemonite_data/collectri_network.rds'); \
+        cat('CollecTRI network saved with', nrow(net), 'interactions\\n'); \
+      } else { \
+        cat('WARNING: CollecTRI network download failed during build\\n'); \
+      }" || echo "CollecTRI download skipped (non-fatal)"
+    
+    # Install yulab.utils from CRAN (needed by tidytree, ggtree etc. for yulab_msg()).
+    R -e "install.packages('yulab.utils', repos='https://cloud.r-project.org', dependencies=TRUE)"
+
+    # Install CRAN-side packages needed for the clusterProfiler ecosystem.
+    R -e "install.packages(c('aplot', 'ggfun', 'gson', 'rlang', 'vctrs', 'withr', 'ape'), \
+      repos='https://cloud.r-project.org', dependencies=TRUE)"
+
+    # Pre-install CRAN packages that are indirect deps of the clusterProfiler ecosystem
+    # and are known to fail in cascade if not installed explicitly first.
+    # systemfonts needs libfontconfig1-dev (now in apt-get above).
+    # ggforce is needed by ggraph and scatterpie.
+    R -e "install.packages(c('systemfonts', 'textshaping', 'ragg', 'polyclip', 'tweenr', 'ggforce'), \
+        repos='https://cran.rstudio.com', dependencies=TRUE)"
+
+    # treeio 1.26.0 (Bioc 3.18) is broken: its zzz.R does
+    #   random_ref <- getFromNamespace("random_ref", 'tidytree')
+    # at the top level, but NO CRAN release of tidytree (0.4.5–0.4.7) has
+    # random_ref in its namespace — yulab.utils 0.2.4 defines it internally
+    # but does not export it, and tidytree does not importFrom it.
+    # The GitHub version of treeio (1.37.0) fixed this by using yulab_msg()
+    # directly. Install treeio and ggtree from GitHub instead.
+    R -e "remotes::install_github('YuLab-SMU/treeio', force=TRUE)"
+    R -e "remotes::install_github('YuLab-SMU/ggtree', force=TRUE)"
+
+    # Install reactome.db first with retries to avoid transient Bioconductor download failures.
+    install_attempts=0
+    until [ "$install_attempts" -ge 3 ]; do
+      R -e "BiocManager::install('reactome.db', ask=FALSE, force=FALSE, update=FALSE)" && break
+      install_attempts=$((install_attempts + 1))
+      echo "Retrying reactome.db install ($install_attempts/3)..."
+      sleep 10
+    done
+    if [ "$install_attempts" -ge 3 ]; then
+      echo "ERROR: reactome.db installation failed after 3 attempts."
+      exit 1
+    fi
+
+    # Install the clusterProfiler ecosystem via BiocManager.
+    # treeio and ggtree are already installed from GitHub above;
+    # update=FALSE prevents BiocManager from overwriting them with the broken Bioc 3.18 versions.
+    # force=FALSE avoids reinstalling already-compiled CRAN deps (systemfonts etc.)
+    R -e "BiocManager::install(c( \
+        'fgsea', \
+        'qvalue', \
+        'GOSemSim', \
+        'DOSE', \
+        'enrichplot', \
+        'ReactomePA', \
+        'clusterProfiler', \
+        'rrvgo' \
+    ), ask=FALSE, force=FALSE, update=FALSE)"
+    
+    # Verify the clusterProfiler ecosystem loads
+    R -e "library(treeio); cat('treeio OK\\n')"
+    R -e "library(ggtree); cat('ggtree OK\\n')"
+    R -e "library(enrichplot); cat('enrichplot OK\\n')"
+    R -e "library(clusterProfiler); cat('clusterProfiler OK\\n')"
+    R -e "library(ReactomePA); cat('ReactomePA OK\\n')"
+
+    # Install remaining packages
+    R -e "BiocManager::install('dorothea', ask=FALSE, force=TRUE)"
+
+    # Test core installations
+    R -e "library(DESeq2); library(decoupleR); library(OmnipathR); cat('Core R packages loaded successfully\\n')"
+    R -e "library(clusterProfiler); cat('clusterProfiler loaded successfully\\n')"
+    python3 -c "import pandas, numpy, networkx; print('Python packages loaded successfully')"
+
+    # ── Final comprehensive validation ──────────────────────────────
+    # This will abort the build (set -e) if ANY required package is missing.
+    R --no-save -e " \
+      required <- c( \
+        'DESeq2', 'decoupleR', 'OmnipathR', 'biomaRt', 'AnnotationDbi', \
+        'org.Hs.eg.db', 'org.Mm.eg.db', 'BiocParallel', 'impute', \
+        'preprocessCore', 'GO.db', 'limma', 'edgeR', 'GSVA', \
+        'WGCNA', 'GOSemSim', 'qvalue', 'DOSE', 'dorothea', \
+        'treeio', 'ggtree', 'enrichplot', 'ReactomePA', 'clusterProfiler', \
+        'igraph', 'pheatmap', 'enrichR', 'optparse', 'data.table', \
+        'tidyverse', 'ggrepel', 'RColorBrewer', 'plotly', 'htmlwidgets', 'DT' \
+      ); \
+      missing <- character(); \
+      for (p in required) { \
+        ok <- requireNamespace(p, quietly=TRUE); \
+        status <- ifelse(ok, 'OK', 'MISSING'); \
+        cat(sprintf('  %-20s %s\\n', p, status)); \
+        if (!ok) missing <- c(missing, p); \
+      }; \
+      if (length(missing) > 0) { \
+        stop(paste('BUILD FAILED: missing R packages:', paste(missing, collapse=', '))) \
+      } else { \
+        cat(sprintf('\\nAll %d required R packages verified.\\n', length(required))) \
+      } \
+    "
+    python3 <<'PY'
+import sys
+import importlib
+missing = []
+for m in ['pandas', 'numpy', 'scipy', 'matplotlib', 'seaborn', 'networkx',
+          'sklearn', 'statsmodels', 'plotly', 'openpyxl']:
+    try:
+        importlib.import_module(m)
+    except ImportError:
+        missing.append(m)
+if missing:
+    sys.exit(f'BUILD FAILED: missing Python packages: {missing}')
+print('All Python packages verified.')
+PY
+    
+    # Create directories matching Docker structure
+    mkdir -p /app /data /results
+
+%files
+    # Copy LemonTree JAR and dependencies from the nextflow directory
+    LemonTree/* /opt/lemontree/
+    
+    # Copy PKN files
+    PKN/* /opt/PKN/
+    
+    # Copy scripts to match Docker path structure
+    scripts/* /app/scripts/
+    
+    # Copy pipeline files
+    main.nf /app/
+    nextflow.config /app/
+    modules/* /app/modules/
+
+%environment
+    export LC_ALL=C
+    export PATH=/usr/local/bin:$PATH
+    export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+    export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH
+    export LEMONTREE_JAR=/opt/lemontree/lemontree_v3.1.1.jar
+
+%runscript
+    echo "Lemonite Analysis Pipeline Container"
+    echo "Use 'singularity exec' to run specific commands"
+    exec "$@"

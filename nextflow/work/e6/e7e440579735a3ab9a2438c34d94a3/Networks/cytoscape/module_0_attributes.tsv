@@ -1,0 +1,6 @@
+Node	Label	Type
+creatinine	creatinine	metabolite
+MYT1L	MYT1L	TF
+PXDN	PXDN	bridge_node
+ELK1	ELK1	TF
+FASN	FASN	bridge_node

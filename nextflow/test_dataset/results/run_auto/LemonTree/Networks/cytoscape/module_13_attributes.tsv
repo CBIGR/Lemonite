@@ -1,0 +1,17 @@
+Node	Label	Type
+L_mimosine	L_mimosine	metabolite
+cholesterol_(spectral_match)	cholesterol_(spectral_match)	metabolite
+heptadecanoic_acid	heptadecanoic_acid	metabolite
+SLCO1A2	SLCO1A2	module_gene
+GPIHBP1	GPIHBP1	module_gene
+MYRF	MYRF	TF
+CNP	CNP	bridge_node
+MYT1L	MYT1L	TF
+PXDN	PXDN	bridge_node
+SOX10	SOX10	TF
+TYR	TYR	bridge_node
+DHH	DHH	bridge_node
+FABP7	FABP7	bridge_node
+STAT2	STAT2	TF
+CCL2	CCL2	bridge_node
+GAA	GAA	bridge_node

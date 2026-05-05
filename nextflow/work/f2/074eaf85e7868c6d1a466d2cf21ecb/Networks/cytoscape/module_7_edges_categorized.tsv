@@ -1,0 +1,8 @@
+Node1	Node2	Source	Type	Category
+2_hydroxyglutaric_acid	CYP1B1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+2_hydroxyglutaric_acid	P4HA1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+2_hydroxyglutaric_acid	SLC1A3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+2_hydroxyglutaric_acid	D2HGDH	UniProtKB	metabolite-gene	Ambiguous
+FOXS1	P4HA1	BioGRID_genes	PPI	PPI
+NFIB	SLC1A3	STRING	PPI	PPI
+TCF7L2	D2HGDH	BioGRID_genes	PPI	PPI

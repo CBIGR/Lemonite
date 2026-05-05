@@ -1,0 +1,74 @@
+Bootstrap: docker
+From: python:3.11-slim
+
+%labels
+    Author LemonIte
+    Description PKN build pipeline - metabolite-gene knowledge graph
+
+%files
+    requirements.txt /opt/pkn_pipeline/requirements.txt
+    config.py /opt/pkn_pipeline/config.py
+    main.py /opt/pkn_pipeline/main.py
+    step1_metabolites /opt/pkn_pipeline/step1_metabolites
+    step2_proteins /opt/pkn_pipeline/step2_proteins
+    step3_final /opt/pkn_pipeline/step3_final
+    utils /opt/pkn_pipeline/utils
+
+%post
+    apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        libxrender1 \
+        libxext6 \
+        && rm -rf /var/lib/apt/lists/*
+
+    pip install --no-cache-dir -r /opt/pkn_pipeline/requirements.txt
+
+%environment
+    export LC_ALL=C.UTF-8
+    export LANG=C.UTF-8
+
+%runscript
+    cd /opt/pkn_pipeline
+    exec python main.py "$@"
+
+%help
+    PKN Build Pipeline - Singularity Container
+    ============================================
+
+    Build the container:
+        singularity build pkn_pipeline.sif Singularity.def
+
+    Run the full pipeline (bind-mount your data and output directories):
+        singularity run \
+            --bind /path/to/databases:/databases \
+            --bind /path/to/output:/output \
+            pkn_pipeline.sif --all
+
+    Run a single step:
+        singularity run \
+            --bind /path/to/databases:/databases \
+            --bind /path/to/output:/output \
+            pkn_pipeline.sif --step 1
+
+    Run with specific databases:
+        singularity run \
+            --bind /path/to/databases:/databases \
+            --bind /path/to/output:/output \
+            pkn_pipeline.sif --step 1 --databases biogrid,stitch
+
+    Resume from checkpoint:
+        singularity run \
+            --bind /path/to/databases:/databases \
+            --bind /path/to/output:/output \
+            pkn_pipeline.sif --step 1 --resume
+
+    IMPORTANT: You must configure config.py or pass environment variables
+    to point DB_DIR and OUTPUT_DIR to the bound mount paths before building,
+    or use the --config flag (see below).
+
+    Run with custom config:
+        singularity run \
+            --bind /path/to/databases:/databases \
+            --bind /path/to/output:/output \
+            --bind /path/to/my_config.py:/opt/pkn_pipeline/config.py \
+            pkn_pipeline.sif --all

@@ -1,0 +1,68 @@
+=== Files staged by Nextflow ===
+total 36
+drwxr-xr-x 6 borisvdm users  4096 Apr 30 14:04 .
+drwxr-xr-x 4 borisvdm users    82 Apr 30 14:04 ..
+lrwxrwxrwx 1 borisvdm users   113 Apr 30 14:04 clusters_list.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/55/979439a4ad4ccd7320c31099c6b303/ModuleViewer_files/clusters_list.txt
+-rw-r--r-- 1 borisvdm users     0 Apr 30 14:04 .command.begin
+-rw-r--r-- 1 borisvdm users     0 Apr 30 14:04 .command.err
+-rw-r--r-- 1 borisvdm users    33 Apr 30 14:04 .command.log
+-rw-r--r-- 1 borisvdm users    33 Apr 30 14:04 .command.out
+-rw-r--r-- 1 borisvdm users 13387 Apr 30 14:04 .command.run
+-rw-r--r-- 1 borisvdm users  4348 Apr 30 14:04 .command.sh
+-rw-r--r-- 1 borisvdm users     0 Apr 30 14:04 .command.trace
+lrwxrwxrwx 1 borisvdm users   107 Apr 30 14:04 DESeq_groups.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/DESeq_groups.txt
+lrwxrwxrwx 1 borisvdm users   124 Apr 30 14:04 expression_variance_histogram.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/expression_variance_histogram.pdf
+drwxr-xr-x 2 borisvdm users     6 Apr 30 14:04 Lemon_out
+lrwxrwxrwx 1 borisvdm users   121 Apr 30 14:04 LemonPreprocessed_complete.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/LemonPreprocessed_complete.txt
+lrwxrwxrwx 1 borisvdm users   123 Apr 30 14:04 LemonPreprocessed_expression.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/LemonPreprocessed_expression.txt
+lrwxrwxrwx 1 borisvdm users   125 Apr 30 14:04 LemonPreprocessed_metabolomics.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/LemonPreprocessed_metabolomics.txt
+lrwxrwxrwx 1 borisvdm users   130 Apr 30 14:04 Metabolites.selected_regs_list.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/55/979439a4ad4ccd7320c31099c6b303/ModuleViewer_files/Metabolites.selected_regs_list.txt
+lrwxrwxrwx 1 borisvdm users   138 Apr 30 14:04 Metabolites.selected_regulators_scores.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/55/979439a4ad4ccd7320c31099c6b303/ModuleViewer_files/Metabolites.selected_regulators_scores.txt
+lrwxrwxrwx 1 borisvdm users   106 Apr 30 14:04 metabolites.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/metabolites.txt
+drwxr-xr-x 2 borisvdm users     6 Apr 30 14:04 ModuleViewer_files
+lrwxrwxrwx 1 borisvdm users   103 Apr 30 14:04 name_map.csv -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/name_map.csv
+lrwxrwxrwx 1 borisvdm users   107 Apr 30 14:04 name_mapping.tsv -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/name_mapping.tsv
+drwxr-xr-x 3 borisvdm users    25 Apr 30 14:04 Networks
+lrwxrwxrwx 1 borisvdm users   117 Apr 30 14:04 Normalized_metabolites.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/Normalized_metabolites.pdf
+lrwxrwxrwx 1 borisvdm users   110 Apr 30 14:04 PCA_metabolites.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/PCA_metabolites.pdf
+lrwxrwxrwx 1 borisvdm users   114 Apr 30 14:04 PCA_transcriptomics.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/PCA_transcriptomics.pdf
+drwxr-xr-x 2 borisvdm users     6 Apr 30 14:04 Preprocessing
+lrwxrwxrwx 1 borisvdm users   114 Apr 30 14:04 sample_mapping.mvf -> /home/borisvdm/repo/LemonIte/nextflow/work/55/979439a4ad4ccd7320c31099c6b303/ModuleViewer_files/sample_mapping.mvf
+lrwxrwxrwx 1 borisvdm users   122 Apr 30 14:04 TFs.selected_regs_list.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/55/979439a4ad4ccd7320c31099c6b303/ModuleViewer_files/TFs.selected_regs_list.txt
+lrwxrwxrwx 1 borisvdm users   130 Apr 30 14:04 TFs.selected_regulators_scores.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/55/979439a4ad4ccd7320c31099c6b303/ModuleViewer_files/TFs.selected_regulators_scores.txt
+lrwxrwxrwx 1 borisvdm users    98 Apr 30 14:04 tfs.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/tfs.txt
+=================================
+=== ModuleViewer_files contents ===
+total 112
+drwxr-xr-x 2 borisvdm users  4096 Apr 30 14:04 .
+drwxr-xr-x 6 borisvdm users  4096 Apr 30 14:04 ..
+-rw-r--r-- 1 borisvdm users 38506 Apr 30 14:04 clusters_list.txt
+-rw-r--r-- 1 borisvdm users  4644 Apr 30 14:04 Metabolites.selected_regs_list.txt
+-rw-r--r-- 1 borisvdm users 11057 Apr 30 14:04 Metabolites.selected_regulators_scores.txt
+-rw-r--r-- 1 borisvdm users  1304 Apr 30 14:04 sample_mapping.mvf
+-rw-r--r-- 1 borisvdm users  6186 Apr 30 14:04 TFs.selected_regs_list.txt
+-rw-r--r-- 1 borisvdm users 30418 Apr 30 14:04 TFs.selected_regulators_scores.txt
+=== Preprocessing contents ===
+total 8424
+drwxr-xr-x 2 borisvdm users    4096 Apr 30 14:04 .
+drwxr-xr-x 6 borisvdm users    4096 Apr 30 14:04 ..
+-rw-r--r-- 1 borisvdm users    1156 Apr 30 14:04 DESeq_groups.txt
+-rw-r--r-- 1 borisvdm users   10178 Apr 30 14:04 expression_variance_histogram.pdf
+-rw-r--r-- 1 borisvdm users 4264576 Apr 30 14:04 LemonPreprocessed_complete.txt
+-rw-r--r-- 1 borisvdm users 4080745 Apr 30 14:04 LemonPreprocessed_expression.txt
+-rw-r--r-- 1 borisvdm users  184436 Apr 30 14:04 LemonPreprocessed_metabolomics.txt
+-rw-r--r-- 1 borisvdm users    1908 Apr 30 14:04 metabolites.txt
+-rwxr-xr-x 1 borisvdm users    8995 Apr 30 14:04 name_map.csv
+-rw-r--r-- 1 borisvdm users      17 Apr 30 14:04 name_mapping.tsv
+-rw-r--r-- 1 borisvdm users    3611 Apr 30 14:04 Normalized_metabolites.pdf
+-rw-r--r-- 1 borisvdm users   10159 Apr 30 14:04 PCA_metabolites.pdf
+-rw-r--r-- 1 borisvdm users   10328 Apr 30 14:04 PCA_transcriptomics.pdf
+-rw-r--r-- 1 borisvdm users    9088 Apr 30 14:04 tfs.txt
+=================================
+Warning: Multiple files found for TFs, using: ModuleViewer_files/TFs.selected_regs_list.txt
+Found TFs regulators: ModuleViewer_files/TFs.selected_regs_list.txt
+Warning: Multiple files found for Metabolites, using: ModuleViewer_files/Metabolites.selected_regs_list.txt
+Found Metabolites regulators: ModuleViewer_files/Metabolites.selected_regs_list.txt
+Creating subnetwork visualization graphs...
+Using metabolite mapping file: ./Preprocessing/name_map.csv
+Using name mapping file for original name restoration: ./Preprocessing/name_mapping.tsv

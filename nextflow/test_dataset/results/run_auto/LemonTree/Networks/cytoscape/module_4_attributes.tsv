@@ -1,0 +1,16 @@
+Node	Label	Type
+myo_inositol	myo_inositol	metabolite
+ANPEP	ANPEP	module_gene
+creatinine	creatinine	metabolite
+VDR	VDR	TF
+ACE	ACE	bridge_node
+ZNF510	ZNF510	TF
+ODC1	ODC1	bridge_node
+SOX15	SOX15	TF
+PLCB3	PLCB3	bridge_node
+NFKB1	NFKB1	TF
+GGH	GGH	bridge_node
+CKB	CKB	bridge_node
+CEBPB	CEBPB	TF
+ANXA3	ANXA3	bridge_node
+CNP	CNP	bridge_node

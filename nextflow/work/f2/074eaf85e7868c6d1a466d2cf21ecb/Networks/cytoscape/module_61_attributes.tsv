@@ -1,0 +1,14 @@
+Node	Label	Type
+myo_inositol	myo_inositol	metabolite
+POU3F2	POU3F2	TF
+GAD1	GAD1	bridge_node
+FOXS1	FOXS1	TF
+GK	GK	bridge_node
+LEF1	LEF1	TF
+DPYSL2	DPYSL2	bridge_node
+ERG	ERG	TF
+EEF1A2	EEF1A2	bridge_node
+FOXL1	FOXL1	TF
+FASN	FASN	bridge_node
+MEF2C	MEF2C	TF
+SLC24A4	SLC24A4	bridge_node

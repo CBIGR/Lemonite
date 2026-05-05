@@ -1,0 +1,9 @@
+Node1	Node2	Source	Type	Category
+2_hydroxyglutaric_acid	SLC22A11	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+2_hydroxyglutaric_acid	PHGDH	UniProtKB	metabolite-gene	Ambiguous
+2_hydroxyglutaric_acid	GAD1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+2_hydroxyglutaric_acid	ASPH	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+RREB1	SLC22A11	STRING	PPI	PPI
+IRF3	PHGDH	STRING	PPI	PPI
+SATB2	GAD1	STRING	PPI	PPI
+KCNIP3	ASPH	BioGRID_genes	PPI	PPI

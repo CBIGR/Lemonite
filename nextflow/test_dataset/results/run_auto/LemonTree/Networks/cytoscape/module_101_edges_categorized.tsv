@@ -1,0 +1,11 @@
+Node1	Node2	Source	Type	Category
+glycerol_3_phosphate	PRDX3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+glycerol_3_phosphate	ACE2	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+glycerol_3_phosphate	FADS3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+glycerol_3_phosphate	FASN	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+KLF8	PRDX3	BioGRID_genes	PPI	PPI
+KLF8	ELF2	BioGRID_genes	PPI	PPI
+GTF2IRD1	ACE2	BioGRID_genes	PPI	PPI
+ACE2	FASN	BioGRID_genes	PPI	PPI
+ZGPAT	FADS3	BioGRID_genes	PPI	PPI
+ELF2	FASN	BioGRID_genes	PPI	PPI

@@ -1,0 +1,11 @@
+Node	Label	Type
+2_hydroxyglutaric_acid	2_hydroxyglutaric_acid	metabolite
+creatinine	creatinine	metabolite
+glycerol_3_phosphate	glycerol_3_phosphate	metabolite
+NEU4	NEU4	module_gene
+ZNF217	ZNF217	TF
+ACE2	ACE2	bridge_node
+NR2C2	NR2C2	TF
+ACLY	ACLY	bridge_node
+DNM1L	DNM1L	bridge_node
+LYPLA2	LYPLA2	bridge_node

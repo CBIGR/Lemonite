@@ -2,6 +2,25 @@
 
 setwd('/home/borisvdm/Documents/PhD/Lemonite/Lloyd-Price_IBD/results/MOFA')
 
+# Load name mapping for display of original metabolite names
+if (!exists('name_lookup')) {
+  name_mapping_file <- '../../data/name_mapping.tsv'
+  if (file.exists(name_mapping_file)) {
+    name_mapping_df <- read.table(name_mapping_file, sep='\t', header=TRUE, stringsAsFactors=FALSE)
+    name_lookup <- setNames(name_mapping_df$original, name_mapping_df$cleaned)
+    message(paste("Loaded name mapping:", length(name_lookup), "entries"))
+  } else {
+    name_lookup <- NULL
+    warning("name_mapping.tsv not found")
+  }
+}
+
+restore_names <- function(nms) {
+  if (is.null(name_lookup)) return(nms)
+  restored <- name_lookup[nms]
+  ifelse(is.na(restored), nms, restored)
+}
+
 # BiocManager::install("MOFA2")
 library(DESeq2)
 library(data.table)
@@ -256,7 +275,7 @@ plot_weights(model,
              nfeatures = 15,     # Number of features to highlight
              scale = T,          # Scale weights from -1 to 1
              abs = F             # Take the absolute value?
-)
+) + { if (!is.null(name_lookup)) scale_y_discrete(labels = restore_names) }
 ggsave('feature_loading_factor5.png')
 
 
@@ -271,6 +290,8 @@ for (i in 1:15){
                         factor = i,
                         nfeatures = 10)
   
+  if (!is.null(name_lookup)) p <- p + scale_y_discrete(labels = restore_names)
+
   # Customize axis label sizes
   p <- p + theme(
     axis.title.x = element_text(size = 16),  # X-axis label size
@@ -378,6 +399,9 @@ for (view in views) {
 }
 
 combined_data <- do.call(rbind, all_data)
+
+# Restore original metabolite names for heatmap display
+rownames(combined_data) <- restore_names(rownames(combined_data))
 
 # =========================================================
 # HORIZONTAL ORIENTATION → transpose matrices
@@ -688,6 +712,7 @@ lipidomics_weights[is.na(lipidomics_weights)] <- 0
 # Rename feature column for clarity
 colnames(expression_weights)[1] <- "Gene"
 colnames(metabolomics_weights)[1] <- "Metabolite"
+metabolomics_weights$Metabolite <- restore_names(metabolomics_weights$Metabolite)
 
 
 # Save to tab-delimited files
@@ -843,7 +868,7 @@ cosmos_barplot <- ggplot(cosmos_summary_long, aes(x = Factor, y = count, fill = 
   labs(
     title = "Metabolites with |weight| > 0.2 per factor",
     x = "Factor",
-    y = "Metabolites with |weight| > 0.2"
+    y = "Number of metabolites with |weight| > 0.2"
   ) +
   theme_minimal(base_size = 12) +
   theme(

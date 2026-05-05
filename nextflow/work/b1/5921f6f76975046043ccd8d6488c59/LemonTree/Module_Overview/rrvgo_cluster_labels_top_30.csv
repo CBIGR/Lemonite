@@ -1,0 +1,7 @@
+"MegaGO_cluster","representative_go_id","MegaGO_label","n_modules","n_terms","module_support","score_method","rrvgo_threshold","rrvgo_method","label_source","fallback_reason"
+"Cluster_0",,"No BP enrichment",4,0,0,"sum(-log10(p.adjust))",0.7,"Rel","fallback_no_bp_terms","no_bp_terms"
+"Cluster_1","GO:0006355","regulation of DNA-templated transcription",15,58,13,"sum(-log10(p.adjust))",0.7,"Rel","rrvgo_parentTerm",
+"Cluster_2","GO:0042552","myelination",4,61,4,"sum(-log10(p.adjust))",0.7,"Rel","rrvgo_parentTerm",
+"Cluster_3","GO:0003341","cilium movement",6,78,3,"sum(-log10(p.adjust))",0.7,"Rel","rrvgo_parentTerm",
+"Cluster_4","GO:0042110","T cell activation",36,942,4,"sum(-log10(p.adjust))",0.7,"Rel","rrvgo_parentTerm",
+"Cluster_5","GO:0006813","potassium ion transport",10,46,3,"sum(-log10(p.adjust))",0.7,"Rel","rrvgo_parentTerm",

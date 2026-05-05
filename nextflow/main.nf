@@ -8,9 +8,8 @@ nextflow.enable.dsl = 2
 params.input_dir = ""
 params.run_id = "" // Will be auto-generated based on parameters if not specified
 params.perform_tfa = true  // Enable TFA analysis
-params.use_megago = true  // Use megago for functional clustering
 params.prioritize_by_expression = true  // Enable expression-based prioritization
-params.overview_n_clusters = 5  // Number of functional clusters
+params.overview_n_clusters = 5  // Number of canonical MegaGO functional clusters
 params.expression_col = "count"  // Expression column name
 params.sample_id_col = "Sample_ID"  // Sample ID column name
 params.max_cpus = 16  // Maximum CPUs
@@ -193,9 +192,8 @@ workflow {
         PKN_EVALUATION.out.viewer_files.ifEmpty(NETWORK_GENERATION.out.viewer_files),
         NETWORK_GENERATION.out.filtered_modules,
         input_ch,
-        PREPROCESSING_TFA.out.preprocessed_data,   // expression file
-        PREPROCESSING_TFA.out.complete_data,
-        PREPROCESSING_TFA.out.omics_preprocessed.collect(),   // omics-specific preprocessed files
+        PREPROCESSING_TFA.out.omics_preprocessed.collect(),   // all LemonPreprocessed_*.txt files
+        PREPROCESSING_TFA.out.name_mapping,
         run_id_ch,
         params.regulator_types
     )
@@ -220,6 +218,7 @@ workflow {
         PREPROCESSING_TFA.out.metadata,
         pkn_ch.ifEmpty([]),
         name_map_ch.ifEmpty([]),
+        PREPROCESSING_TFA.out.name_mapping,
         run_id_ch,
         params.regulator_types
     )

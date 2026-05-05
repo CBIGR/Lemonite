@@ -5,9 +5,8 @@ process MODULE_VIEWER_HEATMAPS {
     path viewer_files
     path filtered_modules
     path input_dir
-    path expression_file        // LemonPreprocessed_expression.txt
-    path preprocessed_file
-    path omics_files             // omics-specific LemonPreprocessed_*.txt files
+    path omics_files             // all LemonPreprocessed_*.txt files (expression, complete, omics-specific)
+    path name_mapping            // name_mapping.tsv for restoring original feature names
     val run_id
     val regulator_types
     
@@ -20,13 +19,8 @@ process MODULE_VIEWER_HEATMAPS {
     def top_n_percent_regulators = params.top_n_percent_regulators ?: 2.0
     
     """
-    # Create output directory
-    # stage expression data explicitly
+    # Stage all LemonPreprocessed_*.txt files (expression, complete, omics-specific)
     mkdir -p Preprocessing
-    cp "${expression_file}" Preprocessing/LemonPreprocessed_expression.txt
-
-    # Stage omics-specific preprocessed files (e.g. LemonPreprocessed_proteomics.txt)
-    # These are passed via the omics_files input channel from PREPROCESSING_TFA
     for f in ${omics_files}; do
         if [ -f "\$f" ]; then
             cp -L "\$f" Preprocessing/ || true
@@ -62,10 +56,6 @@ process MODULE_VIEWER_HEATMAPS {
     for f in ${input_dir}/LemonPreprocessed_*.txt; do
         [ -f "\$f" ] && cp -L "\$f" Preprocessing/ || true
     done
-    # 1b) copy the explicitly passed preprocessed_file (deterministic channel)
-    if [ -n "${preprocessed_file}" ] && [ -f "${preprocessed_file}" ]; then
-        cp -L "${preprocessed_file}" Preprocessing/ || true
-    fi
     # 2) search the current workdir (shallow) for any LemonPreprocessed_*.txt
     # Use -maxdepth 2 to avoid following the input_dir symlink into work/ (causes a loop)
     find -L . -maxdepth 2 -type f -name 'LemonPreprocessed_*.txt' -print 2>/dev/null | while read -r src; do
@@ -138,6 +128,7 @@ process MODULE_VIEWER_HEATMAPS {
         --dpi 300 \\
         --show_regulator_scores \\
         --annotation_types "${params.heatmap_metadata_cols ?: params.metadata_columns ?: 'diagnosis'}" \\
+        --name_mapping ${name_mapping} \\
         ${modules_arg}
     
     # Create summary

@@ -54,20 +54,15 @@ def combine_networks() -> pd.DataFrame:
     logger.info(f"\nLoading PPI network from: {config.PPI_NETWORK}")
     ppi = pd.read_csv(config.PPI_NETWORK, sep='\t')
     
+    # Rename columns to standardized format (handle both GeneA/GeneB and Node1/Node2)
+    if 'GeneA' in ppi.columns and 'GeneB' in ppi.columns:
+        ppi = ppi.rename(columns={'GeneA': 'Node1', 'GeneB': 'Node2'})
+
+    ppi['Type'] = 'PPI'
+
     logger.info(f"  PPI network:")
     logger.info(f"    Interactions: {len(ppi)}")
-    logger.info(f"    Unique genes: {len(set(ppi['GeneA']) | set(ppi['GeneB']))}")
-    
-    # Rename columns to standardized format
-    ppi = ppi.rename(columns={
-        'GeneA': 'Node1',
-        'GeneB': 'Node2'
-    })
-    ppi['Type'] = 'PPI'
-    
-    # Combine networks
-    logger.info(f"\nCombining networks...")
-    
+    logger.info(f"    Unique genes: {len(set(ppi['Node1']) | set(ppi['Node2']))}")
     # Select common columns
     metabolite_gene_subset = metabolite_gene[['Node1', 'Node2', 'Type', 'Source']]
     ppi_subset = ppi[['Node1', 'Node2', 'Type', 'Source']]

@@ -14,10 +14,9 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import config
-from utils.pipeline import LocalFileRetriever
 
 
-class BioGRIDPPIRetriever(LocalFileRetriever):
+class BioGRIDPPIRetriever:
     """
     Retrieve protein-protein interactions from BioGRID database.
     
@@ -28,9 +27,11 @@ class BioGRIDPPIRetriever(LocalFileRetriever):
     
     def __init__(self):
         """Initialize BioGRID PPI retriever."""
-        super().__init__()
         self.logger = logging.getLogger('biogrid_ppi')
         self.file_path = config.BIOGRID_PPI_FILE
+        
+        if not os.path.exists(self.file_path):
+            raise FileNotFoundError(f"BioGRID PPI file not found: {self.file_path}")
     
     def parse_file(self, genes: List[str]) -> pd.DataFrame:
         """

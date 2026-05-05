@@ -14,6 +14,7 @@ import numpy as np
 import networkx as nx
 from multiprocessing import Pool
 from scipy.stats import hypergeom
+from statsmodels.stats.multitest import multipletests
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import seaborn as sns
@@ -419,17 +420,8 @@ def calculate_ppi_enrichment(module2genes, PKN_graph, all_module_genes):
         return enrichment_df
     
     # Add FDR correction using Benjamini-Hochberg
-    try:
-        # Try scipy's newer false_discovery_control function (scipy >= 1.9.0)
-        from scipy.stats import false_discovery_control
-        enrichment_df['FDR'] = false_discovery_control(enrichment_df['P_value'].values, method='bh')
-    except ImportError:
-        # Fallback to manual Benjamini-Hochberg correction
-        from scipy.stats import rankdata
-        p_values = enrichment_df['P_value'].values
-        ranked = rankdata(p_values)
-        n = len(p_values)
-        enrichment_df['FDR'] = np.minimum(p_values * n / ranked, 1.0)
+    _, fdr_values, _, _ = multipletests(enrichment_df['P_value'].values, method='fdr_bh')
+    enrichment_df['FDR'] = fdr_values
     
     # Sort by p-value
     enrichment_df = enrichment_df.sort_values('P_value')
@@ -609,15 +601,8 @@ def calculate_metabolite_gene_enrichment(module2genes, module2mets, module2lipid
         return enrichment_df
     
     # Add FDR correction using Benjamini-Hochberg
-    try:
-        from scipy.stats import false_discovery_control
-        enrichment_df['FDR'] = false_discovery_control(enrichment_df['P_value'].values, method='bh')
-    except ImportError:
-        from scipy.stats import rankdata
-        p_values = enrichment_df['P_value'].values
-        ranked = rankdata(p_values)
-        n = len(p_values)
-        enrichment_df['FDR'] = np.minimum(p_values * n / ranked, 1.0)
+    _, fdr_values, _, _ = multipletests(enrichment_df['P_value'].values, method='fdr_bh')
+    enrichment_df['FDR'] = fdr_values
     
     # Sort by p-value
     enrichment_df = enrichment_df.sort_values('P_value')

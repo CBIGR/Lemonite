@@ -1,0 +1,15 @@
+Node1	Node2	Source	Type	Category
+myo_inositol	CLPS	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	HAL	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	NOS2	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	GDE1	UniProtKB	metabolite-gene	Ambiguous
+myo_inositol	B4GAT1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+pyrophosphate	TERT	UniProtKB	metabolite-gene	Ambiguous
+homocysteine	AHCYL1	UniProtKB	metabolite-gene	Ambiguous
+SP100	CLPS	STRING	PPI	PPI
+SP100	AHCYL1	BioGRID_genes	PPI	PPI
+ELK3	HAL	BioGRID_genes	PPI	PPI
+IRF1	NOS2	STRING	PPI	PPI
+IRF1	TERT	STRING	PPI	PPI
+PLSCR1	GDE1	BioGRID_genes	PPI	PPI
+RUNX1	B4GAT1	BioGRID_genes	PPI	PPI

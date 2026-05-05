@@ -433,11 +433,24 @@ def parse_args():
                        help='Comma-separated list of metadata columns to display as annotation bars (default: diagnosis)')
     parser.add_argument('--annotation_labels', default=None,
                        help='Optional: Comma-separated custom labels for annotation bars (must match --annotation_types count)')
+    parser.add_argument('--name_mapping', default=None,
+                       help='Path to name_mapping.tsv (cleaned->original name mapping for restoring original feature names)')
     
     return parser.parse_args()
 
 def main():
     args = parse_args()
+    
+    # Load name mapping for restoring original feature names
+    name_lookup = {}
+    if args.name_mapping and os.path.exists(args.name_mapping):
+        try:
+            nm_df = pd.read_csv(args.name_mapping, sep='\t')
+            if 'cleaned' in nm_df.columns and 'original' in nm_df.columns:
+                name_lookup = dict(zip(nm_df['cleaned'], nm_df['original']))
+                print(f"Loaded {len(name_lookup)} name mappings from {args.name_mapping}")
+        except Exception as e:
+            print(f"Warning: Could not load name mapping: {e}")
     
     # Setup paths
     input_dir = args.input_dir
@@ -783,6 +796,10 @@ def main():
                 ax = fig.add_subplot(gs[idx, :])
                 numeric_df = subset_df.iloc[:, 2:].reindex(columns=sorted_samples)
                 labels = subset_df['symbol'].values
+                
+                # Restore original names using name mapping
+                if name_lookup:
+                    labels = [name_lookup.get(l, l) for l in labels]
                 
                 # Scale TF data (z-score normalization per TF across samples)
                 # TFA scores are not pre-scaled in LemonPreprocessed_complete.txt

@@ -1,7 +1,7 @@
 # PKN Pipeline Implementation - Complete Summary
 
 ## Overview
-Successfully modularized the 3-notebook PKN (Prior Knowledge Network) pipeline into a production-ready Python package with 28+ modules organized across infrastructure, data retrieval, and analysis components.
+Successfully modularized the 3-notebook PKN (Prior Knowledge Network) pipeline into a production-ready Python package with 27+ modules organized across infrastructure, data retrieval, and analysis components.
 
 ## Project Structure
 
@@ -29,7 +29,6 @@ python_scripts/
 │   ├── uniprot.py             # UniProtKB REST API
 │   ├── intact.py              # IntAct REST API with MI scores
 │   ├── chembl.py              # chEMBL web resource client
-│   ├── l1000.py               # L1000 2.1GB GMT parser (single-threaded)
 │   ├── gem.py                 # Human-GEM NetworkX pathway analysis
 │   └── integration.py         # Combine all databases, UpSet plots
 │
@@ -65,26 +64,17 @@ python_scripts/
 
 3. **Caching Strategy**
    - All retrievers cache parsed results to CSV
-   - L1000: Resume capability (saves progress every 1000 metabolites)
    - ChEMBL mapping: Cached to avoid redundant API calls
    - LINCS: One-time initialization to memory dictionaries
 
 4. **Performance Optimizations**
-   - L1000: Single-threaded to avoid loading 2.1GB file multiple times
    - STRING: Chunking (1000 genes/request) with parallel workers
    - ChEMBL mapping: Multithreaded preprocessing step
    - Preprocessing: Separate module eliminates per-metabolite API calls
 
 ### Key Technical Solutions
 
-#### Problem 1: L1000 File Size (2.1GB)
-**Solution**: Single-threaded processing with progress checkpoints
-```python
-# Parse GMT once, cache lookups in memory
-# Save progress every 1000 metabolites for resume capability
-```
-
-#### Problem 2: ChEMBL/LINCS Need ChEMBL IDs
+#### Problem 1: ChEMBL/LINCS Need ChEMBL IDs
 **Solution**: Preprocessing step with caching
 ```python
 # preprocessing.py:
@@ -94,7 +84,7 @@ python_scripts/
 # - Retrievers load cached mapping
 ```
 
-#### Problem 3: API Rate Limits
+#### Problem 2: API Rate Limits
 **Solution**: Centralized retry decorator
 ```python
 @retry_api_call('DATABASE_NAME')
@@ -103,7 +93,7 @@ def api_call(...):
     # Database-specific retry configs
 ```
 
-#### Problem 4: Large Gene Lists for STRING
+#### Problem 3: Large Gene Lists for STRING
 **Solution**: Chunking with parallel processing
 ```python
 # Split 5000+ genes into chunks of 1000
@@ -121,7 +111,7 @@ python main.py --step 1
 **Process**:
 1. Load HMDB metabolites XML (3000+ metabolites)
 2. Preprocess: Canonicalize SMILES, map ChEMBL IDs
-3. Query 10 databases in parallel:
+3. Query 9 databases in parallel:
    - BioGRID (InChIKey-based)
    - STITCH (PubChem→Ensembl→gene symbol)
    - MetalinksDB (direct HMDB→gene mapping)
@@ -129,7 +119,6 @@ python main.py --step 1
    - UniProtKB (InChIKey REST API)
    - IntAct (ChEBI REST API with MI scores)
    - chEMBL (ChEMBL web resource client)
-   - L1000 (GMT parser with InChIKey lookup)
    - Human-GEM distance=1 (pathway reactions)
    - Human-GEM distance=2 (extended pathway)
 4. Integrate results:
@@ -199,7 +188,6 @@ python main.py --all
 | UniProtKB | REST API | Medium | InChIKey search |
 | IntAct | REST API | Low | ChEBI with MI scores |
 | chEMBL | Web client | High | Bioactivity data |
-| L1000 | GMT file | Very high | Gene expression signatures |
 | Human-GEM (d=1) | Graph | Medium | Direct pathway reactions |
 | Human-GEM (d=2) | Graph | High | Extended pathway |
 
@@ -306,15 +294,14 @@ if __name__ == '__main__':
 
 | Operation | Time | Memory | Notes |
 |-----------|------|--------|-------|
-| Step 1 (all databases) | ~2-4 hours | ~8 GB | L1000 is slowest |
+| Step 1 (all databases) | ~1-2 hours | ~4 GB | STRING/ChEMBL APIs slowest |
 | Step 2 (PPI) | ~30-60 min | ~4 GB | STRING API rate limits |
 | Step 3 (integration) | ~5-10 min | ~2 GB | Fast merge operations |
-| **Total Pipeline** | **~3-5 hours** | **~8 GB peak** | Parallelized where possible |
+| **Total Pipeline** | **~2-3 hours** | **~4 GB peak** | Parallelized where possible |
 
 ### Bottlenecks
-1. **L1000**: 2.1GB file, single-threaded (1-2 hours)
-2. **STRING API**: Rate limits, chunking required (20-40 min)
-3. **ChEMBL mapping**: 3000+ API calls (15-30 min with caching)
+1. **STRING API**: Rate limits, chunking required (20-40 min)
+2. **ChEMBL mapping**: 3000+ API calls (15-30 min with caching)
 
 ## File Outputs
 
@@ -328,7 +315,6 @@ output/
 ├── UniProtKB_interactions.csv
 ├── IntAct_interactions.csv
 ├── chEMBL_interactions.csv
-├── L1000_interactions.csv
 ├── Human1_GEM_dist1_interactions.csv
 ├── Human1_GEM_dist2_interactions.csv
 ├── HMDB_metabolites_ChEMBL_mapping.csv  # Cached mapping
@@ -375,7 +361,6 @@ def api_call():
 - Partial results saved for inspection
 
 ### Resume Capability
-- L1000: Checkpoint every 1000 metabolites
 - ChEMBL mapping: Saves progress to CSV
 - Can restart pipeline without re-downloading
 
@@ -393,26 +378,23 @@ Comprehensive logging to `pipeline.log`:
 
 ## Known Limitations
 
-1. **L1000 Performance**: 2.1GB file requires single-threaded processing
-2. **API Rate Limits**: STRING and UniProt have rate limits (mitigated with chunking/retries)
-3. **ChEMBL Coverage**: Not all SMILES map to ChEMBL IDs (~70% coverage)
-4. **Memory Usage**: Peak ~8GB for L1000 file processing
+1. **API Rate Limits**: STRING and UniProt have rate limits (mitigated with chunking/retries)
+2. **ChEMBL Coverage**: Not all SMILES map to ChEMBL IDs (~70% coverage)
 5. **Annotation URLs**: Simplified implementation, full version would load all metadata
 
 ## Future Enhancements
 
 1. **Database Updates**: Add more sources (MetaCyc, Reactome, KEGG)
-2. **Performance**: Parallelize L1000 with file chunking
-3. **Caching**: Add Redis/SQLite for distributed caching
+2. **Caching**: Add Redis/SQLite for distributed caching
 4. **Validation**: Add comprehensive test suite with pytest
 5. **Documentation**: Add Sphinx API documentation
 6. **Visualization**: Interactive network browser with Cytoscape.js
-7. **Containerization**: Docker image for reproducibility
+7. **Containerization**: Singularity image for reproducibility
 
 ## Success Metrics
 
-✅ **28 Python modules** created across 3 pipeline steps
-✅ **10 metabolite-gene databases** integrated
+✅ **27 Python modules** created across 3 pipeline steps
+✅ **9 metabolite-gene databases** integrated
 ✅ **3 PPI databases** integrated  
 ✅ **Consistent API** with base classes
 ✅ **Comprehensive error handling** with retries

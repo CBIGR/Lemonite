@@ -10,8 +10,8 @@ process PREPROCESSING_TFA {
     path "LemonTree/Preprocessing/LemonPreprocessed_expression.txt", emit: preprocessed_data
     path "LemonTree/Preprocessing/LemonPreprocessed_complete.txt", emit: complete_data
     path "LemonTree/Preprocessing/LemonPreprocessed_*.txt", emit: omics_preprocessed
-    path "LemonTree/Preprocessing/*.txt", emit: regulator_files
     path "LemonTree/Preprocessing/DESeq_groups.txt", emit: metadata
+    path "LemonTree/Preprocessing/name_mapping.tsv", emit: name_mapping
     path "LemonTree/Preprocessing/PCA_*.pdf", emit: pca_plots, optional: true
     path "LemonTree/Preprocessing/*", emit: lemontree_inputs
     path "LemonTree/Preprocessing/*", emit: preprocessing_results, optional: true
@@ -83,20 +83,24 @@ process PREPROCESSING_TFA {
         echo "Error: preprocessing_tfa_complete.R not found"
         exit 1
     fi
+    # Export gene annotation file path if provided; a local PKN backup will be available if online annotation fails.
+    export GENE_ANNOTATION_FILE="${params.gene_annotation_file ?: ''}"
+    export GENE_ANNOTATION_BACKUP="${projectDir}/PKN/ensembl_mapping_jan2024.txt"
+
     Rscript \$SCRIPT_PATH \\
         --expression "\$EXPRESSION_FILE" \\
         --metadata "\$METADATA_FILE" \\
         --output_dir . \\
         --regulator_types "${params.regulator_types}" \\
-        --top_n_genes ${params.top_n_genes} \\
-        --perform_TFA ${params.perform_tfa} \\
-        --use_omics_specific_scaling ${params.use_omics_specific_scaling} \\
-        --DESeq_contrast1 ${params.deseq_contrast1} \\
-        --design_formula "${params.design_formula}" \\
-        --metadata_columns "${params.metadata_columns}" \\
-        --expression_col ${params.expression_col} \\
-        --sample_id_col "${params.sample_id_col}" \\
-        --organism ${params.organism} \\
+        --top_n_genes "${params.top_n_genes}" \
+        --perform_TFA "${params.perform_tfa}" \
+        --use_omics_specific_scaling "${params.use_omics_specific_scaling}" \
+        --DESeq_contrast1 "${params.deseq_contrast1}" \
+        --design_formula "${params.design_formula}" \
+        --metadata_columns "${params.metadata_columns}" \
+        --expression_col "${params.expression_col}" \
+        --sample_id_col "${params.sample_id_col}" \
+        --organism "${params.organism}" \
         \$([ ! -z "\$PRIOR_NETWORK" ] && echo "--prior_network \$PRIOR_NETWORK")
     """
 
@@ -109,5 +113,6 @@ process PREPROCESSING_TFA {
     touch LemonTree/Preprocessing/DESeq_groups.txt
     touch LemonTree/Preprocessing/lovering_TFs.txt
     touch LemonTree/Preprocessing/metabolites.txt
+    touch LemonTree/Preprocessing/name_mapping.tsv
     """
 }

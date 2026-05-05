@@ -3,15 +3,15 @@
 ## Project Status: COMPLETE
 
 **Date Completed**: January 2025  
-**Total Files Created**: 31  
+**Total Files Created**: 30  
 **Lines of Code**: ~5,000+  
 **Implementation Time**: Complete modularization from 3 Jupyter notebooks
 
 ## What Was Built
 
 ### Complete 3-Step Pipeline
-1. **Step 1: Metabolite-Gene Interactions** (12 modules)
-   - 10 database retrievers
+1. **Step 1: Metabolite-Gene Interactions** (11 modules)
+   - 9 database retrievers
    - 1 preprocessing module
    - 1 integration module
 
@@ -50,7 +50,7 @@
 - [x] `utils/pipeline.py` - Base retriever classes
 - [x] `utils/file_io.py` - HMDB loading, progress tracking
 
-### Step 1: Metabolites (12 files)
+### Step 1: Metabolites (11 files)
 - [x] `step1_metabolites/__init__.py`
 - [x] `step1_metabolites/preprocessing.py` - SMILES + ChEMBL mapping
 - [x] `step1_metabolites/biogrid.py` - BioGRID retriever
@@ -60,7 +60,6 @@
 - [x] `step1_metabolites/uniprot.py` - UniProtKB retriever
 - [x] `step1_metabolites/intact.py` - IntAct retriever
 - [x] `step1_metabolites/chembl.py` - chEMBL retriever
-- [x] `step1_metabolites/l1000.py` - L1000 retriever
 - [x] `step1_metabolites/gem.py` - Human-GEM retriever
 - [x] `step1_metabolites/integration.py` - Database combiner
 
@@ -83,7 +82,7 @@
 - [x] `QUICKSTART.md` - User guide
 - [x] `COMPLETION_REPORT.md` - This file
 
-**Total: 31 files**
+**Total: 30 files**
 
 ## Technical Achievements
 
@@ -96,14 +95,14 @@
 ### Error Handling
 ✅ Retry logic with exponential backoff  
 ✅ Graceful degradation (pipeline continues if database fails)  
-✅ Resume capability (L1000, ChEMBL mapping)  
+✅ Resume capability (ChEMBL mapping, API queries)  
 ✅ Comprehensive logging
 
 ### Performance
 ✅ Parallel processing (ThreadPoolExecutor)  
 ✅ Caching (all results saved, no redundant calls)  
 ✅ Chunking (STRING API, 1000 genes/request)  
-✅ Single-threading where needed (L1000 to avoid loading 2.1GB × workers)
+✅ Chunking (STRING API, 1000 genes/request)  
 
 ### Testing
 ✅ Standalone test blocks in every retriever  
@@ -119,7 +118,7 @@
 
 ## Feature Coverage
 
-### Metabolite-Gene Databases (10/10)
+### Metabolite-Gene Databases (9/9)
 - [x] BioGRID (InChIKey-based local file)
 - [x] STITCH (PubChem → Ensembl → gene symbol)
 - [x] MetalinksDB (direct HMDB → gene)
@@ -127,7 +126,6 @@
 - [x] UniProtKB (InChIKey REST API)
 - [x] IntAct (ChEBI REST API with MI scores)
 - [x] chEMBL (web resource client)
-- [x] L1000 (2.1GB GMT parser)
 - [x] Human-GEM distance=1 (pathway reactions)
 - [x] Human-GEM distance=2 (extended pathway)
 
@@ -170,13 +168,12 @@ Total               33     ~5,750      ~860       ~930
 
 | Operation | Expected Time | Memory Usage |
 |-----------|--------------|--------------|
-| Step 1 (all databases) | 2-4 hours | ~8 GB |
+| Step 1 (all databases) | 1-2 hours | ~4 GB |
 | Step 2 (PPI) | 30-60 min | ~4 GB |
 | Step 3 (integration) | 5-10 min | ~2 GB |
-| **Total Pipeline** | **3-5 hours** | **~8 GB peak** |
+| **Total Pipeline** | **2-3 hours** | **~4 GB peak** |
 
 ### Database-Specific Times
-- L1000: 1-2 hours (2.1GB file)
 - STRING: 20-40 min (API rate limits)
 - ChEMBL mapping: 15-30 min (3000+ API calls)
 - BioGRID: 2-5 min (local file)
@@ -227,18 +224,15 @@ Total               33     ~5,750      ~860       ~930
 
 ## Known Limitations
 
-1. **L1000 Performance**: Single-threaded due to 2.1GB file size
-2. **API Rate Limits**: STRING and UniProt have limits (mitigated with retries)
-3. **ChEMBL Coverage**: ~70% of SMILES map to ChEMBL IDs
-4. **Memory Usage**: Peak ~8GB for L1000 processing
-5. **Annotation URLs**: Simplified implementation (full version needs metadata)
+1. **API Rate Limits**: STRING and UniProt have limits (mitigated with retries)
+2. **ChEMBL Coverage**: ~70% of SMILES map to ChEMBL IDs
+3. **Annotation URLs**: Simplified implementation (full version needs metadata)
 
 ## Future Enhancements
 
 ### High Priority
 - [ ] Add pytest test suite
-- [ ] Docker containerization
-- [ ] Parallel L1000 with file chunking
+- [ ] Singularity/Docker containerization
 
 ### Medium Priority
 - [ ] Add more databases (MetaCyc, Reactome, KEGG)

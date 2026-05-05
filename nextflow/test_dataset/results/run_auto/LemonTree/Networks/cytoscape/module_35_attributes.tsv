@@ -1,0 +1,8 @@
+Node	Label	Type
+2_hydroxyglutaric_acid	2_hydroxyglutaric_acid	metabolite
+creatinine	creatinine	metabolite
+TFAP4	TFAP4	TF
+FASN	FASN	bridge_node
+ZNF76	ZNF76	TF
+ALOXE3	ALOXE3	bridge_node
+LAP3	LAP3	bridge_node

@@ -68,14 +68,14 @@ def get_chembl_id_from_smiles(canonical_smiles: str) -> str:
     from chembl_webresource_client.new_client import new_client
     
     if pd.isna(canonical_smiles) or canonical_smiles == 'NA' or canonical_smiles == '':
-        return 'none'
+        return None
     
     molecule = new_client.molecule
     mol_data = molecule.filter(molecule_structures__canonical_smiles=canonical_smiles)
     mol_data = list(mol_data)
     
     if not mol_data:
-        return 'none'
+        return None
     
     return mol_data[0]['molecule_chembl_id']
 
@@ -162,7 +162,7 @@ def map_chembl_ids(metabolites_df: pd.DataFrame, max_workers: int = None) -> pd.
         logger.info(f"Loaded {mapped_count} existing ChEMBL mappings")
     else:
         logger.info("No existing ChEMBL mapping found, will create new mapping")
-        metabolites_df['ChEMBL_id'] = 'none'
+        metabolites_df['ChEMBL_id'] = None
     
     # Identify metabolites that need mapping
     needs_mapping = metabolites_df['ChEMBL_id'].isna() | (metabolites_df['ChEMBL_id'] == 'none')
@@ -194,7 +194,7 @@ def map_chembl_ids(metabolites_df: pd.DataFrame, max_workers: int = None) -> pd.
                     chembl_ids.append((idx, chembl_id))
                 except Exception as e:
                     logger.error(f"Failed to map {idx}: {e}")
-                    chembl_ids.append((idx, 'none'))
+                    chembl_ids.append((idx, None))
         
         # Update dataframe
         for idx, chembl_id in chembl_ids:
@@ -204,7 +204,7 @@ def map_chembl_ids(metabolites_df: pd.DataFrame, max_workers: int = None) -> pd.
         mapping_df = metabolites_df[['HMDB', 'Canonical_smiles', 'ChEMBL_id']].copy()
         mapping_df.to_csv(mapping_file, index=False, sep='\t')
         
-        mapped_count = (metabolites_df['ChEMBL_id'] != 'none').sum()
+        mapped_count = metabolites_df['ChEMBL_id'].notna().sum()
         logger.info(f"\nChEMBL mapping complete!")
         logger.info(f"  Successfully mapped: {mapped_count} metabolites")
         logger.info(f"  Mapping saved to: {mapping_file}")

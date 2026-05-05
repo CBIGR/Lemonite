@@ -1,0 +1,17 @@
+Node	Label	Type
+fructose	fructose	metabolite
+myo_inositol	myo_inositol	metabolite
+STAT6	STAT6	TF
+AICDA	AICDA	bridge_node
+ZBED3	ZBED3	TF
+ACE2	ACE2	bridge_node
+ZNF142	ZNF142	TF
+GLB1L	GLB1L	bridge_node
+POU2F1	POU2F1	TF
+ACY1	ACY1	bridge_node
+ZSCAN26	ZSCAN26	TF
+ACP5	ACP5	bridge_node
+ZBTB8B	ZBTB8B	TF
+CPA2	CPA2	bridge_node
+ZNF384	ZNF384	TF
+ALPL	ALPL	bridge_node

@@ -1,0 +1,15 @@
+Node	Label	Type
+myo_inositol	myo_inositol	metabolite
+scyllo_inositol	scyllo_inositol	metabolite
+ESR2	ESR2	TF
+CDIPT	CDIPT	bridge_node
+ZBED1	ZBED1	TF
+GGACT	GGACT	bridge_node
+TFAP4	TFAP4	TF
+FASN	FASN	bridge_node
+NFIB	NFIB	TF
+SLC19A1	SLC19A1	bridge_node
+NR2F1	NR2F1	TF
+NOS2	NOS2	bridge_node
+HES6	HES6	TF
+PTEN	PTEN	bridge_node

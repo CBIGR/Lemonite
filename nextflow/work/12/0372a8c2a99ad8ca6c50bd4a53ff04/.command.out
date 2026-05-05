@@ -1,0 +1,49 @@
+=== LemonTree Clustering Debug Info ===
+Cluster ID: 2
+Input file: LemonPreprocessed_expression.txt
+Output dir: .
+LemonTree JAR: /home/borisvdm/repo/LemonIte/nextflow/LemonTree/lemontree_v3.1.1.jar
+========================================
+Java found: openjdk version "17.0.18" 2026-01-20 LTS
+LemonTree directory: /home/borisvdm/repo/LemonIte/nextflow/LemonTree
+Found lib directory at /home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib
+Classpath includes 11 dependency JARs
+Final classpath: /home/borisvdm/repo/LemonIte/nextflow/LemonTree/lemontree_v3.1.1.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/BiNGO.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/colt.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/commons-cli-1.1.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/cytoscape.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/cytoscape-task.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/epsgraphics-1.0.0.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/epsgraphics-1.1.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/freehep-graphicsio.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/giny.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/xercesImpl.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/xom-1.0a5.jar
+Running LemonTree...
+
+LemonTree - Version 3.1.1
+-------------------------
+
+Parameters
+----------
+task:               ganesh
+data_file:          LemonPreprocessed_expression.txt
+gene_file:          null
+output_file:        ./Lemon_results/cluster_2
+lambda:             0.1
+mu:                 0.0
+alpha:              0.1
+beta:               0.1
+num_steps:          100
+burn_in:            50
+sample_steps:       100
+score_gain:         0.0
+Reading expression data... [ok]
+Number of genes in the data matrix: 3227
+Number of conditions in the data matrix: 75
+Number of missing values in the data matrix: 25057
+Total number of expression values: 242025
+Gibbs sampling modules...
+Initial number of clusters: 1613
+step 1 timestamp: Thu Apr 30 09:09:53 CEST 2026
+step 2 timestamp: Thu Apr 30 09:10:09 CEST 2026
+step 3 timestamp: Thu Apr 30 09:10:19 CEST 2026
+step 4 timestamp: Thu Apr 30 09:10:28 CEST 2026
+step 5 timestamp: Thu Apr 30 09:10:37 CEST 2026
+step 6 timestamp: Thu Apr 30 09:10:46 CEST 2026
+step 7 timestamp: Thu Apr 30 09:10:54 CEST 2026
+step 8 timestamp: Thu Apr 30 09:11:02 CEST 2026
+step 9 timestamp: Thu Apr 30 09:11:11 CEST 2026
+step 10 timestamp: Thu Apr 30 09:11:20 CEST 2026
+step 11 timestamp: Thu Apr 30 09:11:28 CEST 2026
+step 12 timestamp: Thu Apr 30 09:11:37 CEST 2026

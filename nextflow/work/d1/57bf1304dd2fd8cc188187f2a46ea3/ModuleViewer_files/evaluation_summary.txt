@@ -1,0 +1,27 @@
+Lemonite Network PKN Evaluation Summary
+========================================
+
+Network file: Networks/LemonNetwork_top2.0pct_75modules.txt
+Total network interactions: 28385
+Metabolites-gene interactions: 6174
+TFs-gene interactions: 22211
+Genes in dataset: 2197
+Modules analyzed: 104
+Modules with TF regulators: 104
+Modules with metabolite regulators: 96
+Modules with lipid regulators: 0
+Modules with metabolites checked: 96
+Total metabolites checked: 233
+PKN-supported interactions: 43
+ModuleViewer file created: /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/metabolite_LemoniteKG_interactions.mvf
+PPI MVF file created: /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/PPI_interactions.mvf
+Total PPIs in modules: 13219
+Modules with PPIs: 95/104
+PPI enrichment: 55 modules significantly enriched (FDR < 0.05)
+Metabolite-gene enrichment: 1 modules significantly enriched (FDR < 0.05)
+Subnetworks generated: 0/104
+Subnetworks directory: /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/Networks/subnetworks
+Metabolites with HMDB mapping: 74
+PKN graph nodes: 41132
+PKN graph edges: 1955194
+PKN interactions loaded: 8849

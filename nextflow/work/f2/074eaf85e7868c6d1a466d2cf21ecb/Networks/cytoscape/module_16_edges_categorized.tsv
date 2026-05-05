@@ -1,0 +1,9 @@
+Node1	Node2	Source	Type	Category
+creatinine	PLA2G7	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+creatinine	PRDX3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+creatinine	CNP	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+creatinine	ACP5	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+KLF8	PRDX3	BioGRID_genes	PPI	PPI
+SOX10	CNP	STRING	PPI	PPI
+SOX10	RUNX2	STRING	PPI	PPI
+RUNX2	ACP5	STRING	PPI	PPI

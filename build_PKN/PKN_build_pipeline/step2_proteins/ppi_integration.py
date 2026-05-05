@@ -156,15 +156,15 @@ def create_venn_diagram(results: Dict[str, pd.DataFrame], output_dir: str = None
             logger.warning("Need at least 2 databases for Venn diagram, skipping")
             return
         
-        # Get the three main sets (STRING, BioGRID_PPI, HuRI)
+        # Select up to three sets for the Venn diagram.
         set_string = sets.get('STRING', set())
         set_biogrid = sets.get('BioGRID_PPI', set())
         set_huri = sets.get('HuRI', set())
-        
-        # Calculate overlap counts
-        only_string = len(set_string - set_biogrid - set_huri)
-        only_biogrid = len(set_biogrid - set_string - set_huri)
-        only_huri = len(set_huri - set_string - set_biogrid)
+        set_humannet = sets.get('HumanNet', set())
+
+        if set_humannet:
+            logger.info("HumanNet data is present; Venn diagram will still display STRING/BioGRID/HuRI overlap. HumanNet is included in integration but omitted from the Venn plot.")
+
         string_biogrid = len(set_string & set_biogrid - set_huri)
         string_huri = len(set_string & set_huri - set_biogrid)
         biogrid_huri = len(set_biogrid & set_huri - set_string)
@@ -226,6 +226,7 @@ def build_ppi_network() -> pd.DataFrame:
     from step2_proteins.string_api import STRINGRetriever
     from step2_proteins.biogrid_ppi import BioGRIDPPIRetriever
     from step2_proteins.huri import HuRIRetriever
+    from step2_proteins.humanet import HumanNetRetriever
     
     logger = logging.getLogger('ppi_integration')
     logger.info("="*80)
@@ -271,14 +272,24 @@ def build_ppi_network() -> pd.DataFrame:
         logger.error(f"HuRI failed: {e}", exc_info=True)
         results['HuRI'] = None
     
+    # HumanNet
+    try:
+        logger.info("\n" + "="*80)
+        logger.info("Querying HumanNet")
+        logger.info("="*80)
+        humanet_retriever = HumanNetRetriever()
+        results['HumanNet'] = humanet_retriever.get_interactions(genes)
+    except Exception as e:
+        logger.error(f"HumanNet failed: {e}", exc_info=True)
+        results['HumanNet'] = None
+
     # Integrate results
     logger.info("\n" + "="*80)
     logger.info("INTEGRATING PPI RESULTS")
     logger.info("="*80)
-    
     ppi_network = integrate_ppi_databases(results)
     create_venn_diagram(results)
-    
+
     logger.info("\n" + "="*80)
     logger.info("PPI NETWORK COMPLETE")
     logger.info("="*80)

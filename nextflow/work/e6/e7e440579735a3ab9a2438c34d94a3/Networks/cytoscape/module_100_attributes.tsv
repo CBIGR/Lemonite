@@ -1,0 +1,14 @@
+Node	Label	Type
+2_hydroxyglutaric_acid	2_hydroxyglutaric_acid	metabolite
+myo_inositol	myo_inositol	metabolite
+D_glucose	D_glucose	metabolite
+ZBTB5	ZBTB5	TF
+ST3GAL3	ST3GAL3	bridge_node
+RFX3	RFX3	TF
+FUT5	FUT5	bridge_node
+SOX2	SOX2	TF
+MDH1	MDH1	bridge_node
+IMPA2	IMPA2	bridge_node
+MOGS	MOGS	bridge_node
+ZHX2	ZHX2	TF
+ALPL	ALPL	bridge_node

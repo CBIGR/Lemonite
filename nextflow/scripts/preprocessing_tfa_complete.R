@@ -349,15 +349,11 @@ if (ncol(RNAseq) > 0 && names(RNAseq)[1] == "V1") {
 # Use the Ensembl BioMart with error handling and fallback
 cat("Connecting to Ensembl BioMart...\n")
 
-# Try multiple Ensembl servers in order of preference
-ensembl_servers <- c(
-  "https://www.ensembl.org",                    # Current release
-  "https://jul2024.archive.ensembl.org",        # Recent archive
-  "https://jan2024.archive.ensembl.org"         # Original (fallback)
-)
+# Check if a pre-downloaded gene annotation file is provided
+gene_annotation_file <- Sys.getenv("GENE_ANNOTATION_FILE", unset = "")
+gene_annotation_backup <- Sys.getenv("GENE_ANNOTATION_BACKUP", unset = "")
 
-ensembl <- NULL
-# Determine organism/Ensembl dataset and symbol attribute
+# Determine organism/Ensembl dataset and symbol attribute (needed regardless of cache)
 organism_choice <- tolower(opt$organism)
 if (organism_choice %in% c('mouse', 'mmu', 'mus_musculus')) {
   dataset_name <- "mmusculus_gene_ensembl"
@@ -366,6 +362,24 @@ if (organism_choice %in% c('mouse', 'mmu', 'mus_musculus')) {
   dataset_name <- "hsapiens_gene_ensembl"
   symbol_attr <- 'hgnc_symbol'
 }
+
+if (nzchar(gene_annotation_file) && file.exists(gene_annotation_file)) {
+  cat(sprintf("Using pre-downloaded gene annotations: %s\n", gene_annotation_file))
+  all_genes <- read.table(gene_annotation_file, header=TRUE, sep='\t', stringsAsFactors=FALSE)
+  ensembl <- NULL  # skip BioMart
+} else {
+  if (nzchar(gene_annotation_file)) {
+    cat(sprintf("[WARNING] Gene annotation file not found: %s - falling back to BioMart\n", gene_annotation_file))
+  }
+
+# Try multiple Ensembl servers in order of preference
+ensembl_servers <- c(
+  "https://www.ensembl.org",                    # Current release
+  "https://jul2024.archive.ensembl.org",        # Recent archive
+  "https://jan2024.archive.ensembl.org"         # Original (fallback)
+)
+
+ensembl <- NULL
 for (server in ensembl_servers) {
   cat(sprintf("Trying Ensembl server: %s\n", server))
   tryCatch({
@@ -380,6 +394,12 @@ for (server in ensembl_servers) {
     cat(sprintf("Failed to connect to %s: %s\n", server, e$message))
     if (server == tail(ensembl_servers, 1)) {
       cat("All Ensembl servers failed. Trying offline mode...\n")
+
+      if (nzchar(gene_annotation_backup) && file.exists(gene_annotation_backup)) {
+        cat(sprintf("Using backup gene annotation file: %s\n", gene_annotation_backup))
+        all_genes <- read.table(gene_annotation_backup, header=TRUE, sep='\t', stringsAsFactors=FALSE)
+        break
+      }
 
       # Create a minimal gene annotation file for protein coding genes
       # This is a fallback when BioMart is completely unavailable
@@ -400,13 +420,28 @@ for (server in ensembl_servers) {
 # If we still don't have ensembl connection, use the fallback
 if (is.null(ensembl)) {
   cat("Using offline fallback mode for gene annotations\n")
-  all_genes <- read.table('./ensembl_mapping_fallback.txt', header=TRUE, sep='\t')
+  if (nzchar(gene_annotation_backup) && file.exists(gene_annotation_backup)) {
+    cat(sprintf("Using backup gene annotation file: %s\n", gene_annotation_backup))
+    all_genes <- read.table(gene_annotation_backup, header=TRUE, sep='\t', stringsAsFactors=FALSE)
+  } else {
+    all_genes <- read.table('./ensembl_mapping_fallback.txt', header=TRUE, sep='\t')
+  }
 } else {
   # Get gene annotations from BioMart
-  all_genes <- getBM(attributes = c(symbol_attr, 'ensembl_gene_id', 'gene_biotype'),
-                     mart = ensembl)
+  all_genes <- tryCatch({
+    getBM(attributes = c(symbol_attr, 'ensembl_gene_id', 'gene_biotype'),
+          mart = ensembl)
+  }, error = function(e) {
+    cat(sprintf("Failed to retrieve gene annotations from BioMart: %s\n", e$message))
+    if (nzchar(gene_annotation_backup) && file.exists(gene_annotation_backup)) {
+      cat(sprintf("Using backup gene annotation file after BioMart failure: %s\n", gene_annotation_backup))
+      return(read.table(gene_annotation_backup, header=TRUE, sep='\t', stringsAsFactors=FALSE))
+    }
+    stop("BioMart query failed and no backup annotation file is available.")
+  })
   write.table(all_genes, file = './ensembl_mapping.txt', quote=FALSE, sep = '\t', row.names = FALSE)
 }
+}  # end of else block (no pre-downloaded annotation file)
 
 id_ensembl <- all_genes[all_genes[[symbol_attr]] %in% RNAseq[[gene_col]], ]
 
@@ -614,7 +649,7 @@ DESeq_groups <- DESeq_groups[, final_formula_vars, drop=FALSE]
 cat("Final DESeq_groups columns (for DESeq2):", paste(colnames(DESeq_groups), collapse=", "), "\n")
 cat("All metadata columns (for visualization):", paste(colnames(DESeq_groups_all), collapse=", "), "\n")
 
-dds <- DESeqDataSetFromMatrix(countData = (RNAseq+1), colData = DESeq_groups, design = design_formula) 
+dds <- DESeqDataSetFromMatrix(countData = RNAseq, colData = DESeq_groups, design = design_formula) 
 keep <- rowSums(counts(dds) >=10) >= 3 # Dispersion plot looks better with some prefiltering
 dds <- dds[keep, ]
 dds <- DESeq(dds)
@@ -722,11 +757,12 @@ if (perform_TFA) {
     collectri_organism <- if (tolower(opt$organism) %in% c('mouse', 'mmu', 'mus_musculus')) 'mouse' else 'human'
     cat(sprintf(" Using organism: %s\n", collectri_organism))
     
-    tryCatch({
+    net <- tryCatch({
       # First try online download (most up-to-date)
       cat(" Attempting online download from CollecTRI database...\n")
-      net <- decoupleR::get_collectri(organism = collectri_organism, split_complexes = FALSE)
-      cat(sprintf(" CollecTRI network downloaded with %d interactions\n", nrow(net)))
+      result <- decoupleR::get_collectri(organism = collectri_organism, split_complexes = FALSE)
+      cat(sprintf(" CollecTRI network downloaded with %d interactions\n", nrow(result)))
+      result
     }, error = function(e1) {
       cat(sprintf("[WARNING] Online download failed: %s\n", e1$message))
       cat(" Trying pre-downloaded network from PKN directory...\n")
@@ -741,40 +777,45 @@ if (perform_TFA) {
         
         if (file.exists(pkn_network_file)) {
           cat(sprintf(" Loading pre-downloaded CollecTRI network: %s\n", pkn_network_file))
-          net <<- fread(pkn_network_file)
-          cat(sprintf(" CollecTRI network loaded with %d interactions\n", nrow(net)))
+          result <- fread(pkn_network_file)
+          cat(sprintf(" CollecTRI network loaded with %d interactions\n", nrow(result)))
           
           # Ensure correct column names
-          if (!all(c('source', 'target') %in% colnames(net))) {
+          if (!all(c('source', 'target') %in% colnames(result))) {
             cat("[INFO] Renaming columns to 'source' and 'target'\n")
-            colnames(net)[1:2] <- c('source', 'target')
+            colnames(result)[1:2] <- c('source', 'target')
           }
+          result
         } else {
           stop(sprintf("Pre-downloaded network not found: %s", pkn_network_file))
         }
       }, error = function(e2) {
         cat(sprintf("[ERROR] Failed to load CollecTRI network: %s\n", e2$message))
         cat("[WARNING] Continuing without TFA...\n")
-        perform_TFA <<- FALSE
-        return(NULL)
+        NULL
       })
     })
+    
+    if (is.null(net)) {
+      perform_TFA <- FALSE
+    }
   }
   
   # Only proceed with decouple analysis if network was loaded successfully
-  if (perform_TFA && exists("net") && !is.null(net)) {
+  if (perform_TFA && !is.null(net)) {
     cat(" Running decouple analysis...\n")
-    tryCatch({
+    decouple_ok <- tryCatch({
       decoupled <- decouple(mat=log_normcnt, net=net, .source='source', .target='target')
       cat("[OK] Decouple completed, running consensus...\n")
       consensus <- run_consensus(decoupled)
       cat("[OK] Consensus analysis completed\n")
+      TRUE
     }, error = function(e) {
       cat("[ERROR] Error in TFA analysis:", e$message, "\n")
       cat("[WARNING]  Continuing without TFA...\n")
-      perform_TFA <<- FALSE
-      return(NULL)
+      FALSE
     })
+    if (!decouple_ok) perform_TFA <- FALSE
   } else if (perform_TFA) {
     cat("[ERROR] Cannot proceed with TFA analysis: network not loaded\n")
     cat("[WARNING]  Continuing without TFA...\n")
@@ -844,13 +885,7 @@ if (perform_TFA) {
     
     if (n_levels > 0) {
       # Use predefined colors if available, otherwise generate
-      if (col_name == "diagnosis" && all(c("UC", "nonIBD") %in% levels_vec)) {
-        ann_colors[[col_name]] <- c("UC" = "firebrick", "nonIBD" = "black")
-      } else if (col_name == "sex" && all(c("Female", "Male") %in% levels_vec)) {
-        ann_colors[[col_name]] <- c("Female" = "#1B9E77", "Male" = "#D95F02")
-      } else if (col_name == "biopsy_location" && all(c("Colon", "Rectum") %in% levels_vec)) {
-        ann_colors[[col_name]] <- c("Colon" = "#7570B3", "Rectum" = "#E7298A")
-      } else {
+      {
         # Generate colors for this variable
         palette_idx <- ((i - 1) %% length(color_palettes)) + 1
         colors <- color_palettes[[palette_idx]][1:n_levels]
@@ -977,16 +1012,15 @@ RNA_preprocessed_noTFA <- as.data.frame(t(scale(t(RNA_preprocessed_noTFA))))
 cat("[OK] Created expression-only dataset with", nrow(RNA_preprocessed_noTFA), "features (all scaled)\n")
 cat("=============================================\n\n")
 
-# Scale RNA_preprocessed if TFA was disabled
+# Use the appropriate preprocessed dataset depending on whether TFA was enabled
 if (!perform_TFA) {
-  RNA_preprocessed <- as.data.frame(t(scale(t(RNA_preprocessed))))
-  cat("[INFO] Scaled all features (TFA disabled)\n")
+  RNA_preprocessed <- RNA_preprocessed_noTFA
+  cat("[INFO] Using expression-only dataset because TFA is disabled\n")
+} else {
+  RNA_preprocessed <- RNA_preprocessed_withTFA
 }
 
 cat("===========================\n\n")
-
-  # Set RNA_preprocessed to withTFA version for complete dataframe
-  RNA_preprocessed <- RNA_preprocessed_withTFA
 
 
 ###########################################################################################
@@ -1018,6 +1052,10 @@ pareto_scale <- function(x, centering = TRUE) {
   return(x)
 }
 
+# Global accumulator for name mappings (original -> cleaned)
+# Populated by process_omics_data(); written to name_mapping.tsv at end of script
+global_name_mapping <- data.frame(cleaned = character(0), original = character(0), stringsAsFactors = FALSE)
+
 # Define function to process omics data (metabolomics or lipidomics)
 process_omics_data <- function(omics_file, omics_type, use_pareto = TRUE, data_type = "c") {
   cat("\n")
@@ -1033,22 +1071,25 @@ process_omics_data <- function(omics_file, omics_type, use_pareto = TRUE, data_t
   
   # Read the file with error handling
   cat("Reading", omics_type, "file...\n")
-  tryCatch({
-    omics_data <- fread(omics_file, header = TRUE, sep = "\t", stringsAsFactors = FALSE, 
-                        check.names = FALSE, quote = "", comment.char = "")
+  omics_data <- tryCatch({
+    result <- fread(omics_file, header = TRUE, sep = "\t", stringsAsFactors = FALSE, 
+                    check.names = FALSE, quote = "", comment.char = "")
     cat("[OK] Successfully read with fread\n")
+    result
   }, error = function(e1) {
     cat("[WARNING]  fread failed, trying read.csv...\n")
     tryCatch({
-      omics_data <<- read.csv(omics_file, header = TRUE, sep = "\t", stringsAsFactors = FALSE, 
-                             check.names = FALSE, quote = "", comment.char = "")
+      result <- read.csv(omics_file, header = TRUE, sep = "\t", stringsAsFactors = FALSE, 
+                         check.names = FALSE, quote = "", comment.char = "")
       cat("[OK] Successfully read with read.csv\n")
+      result
     }, error = function(e2) {
       cat("[WARNING]  read.csv failed, trying read.table...\n")
       tryCatch({
-        omics_data <<- read.table(omics_file, header = TRUE, sep = "\t", stringsAsFactors = FALSE, 
-                                 check.names = FALSE, quote = "", comment.char = "")
+        result <- read.table(omics_file, header = TRUE, sep = "\t", stringsAsFactors = FALSE, 
+                             check.names = FALSE, quote = "", comment.char = "")
         cat("[OK] Successfully read with read.table\n")
+        result
       }, error = function(e3) {
         stop("Failed to read ", omics_type, " file: ", e3$message)
       })
@@ -1073,12 +1114,24 @@ process_omics_data <- function(omics_file, omics_type, use_pareto = TRUE, data_t
   
   cat(sprintf("  First 5 feature names: %s\n", paste(head(rownames(omics_data), 5), collapse=", ")))
   
+  # Save original names before cleaning
+  original_names <- rownames(omics_data)
+  
   # Clean row names
   rownames(omics_data) <- str_replace_all(rownames(omics_data), ' ', '_')
   rownames(omics_data) <- str_replace_all(rownames(omics_data), '-', '_')
   rownames(omics_data) <- str_replace_all(rownames(omics_data), ':', '_')
   rownames(omics_data) <- str_replace_all(rownames(omics_data), '\\+', '_')
   rownames(omics_data) <- str_replace_all(rownames(omics_data), '_$', '')
+  
+  # Accumulate name mappings (only where cleaning changed the name)
+  cleaned_names <- rownames(omics_data)
+  changed <- original_names != cleaned_names
+  if (any(changed)) {
+    new_mappings <- data.frame(cleaned = cleaned_names[changed], original = original_names[changed], stringsAsFactors = FALSE)
+    global_name_mapping <<- rbind(global_name_mapping, new_mappings)
+    cat(sprintf("  [INFO] %d feature names were modified by cleaning\n", sum(changed)))
+  }
   
   cat(sprintf("  First 5 feature names (cleaned): %s\n", paste(head(rownames(omics_data), 5), collapse=", ")))
   
@@ -1360,6 +1413,18 @@ if (tfa_consensus_exists || tfa_expression_exists || tfa_dir_exists) {
   } else {
     cat("   TFA analysis was disabled\n")
   }
+}
+
+# Write name_mapping.tsv (cleaned -> original name mapping for downstream restoration)
+if (nrow(global_name_mapping) > 0) {
+  # Remove duplicates (same feature may appear in multiple omics types)
+  global_name_mapping <- global_name_mapping[!duplicated(global_name_mapping$cleaned), ]
+  write.table(global_name_mapping, './LemonTree/Preprocessing/name_mapping.tsv', sep = '\t', row.names = FALSE, quote = FALSE)
+  cat(sprintf("[OK] Saved: name_mapping.tsv (%d cleaned -> original name mappings)\n", nrow(global_name_mapping)))
+} else {
+  # Write empty file with header so downstream processes always have the file
+  write.table(global_name_mapping, './LemonTree/Preprocessing/name_mapping.tsv', sep = '\t', row.names = FALSE, quote = FALSE)
+  cat("[INFO] No feature names were modified by cleaning — name_mapping.tsv is empty\n")
 }
 
 cat("\n=======================================================================\n")

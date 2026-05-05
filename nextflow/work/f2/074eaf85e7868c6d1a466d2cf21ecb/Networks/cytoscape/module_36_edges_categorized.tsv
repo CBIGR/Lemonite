@@ -1,0 +1,5 @@
+Node1	Node2	Source	Type	Category
+D_glucose_6_phosphate	NME1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+D_glucose_6_phosphate	GANAB	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+FOXP4	NME1	BioGRID_genes	PPI	PPI
+CREB3L4	GANAB	BioGRID_genes	PPI	PPI

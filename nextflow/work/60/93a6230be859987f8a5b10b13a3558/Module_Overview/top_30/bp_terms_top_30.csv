@@ -1,0 +1,1186 @@
+Module,Database,Term,p.adjust,__direction__,__source__,GO_ID
+10,BP,Nervous System Development (GO:0007399),1.12382468295671e-06,Up,EnrichR,GO:0007399
+10,BP,Postsynaptic Membrane Assembly (GO:0097104),2.82693984335041e-05,Up,EnrichR,GO:0097104
+10,BP,Postsynapse Assembly (GO:0099068),5.88988257336073e-05,Up,EnrichR,GO:0099068
+10,BP,Regulation of Synapse Assembly (GO:0051963),5.88988257336073e-05,Up,EnrichR,GO:0051963
+10,BP,Presynaptic Membrane Assembly (GO:0097105),6.29694688381678e-05,Up,EnrichR,GO:0097105
+10,BP,Presynaptic Membrane Organization (GO:0097090),7.85647012481185e-05,Up,EnrichR,GO:0097090
+10,BP,Membrane Assembly (GO:0071709),0.0001363028545888,Up,EnrichR,GO:0071709
+10,BP,Synapse Assembly (GO:0007416),0.0001363028545888,Up,EnrichR,GO:0007416
+10,BP,Neuron Cell-Cell Adhesion (GO:0007158),0.0002248499211644,Up,EnrichR,GO:0007158
+10,BP,Postsynaptic Membrane Organization (GO:0001941),0.0002819697323392,Up,EnrichR,GO:0001941
+10,BP,Presynapse Assembly (GO:0099054),0.0002819697323392,Up,EnrichR,GO:0099054
+10,BP,Axonogenesis (GO:0007409),0.0003876440162105,Up,EnrichR,GO:0007409
+10,BP,"Positive Regulation of Synaptic Transmission, Glutamatergic (GO:0051968)",0.0006487903919291,Up,EnrichR,GO:0051968
+10,BP,Synapse Organization (GO:0050808),0.0009047641987662,Up,EnrichR,GO:0050808
+10,BP,Imitative Learning (GO:0098596),0.0013024431977551,Up,EnrichR,GO:0098596
+10,BP,Postsynaptic Density Protein 95 Clustering (GO:0097119),0.0013024431977551,Up,EnrichR,GO:0097119
+10,BP,Vocal Learning (GO:0042297),0.0013024431977551,Up,EnrichR,GO:0042297
+10,BP,Cell-Cell Adhesion via Plasma-Membrane Adhesion Molecules (GO:0098742),0.0015921971202394,Up,EnrichR,GO:0098742
+10,BP,Postsynaptic Density Assembly (GO:0097107),0.0017450517380992,Up,EnrichR,GO:0097107
+10,BP,Positive Regulation of Synapse Assembly (GO:0051965),0.0017491932147279,Up,EnrichR,GO:0051965
+10,BP,Anterograde Trans-Synaptic Signaling (GO:0098916),0.0021780315289532,Up,EnrichR,GO:0098916
+10,BP,Cell Junction Assembly (GO:0034329),0.0021780315289532,Up,EnrichR,GO:0034329
+10,BP,Auditory Behavior (GO:0031223),0.0024672552556305,Up,EnrichR,GO:0031223
+10,BP,Learned Vocalization Behavior or Vocal Learning (GO:0098598),0.0024672552556305,Up,EnrichR,GO:0098598
+10,BP,Postsynaptic Density Organization (GO:0097106),0.0024672552556305,Up,EnrichR,GO:0097106
+10,BP,Positive Regulation of Nervous System Development (GO:0051962),0.0041550417545645,Up,EnrichR,GO:0051962
+10,BP,"Regulation of Synaptic Transmission, Glutamatergic (GO:0051966)",0.0042381921622555,Up,EnrichR,GO:0051966
+10,BP,Neuron Projection Guidance (GO:0097485),0.0047669013608172,Up,EnrichR,GO:0097485
+10,BP,Presynapse Organization (GO:0099172),0.0049795798296831,Up,EnrichR,GO:0099172
+10,BP,Homophilic Cell Adhesion via Plasma Membrane Adhesion Molecules (GO:0007156),0.005538028962104,Up,EnrichR,GO:0007156
+101,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.005263725088109,Up,EnrichR,GO:0045892
+101,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),0.0126871854173817,Up,EnrichR,GO:0000122
+101,BP,Cellular Response to Iron Ion (GO:0071281),0.0404538053337741,Up,EnrichR,GO:0071281
+101,BP,Regulation of Aldosterone Biosynthetic Process (GO:0032347),0.0404538053337741,Up,EnrichR,GO:0032347
+101,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0404538053337741,Up,EnrichR,GO:0006357
+101,BP,Type B Pancreatic Cell Development (GO:0003323),0.0404538053337741,Up,EnrichR,GO:0003323
+103,BP,External Encapsulating Structure Organization (GO:0045229),0.0153443765054083,Up,EnrichR,GO:0045229
+103,BP,Extracellular Structure Organization (GO:0043062),0.0153443765054083,Up,EnrichR,GO:0043062
+103,BP,Regulation of DNA-templated Transcription (GO:0006355),0.0159632515824707,Up,EnrichR,GO:0006355
+103,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0159632515824707,Up,EnrichR,GO:0006357
+103,BP,Extracellular Matrix Organization (GO:0030198),0.0162486344045083,Up,EnrichR,GO:0030198
+103,BP,Limb Development (GO:0060173),0.0495534445794525,Up,EnrichR,GO:0060173
+11,BP,Inflammatory Response (GO:0006954),1.37204821270508e-07,Up,EnrichR,GO:0006954
+11,BP,Complement Receptor Mediated Signaling Pathway (GO:0002430),1.94330577004703e-06,Up,EnrichR,GO:0002430
+11,BP,Regulation of Type II Interferon Production (GO:0032649),7.69575152056485e-06,Up,EnrichR,GO:0032649
+11,BP,Cytokine-Mediated Signaling Pathway (GO:0019221),1.19552271167239e-05,Up,EnrichR,GO:0019221
+11,BP,Immune Response-Activating Cell Surface Receptor Signaling Pathway (GO:0002429),1.7077598584446e-05,Up,EnrichR,GO:0002429
+11,BP,Positive Regulation of Type II Interferon Production (GO:0032729),1.7077598584446e-05,Up,EnrichR,GO:0032729
+11,BP,Negative Regulation of Production of Molecular Mediator of Immune Response (GO:0002701),4.50256978016808e-05,Up,EnrichR,GO:0002701
+11,BP,Negative Regulation of Lymphocyte Proliferation (GO:0050672),0.0001532505645731,Up,EnrichR,GO:0050672
+11,BP,Positive Regulation of T-helper 1 Type Immune Response (GO:0002827),0.0001532505645731,Up,EnrichR,GO:0002827
+11,BP,Negative Regulation of Cytokine Production (GO:0001818),0.0002233339268227,Up,EnrichR,GO:0001818
+11,BP,Positive Regulation of Cytokine Production (GO:0001819),0.0003629565791145,Up,EnrichR,GO:0001819
+11,BP,Regulation of Lymphocyte Differentiation (GO:0045619),0.0004466853805033,Up,EnrichR,GO:0045619
+11,BP,Intracellular Signaling Cassette (GO:0141124),0.0005350548167264,Up,EnrichR,GO:0141124
+11,BP,Negative Regulation of Multicellular Organismal Process (GO:0051241),0.0006307396642363,Up,EnrichR,GO:0051241
+11,BP,Negative Regulation of Immune Response (GO:0050777),0.0006535964192257,Up,EnrichR,GO:0050777
+11,BP,Regulation of B Cell Activation (GO:0050864),0.0007877129557792,Up,EnrichR,GO:0050864
+11,BP,Regulation of Monocyte Chemotaxis (GO:0090025),0.0010510073181578,Up,EnrichR,GO:0090025
+11,BP,Regulation of Cytokine Production (GO:0001817),0.0012153650019893,Up,EnrichR,GO:0001817
+11,BP,Positive Regulation of T-helper 1 Cell Cytokine Production (GO:2000556),0.0012509664178372,Up,EnrichR,GO:2000556
+11,BP,Regulation of Immunoglobulin Production (GO:0002637),0.0012509664178372,Up,EnrichR,GO:0002637
+11,BP,Regulation of T-helper 1 Cell Cytokine Production (GO:2000554),0.0012509664178372,Up,EnrichR,GO:2000554
+11,BP,Positive Regulation of Immune Response (GO:0050778),0.0014852160145086,Up,EnrichR,GO:0050778
+11,BP,Negative Regulation of T Cell Proliferation (GO:0042130),0.002129949640287,Up,EnrichR,GO:0042130
+11,BP,Negative Regulation of Humoral Immune Response Mediated by Circulating Immunoglobulin (GO:0002924),0.0027907520742022,Up,EnrichR,GO:0002924
+11,BP,Negative Regulation of Leukocyte Degranulation (GO:0043301),0.0027907520742022,Up,EnrichR,GO:0043301
+11,BP,Regulation of B Cell Proliferation (GO:0030888),0.0027907520742022,Up,EnrichR,GO:0030888
+11,BP,Regulation of Dendritic Cell Antigen Processing and Presentation (GO:0002604),0.0027907520742022,Up,EnrichR,GO:0002604
+11,BP,Regulation of T Cell Differentiation (GO:0045580),0.0030654664121462,Up,EnrichR,GO:0045580
+11,BP,Positive Regulation of Innate Immune Response (GO:0045089),0.0031344448639337,Up,EnrichR,GO:0045089
+11,BP,Regulation of Complement-Dependent Cytotoxicity (GO:1903659),0.0031344448639337,Up,EnrichR,GO:1903659
+12,BP,Inflammatory Response (GO:0006954),1.37204821270508e-07,Up,EnrichR,GO:0006954
+12,BP,Complement Receptor Mediated Signaling Pathway (GO:0002430),1.94330577004703e-06,Up,EnrichR,GO:0002430
+12,BP,Regulation of Type II Interferon Production (GO:0032649),7.69575152056485e-06,Up,EnrichR,GO:0032649
+12,BP,Cytokine-Mediated Signaling Pathway (GO:0019221),1.19552271167239e-05,Up,EnrichR,GO:0019221
+12,BP,Immune Response-Activating Cell Surface Receptor Signaling Pathway (GO:0002429),1.7077598584446e-05,Up,EnrichR,GO:0002429
+12,BP,Positive Regulation of Type II Interferon Production (GO:0032729),1.7077598584446e-05,Up,EnrichR,GO:0032729
+12,BP,Negative Regulation of Production of Molecular Mediator of Immune Response (GO:0002701),4.50256978016808e-05,Up,EnrichR,GO:0002701
+12,BP,Negative Regulation of Lymphocyte Proliferation (GO:0050672),0.0001532505645731,Up,EnrichR,GO:0050672
+12,BP,Positive Regulation of T-helper 1 Type Immune Response (GO:0002827),0.0001532505645731,Up,EnrichR,GO:0002827
+12,BP,Negative Regulation of Cytokine Production (GO:0001818),0.0002233339268227,Up,EnrichR,GO:0001818
+12,BP,Positive Regulation of Cytokine Production (GO:0001819),0.0003629565791145,Up,EnrichR,GO:0001819
+12,BP,Regulation of Lymphocyte Differentiation (GO:0045619),0.0004466853805033,Up,EnrichR,GO:0045619
+12,BP,Intracellular Signaling Cassette (GO:0141124),0.0005350548167264,Up,EnrichR,GO:0141124
+12,BP,Negative Regulation of Multicellular Organismal Process (GO:0051241),0.0006307396642363,Up,EnrichR,GO:0051241
+12,BP,Negative Regulation of Immune Response (GO:0050777),0.0006535964192257,Up,EnrichR,GO:0050777
+12,BP,Regulation of B Cell Activation (GO:0050864),0.0007877129557792,Up,EnrichR,GO:0050864
+12,BP,Regulation of Monocyte Chemotaxis (GO:0090025),0.0010510073181578,Up,EnrichR,GO:0090025
+12,BP,Regulation of Cytokine Production (GO:0001817),0.0012153650019893,Up,EnrichR,GO:0001817
+12,BP,Positive Regulation of T-helper 1 Cell Cytokine Production (GO:2000556),0.0012509664178372,Up,EnrichR,GO:2000556
+12,BP,Regulation of Immunoglobulin Production (GO:0002637),0.0012509664178372,Up,EnrichR,GO:0002637
+12,BP,Regulation of T-helper 1 Cell Cytokine Production (GO:2000554),0.0012509664178372,Up,EnrichR,GO:2000554
+12,BP,Positive Regulation of Immune Response (GO:0050778),0.0014852160145086,Up,EnrichR,GO:0050778
+12,BP,Negative Regulation of T Cell Proliferation (GO:0042130),0.002129949640287,Up,EnrichR,GO:0042130
+12,BP,Negative Regulation of Humoral Immune Response Mediated by Circulating Immunoglobulin (GO:0002924),0.0027907520742022,Up,EnrichR,GO:0002924
+12,BP,Negative Regulation of Leukocyte Degranulation (GO:0043301),0.0027907520742022,Up,EnrichR,GO:0043301
+12,BP,Regulation of B Cell Proliferation (GO:0030888),0.0027907520742022,Up,EnrichR,GO:0030888
+12,BP,Regulation of Dendritic Cell Antigen Processing and Presentation (GO:0002604),0.0027907520742022,Up,EnrichR,GO:0002604
+12,BP,Regulation of T Cell Differentiation (GO:0045580),0.0030654664121462,Up,EnrichR,GO:0045580
+12,BP,Positive Regulation of Innate Immune Response (GO:0045089),0.0031344448639337,Up,EnrichR,GO:0045089
+12,BP,Regulation of Complement-Dependent Cytotoxicity (GO:1903659),0.0031344448639337,Up,EnrichR,GO:1903659
+13,BP,Myelination (GO:0042552),3.55419622964828e-08,Up,EnrichR,GO:0042552
+13,BP,Oligodendrocyte Development (GO:0014003),2.11324619143952e-06,Up,EnrichR,GO:0014003
+13,BP,Galactolipid Biosynthetic Process (GO:0019375),0.0001305730140248,Up,EnrichR,GO:0019375
+13,BP,Galactosylceramide Biosynthetic Process (GO:0006682),0.0001305730140248,Up,EnrichR,GO:0006682
+13,BP,Glycosylceramide Biosynthetic Process (GO:0046476),0.0001767010534048,Up,EnrichR,GO:0046476
+13,BP,Oligodendrocyte Differentiation (GO:0048709),0.0001767010534048,Up,EnrichR,GO:0048709
+13,BP,Axon Ensheathment in Central Nervous System (GO:0032291),0.0002130644812483,Up,EnrichR,GO:0032291
+13,BP,Galactosylceramide Metabolic Process (GO:0006681),0.0002130644812483,Up,EnrichR,GO:0006681
+13,BP,Glial Cell Development (GO:0021782),0.0002130644812483,Up,EnrichR,GO:0021782
+13,BP,Central Nervous System Myelination (GO:0022010),0.0008448976964957,Up,EnrichR,GO:0022010
+13,BP,Glial Cell Differentiation (GO:0010001),0.0144193734682468,Up,EnrichR,GO:0010001
+13,BP,Central Nervous System Development (GO:0007417),0.0165555781613793,Up,EnrichR,GO:0007417
+13,BP,Myelin Assembly (GO:0032288),0.039936379671416,Up,EnrichR,GO:0032288
+14,BP,Negative Regulation of Neuron Differentiation (GO:0045665),0.0010624570251542,Up,EnrichR,GO:0045665
+14,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0010624570251542,Up,EnrichR,GO:0045893
+14,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0010624570251542,Up,EnrichR,GO:0006357
+14,BP,Glial Cell Differentiation (GO:0010001),0.0010690857995101,Up,EnrichR,GO:0010001
+14,BP,Astrocyte Differentiation (GO:0048708),0.0012262835864158,Up,EnrichR,GO:0048708
+14,BP,Chondrocyte Differentiation (GO:0002062),0.0012262835864158,Up,EnrichR,GO:0002062
+14,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.0012262835864158,Up,EnrichR,GO:0045944
+14,BP,Regulation of DNA-templated Transcription (GO:0006355),0.0012262835864158,Up,EnrichR,GO:0006355
+14,BP,Regulation of Nervous System Development (GO:0051960),0.0020166024357075,Up,EnrichR,GO:0051960
+14,BP,Regulation of Cell Development (GO:0060284),0.0028030461020083,Up,EnrichR,GO:0060284
+14,BP,Cartilage Development (GO:0051216),0.0033536546691832,Up,EnrichR,GO:0051216
+14,BP,Regulation of Neurogenesis (GO:0050767),0.0047562021232339,Up,EnrichR,GO:0050767
+14,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),0.0049475383835663,Up,EnrichR,GO:0000122
+14,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.0054477471077407,Up,EnrichR,GO:0045892
+14,BP,Regulation of Neuron Differentiation (GO:0045664),0.0057759055114774,Up,EnrichR,GO:0045664
+14,BP,Negative Regulation of Myoblast Differentiation (GO:0045662),0.0060203135160974,Up,EnrichR,GO:0045662
+14,BP,Negative Regulation of Cell Differentiation (GO:0045596),0.0092004881367091,Up,EnrichR,GO:0045596
+14,BP,Glial Cell Development (GO:0021782),0.0111961217407727,Up,EnrichR,GO:0021782
+14,BP,Potassium Ion Transport (GO:0006813),0.0203446465380581,Up,EnrichR,GO:0006813
+14,BP,Potassium Ion Transmembrane Transport (GO:0071805),0.022541823903833,Up,EnrichR,GO:0071805
+14,BP,Connective Tissue Development (GO:0061448),0.0304956749949612,Up,EnrichR,GO:0061448
+14,BP,Notch Signaling Pathway (GO:0007219),0.0305314992510455,Up,EnrichR,GO:0007219
+14,BP,Brain Development (GO:0007420),0.0379343623204761,Up,EnrichR,GO:0007420
+14,BP,Proteoglycan Biosynthetic Process (GO:0030166),0.0379343623204761,Up,EnrichR,GO:0030166
+14,BP,Eye Development (GO:0001654),0.0487367885527383,Up,EnrichR,GO:0001654
+14,BP,Regulation of Myoblast Differentiation (GO:0045661),0.0487367885527383,Up,EnrichR,GO:0045661
+15,BP,Fibroblast Growth Factor Receptor Signaling Pathway (GO:0008543),0.0375596091629637,Up,EnrichR,GO:0008543
+16,BP,Cardiac Muscle Cell Action Potential Involved in Contraction (GO:0086002),0.133830631514672,Up,EnrichR,GO:0086002
+16,BP,Cardiac Muscle Tissue Development (GO:0048738),0.133830631514672,Up,EnrichR,GO:0048738
+16,BP,Cellular Response to Hormone Stimulus (GO:0032870),0.133830631514672,Up,EnrichR,GO:0032870
+17,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),6.46902035391539e-28,Up,EnrichR,GO:0006357
+17,BP,Regulation of DNA-templated Transcription (GO:0006355),1.39443727030744e-22,Up,EnrichR,GO:0006355
+17,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),5.01695083546025e-05,Up,EnrichR,GO:0045892
+17,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),0.0001160557517458,Up,EnrichR,GO:0000122
+17,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.0074661839263593,Up,EnrichR,GO:0045944
+17,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0089680676361763,Up,EnrichR,GO:0045893
+18,BP,T Cell Activation (GO:0042110),4.14609338847727e-10,Up,EnrichR,GO:0042110
+18,BP,Regulation of T Cell Activation (GO:0050863),4.05286393963052e-06,Up,EnrichR,GO:0050863
+18,BP,Regulation of Lymphocyte Activation (GO:0051249),0.0001551585058818,Up,EnrichR,GO:0051249
+18,BP,Regulation of Lymphocyte Differentiation (GO:0045619),0.0001551585058818,Up,EnrichR,GO:0045619
+18,BP,T Cell Receptor Signaling Pathway (GO:0050852),0.0003235070014168,Up,EnrichR,GO:0050852
+18,BP,Natural Killer Cell Mediated Cytotoxicity (GO:0042267),0.0004487797149544,Up,EnrichR,GO:0042267
+18,BP,Natural Killer Cell Mediated Immunity (GO:0002228),0.0004487797149544,Up,EnrichR,GO:0002228
+18,BP,Antigen Receptor-Mediated Signaling Pathway (GO:0050851),0.0004523934820869,Up,EnrichR,GO:0050851
+18,BP,Positive Regulation of T Cell Activation (GO:0050870),0.0004523934820869,Up,EnrichR,GO:0050870
+18,BP,Regulation of Natural Killer Cell Mediated Cytotoxicity (GO:0042269),0.0004523934820869,Up,EnrichR,GO:0042269
+18,BP,Enzyme-Linked Receptor Protein Signaling Pathway (GO:0007167),0.0005203765645029,Up,EnrichR,GO:0007167
+18,BP,Positive Regulation of Cell-Cell Adhesion (GO:0022409),0.0010185647482103,Up,EnrichR,GO:0022409
+18,BP,Positive Regulation of Cytokine Production (GO:0001819),0.0012914510650544,Up,EnrichR,GO:0001819
+18,BP,Positive Regulation of Type II Interferon Production (GO:0032729),0.0012914510650544,Up,EnrichR,GO:0032729
+18,BP,Regulation of Cell-Cell Adhesion Mediated by Integrin (GO:0033632),0.0012914510650544,Up,EnrichR,GO:0033632
+18,BP,Positive Regulation of T Cell Proliferation (GO:0042102),0.0016805953192538,Up,EnrichR,GO:0042102
+18,BP,Positive Regulation of Lymphocyte Proliferation (GO:0050671),0.0026216563256176,Up,EnrichR,GO:0050671
+18,BP,Regulation of T Cell Proliferation (GO:0042129),0.0030939886800154,Up,EnrichR,GO:0042129
+18,BP,Regulation of Type II Interferon Production (GO:0032649),0.0034857037762768,Up,EnrichR,GO:0032649
+18,BP,Positive Regulation of Cell Adhesion Mediated by Integrin (GO:0033630),0.0036358126840148,Up,EnrichR,GO:0033630
+18,BP,Alpha-Beta T Cell Activation (GO:0046631),0.0039688719816464,Up,EnrichR,GO:0046631
+18,BP,Immunoglobulin Mediated Immune Response (GO:0016064),0.0039688719816464,Up,EnrichR,GO:0016064
+18,BP,Regulation of B Cell Differentiation (GO:0045577),0.0039688719816464,Up,EnrichR,GO:0045577
+18,BP,B Cell Mediated Immunity (GO:0019724),0.0040538298612413,Up,EnrichR,GO:0019724
+18,BP,T Cell Mediated Immunity (GO:0002456),0.0040538298612413,Up,EnrichR,GO:0002456
+18,BP,Positive Regulation of Natural Killer Cell Mediated Cytotoxicity (GO:0045954),0.004731477480627,Up,EnrichR,GO:0045954
+18,BP,Adaptive Imm Resp Based on Som Recomb of Imm Rcptrs Built Frm IgSF Domains (GO:0002460),0.0054351270582302,Up,EnrichR,GO:0002460
+18,BP,Positive Regulation of Natural Killer Cell Mediated Immunity (GO:0002717),0.0061616351763379,Up,EnrichR,GO:0002717
+18,BP,Cell Surface Receptor Protein Tyrosine Kinase Signaling Pathway (GO:0007169),0.0062414218665575,Up,EnrichR,GO:0007169
+18,BP,Heterophilic Cell-Cell Adhesion via Plasma Membrane Cell Adhesion Molecules (GO:0007157),0.0150419660329774,Up,EnrichR,GO:0007157
+19,BP,T Cell Activation (GO:0042110),4.14609338847727e-10,Up,EnrichR,GO:0042110
+19,BP,Regulation of T Cell Activation (GO:0050863),4.05286393963052e-06,Up,EnrichR,GO:0050863
+19,BP,Regulation of Lymphocyte Activation (GO:0051249),0.0001551585058818,Up,EnrichR,GO:0051249
+19,BP,Regulation of Lymphocyte Differentiation (GO:0045619),0.0001551585058818,Up,EnrichR,GO:0045619
+19,BP,T Cell Receptor Signaling Pathway (GO:0050852),0.0003235070014168,Up,EnrichR,GO:0050852
+19,BP,Natural Killer Cell Mediated Cytotoxicity (GO:0042267),0.0004487797149544,Up,EnrichR,GO:0042267
+19,BP,Natural Killer Cell Mediated Immunity (GO:0002228),0.0004487797149544,Up,EnrichR,GO:0002228
+19,BP,Antigen Receptor-Mediated Signaling Pathway (GO:0050851),0.0004523934820869,Up,EnrichR,GO:0050851
+19,BP,Positive Regulation of T Cell Activation (GO:0050870),0.0004523934820869,Up,EnrichR,GO:0050870
+19,BP,Regulation of Natural Killer Cell Mediated Cytotoxicity (GO:0042269),0.0004523934820869,Up,EnrichR,GO:0042269
+19,BP,Enzyme-Linked Receptor Protein Signaling Pathway (GO:0007167),0.0005203765645029,Up,EnrichR,GO:0007167
+19,BP,Positive Regulation of Cell-Cell Adhesion (GO:0022409),0.0010185647482103,Up,EnrichR,GO:0022409
+19,BP,Positive Regulation of Cytokine Production (GO:0001819),0.0012914510650544,Up,EnrichR,GO:0001819
+19,BP,Positive Regulation of Type II Interferon Production (GO:0032729),0.0012914510650544,Up,EnrichR,GO:0032729
+19,BP,Regulation of Cell-Cell Adhesion Mediated by Integrin (GO:0033632),0.0012914510650544,Up,EnrichR,GO:0033632
+19,BP,Positive Regulation of T Cell Proliferation (GO:0042102),0.0016805953192538,Up,EnrichR,GO:0042102
+19,BP,Positive Regulation of Lymphocyte Proliferation (GO:0050671),0.0026216563256176,Up,EnrichR,GO:0050671
+19,BP,Regulation of T Cell Proliferation (GO:0042129),0.0030939886800154,Up,EnrichR,GO:0042129
+19,BP,Regulation of Type II Interferon Production (GO:0032649),0.0034857037762768,Up,EnrichR,GO:0032649
+19,BP,Positive Regulation of Cell Adhesion Mediated by Integrin (GO:0033630),0.0036358126840148,Up,EnrichR,GO:0033630
+19,BP,Alpha-Beta T Cell Activation (GO:0046631),0.0039688719816464,Up,EnrichR,GO:0046631
+19,BP,Immunoglobulin Mediated Immune Response (GO:0016064),0.0039688719816464,Up,EnrichR,GO:0016064
+19,BP,Regulation of B Cell Differentiation (GO:0045577),0.0039688719816464,Up,EnrichR,GO:0045577
+19,BP,B Cell Mediated Immunity (GO:0019724),0.0040538298612413,Up,EnrichR,GO:0019724
+19,BP,T Cell Mediated Immunity (GO:0002456),0.0040538298612413,Up,EnrichR,GO:0002456
+19,BP,Positive Regulation of Natural Killer Cell Mediated Cytotoxicity (GO:0045954),0.004731477480627,Up,EnrichR,GO:0045954
+19,BP,Adaptive Imm Resp Based on Som Recomb of Imm Rcptrs Built Frm IgSF Domains (GO:0002460),0.0054351270582302,Up,EnrichR,GO:0002460
+19,BP,Positive Regulation of Natural Killer Cell Mediated Immunity (GO:0002717),0.0061616351763379,Up,EnrichR,GO:0002717
+19,BP,Cell Surface Receptor Protein Tyrosine Kinase Signaling Pathway (GO:0007169),0.0062414218665575,Up,EnrichR,GO:0007169
+19,BP,Heterophilic Cell-Cell Adhesion via Plasma Membrane Cell Adhesion Molecules (GO:0007157),0.0150419660329774,Up,EnrichR,GO:0007157
+20,BP,T Cell Activation (GO:0042110),4.14609338847727e-10,Up,EnrichR,GO:0042110
+20,BP,Regulation of T Cell Activation (GO:0050863),4.05286393963052e-06,Up,EnrichR,GO:0050863
+20,BP,Regulation of Lymphocyte Activation (GO:0051249),0.0001551585058818,Up,EnrichR,GO:0051249
+20,BP,Regulation of Lymphocyte Differentiation (GO:0045619),0.0001551585058818,Up,EnrichR,GO:0045619
+20,BP,T Cell Receptor Signaling Pathway (GO:0050852),0.0003235070014168,Up,EnrichR,GO:0050852
+20,BP,Natural Killer Cell Mediated Cytotoxicity (GO:0042267),0.0004487797149544,Up,EnrichR,GO:0042267
+20,BP,Natural Killer Cell Mediated Immunity (GO:0002228),0.0004487797149544,Up,EnrichR,GO:0002228
+20,BP,Antigen Receptor-Mediated Signaling Pathway (GO:0050851),0.0004523934820869,Up,EnrichR,GO:0050851
+20,BP,Positive Regulation of T Cell Activation (GO:0050870),0.0004523934820869,Up,EnrichR,GO:0050870
+20,BP,Regulation of Natural Killer Cell Mediated Cytotoxicity (GO:0042269),0.0004523934820869,Up,EnrichR,GO:0042269
+20,BP,Enzyme-Linked Receptor Protein Signaling Pathway (GO:0007167),0.0005203765645029,Up,EnrichR,GO:0007167
+20,BP,Positive Regulation of Cell-Cell Adhesion (GO:0022409),0.0010185647482103,Up,EnrichR,GO:0022409
+20,BP,Positive Regulation of Cytokine Production (GO:0001819),0.0012914510650544,Up,EnrichR,GO:0001819
+20,BP,Positive Regulation of Type II Interferon Production (GO:0032729),0.0012914510650544,Up,EnrichR,GO:0032729
+20,BP,Regulation of Cell-Cell Adhesion Mediated by Integrin (GO:0033632),0.0012914510650544,Up,EnrichR,GO:0033632
+20,BP,Positive Regulation of T Cell Proliferation (GO:0042102),0.0016805953192538,Up,EnrichR,GO:0042102
+20,BP,Positive Regulation of Lymphocyte Proliferation (GO:0050671),0.0026216563256176,Up,EnrichR,GO:0050671
+20,BP,Regulation of T Cell Proliferation (GO:0042129),0.0030939886800154,Up,EnrichR,GO:0042129
+20,BP,Regulation of Type II Interferon Production (GO:0032649),0.0034857037762768,Up,EnrichR,GO:0032649
+20,BP,Positive Regulation of Cell Adhesion Mediated by Integrin (GO:0033630),0.0036358126840148,Up,EnrichR,GO:0033630
+20,BP,Alpha-Beta T Cell Activation (GO:0046631),0.0039688719816464,Up,EnrichR,GO:0046631
+20,BP,Immunoglobulin Mediated Immune Response (GO:0016064),0.0039688719816464,Up,EnrichR,GO:0016064
+20,BP,Regulation of B Cell Differentiation (GO:0045577),0.0039688719816464,Up,EnrichR,GO:0045577
+20,BP,B Cell Mediated Immunity (GO:0019724),0.0040538298612413,Up,EnrichR,GO:0019724
+20,BP,T Cell Mediated Immunity (GO:0002456),0.0040538298612413,Up,EnrichR,GO:0002456
+20,BP,Positive Regulation of Natural Killer Cell Mediated Cytotoxicity (GO:0045954),0.004731477480627,Up,EnrichR,GO:0045954
+20,BP,Adaptive Imm Resp Based on Som Recomb of Imm Rcptrs Built Frm IgSF Domains (GO:0002460),0.0054351270582302,Up,EnrichR,GO:0002460
+20,BP,Positive Regulation of Natural Killer Cell Mediated Immunity (GO:0002717),0.0061616351763379,Up,EnrichR,GO:0002717
+20,BP,Cell Surface Receptor Protein Tyrosine Kinase Signaling Pathway (GO:0007169),0.0062414218665575,Up,EnrichR,GO:0007169
+20,BP,Heterophilic Cell-Cell Adhesion via Plasma Membrane Cell Adhesion Molecules (GO:0007157),0.0150419660329774,Up,EnrichR,GO:0007157
+21,BP,Action Potential (GO:0001508),0.0303018205712334,Up,EnrichR,GO:0001508
+21,BP,Positive Regulation of Calcium Ion-Dependent Exocytosis (GO:0045956),0.0303018205712334,Up,EnrichR,GO:0045956
+21,BP,Positive Regulation of Regulated Secretory Pathway (GO:1903307),0.0303018205712334,Up,EnrichR,GO:1903307
+21,BP,Potassium Ion Transmembrane Transport (GO:0071805),0.0303018205712334,Up,EnrichR,GO:0071805
+21,BP,Potassium Ion Transport (GO:0006813),0.0303018205712334,Up,EnrichR,GO:0006813
+21,BP,Regulation of Catecholamine Secretion (GO:0050433),0.0303018205712334,Up,EnrichR,GO:0050433
+23,BP,Action Potential (GO:0001508),0.0303018205712334,Up,EnrichR,GO:0001508
+23,BP,Positive Regulation of Calcium Ion-Dependent Exocytosis (GO:0045956),0.0303018205712334,Up,EnrichR,GO:0045956
+23,BP,Positive Regulation of Regulated Secretory Pathway (GO:1903307),0.0303018205712334,Up,EnrichR,GO:1903307
+23,BP,Potassium Ion Transmembrane Transport (GO:0071805),0.0303018205712334,Up,EnrichR,GO:0071805
+23,BP,Potassium Ion Transport (GO:0006813),0.0303018205712334,Up,EnrichR,GO:0006813
+23,BP,Regulation of Catecholamine Secretion (GO:0050433),0.0303018205712334,Up,EnrichR,GO:0050433
+24,BP,Regulation of DNA-templated Transcription (GO:0006355),0.0004785716799166,Up,EnrichR,GO:0006355
+24,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0007231132574479,Up,EnrichR,GO:0045893
+24,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0019992810486949,Up,EnrichR,GO:0006357
+24,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.0023291187701928,Up,EnrichR,GO:0045944
+24,BP,Regulation of Microglial Cell Migration (GO:1904139),0.0023291187701928,Up,EnrichR,GO:1904139
+24,BP,Regulation of RNA Biosynthetic Process (GO:2001141),0.0023291187701928,Up,EnrichR,GO:2001141
+24,BP,Endochondral Ossification (GO:0001958),0.0030664128224678,Up,EnrichR,GO:0001958
+24,BP,Myeloid Cell Differentiation (GO:0030099),0.0033556240462416,Up,EnrichR,GO:0030099
+24,BP,Positive Regulation of RNA Biosynthetic Process (GO:1902680),0.0035132072754419,Up,EnrichR,GO:1902680
+24,BP,Regulation of Macrophage Migration (GO:1905521),0.0035132072754419,Up,EnrichR,GO:1905521
+24,BP,Endochondral Bone Morphogenesis (GO:0060350),0.0042023185820049,Up,EnrichR,GO:0060350
+24,BP,Granulocyte Differentiation (GO:0030851),0.0042023185820049,Up,EnrichR,GO:0030851
+24,BP,Lymphocyte Differentiation (GO:0030098),0.0048773394126783,Up,EnrichR,GO:0030098
+24,BP,Negative Regulation of Neuron Apoptotic Process (GO:0043524),0.0054719490702985,Up,EnrichR,GO:0043524
+24,BP,B Cell Activation (GO:0042113),0.0072164020580158,Up,EnrichR,GO:0042113
+24,BP,Cell Projection Organization (GO:0030030),0.0072164020580158,Up,EnrichR,GO:0030030
+24,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.0072164020580158,Up,EnrichR,GO:0045892
+24,BP,Regulation of Megakaryocyte Differentiation (GO:0045652),0.0072164020580158,Up,EnrichR,GO:0045652
+24,BP,Hemopoiesis (GO:0030097),0.0077350925217933,Up,EnrichR,GO:0030097
+24,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),0.0079170557495119,Up,EnrichR,GO:0000122
+24,BP,Cellular Response to Molecule of Bacterial Origin (GO:0071219),0.0115155805184717,Up,EnrichR,GO:0071219
+24,BP,Positive Regulation of Lipid Metabolic Process (GO:0045834),0.0115155805184717,Up,EnrichR,GO:0045834
+24,BP,Regulation of Gene Expression (GO:0010468),0.0115155805184717,Up,EnrichR,GO:0010468
+24,BP,Regulation of Lipid Biosynthetic Process (GO:0046890),0.0118747873693422,Up,EnrichR,GO:0046890
+24,BP,Positive Regulation of Myeloid Cell Differentiation (GO:0045639),0.0199355757463425,Up,EnrichR,GO:0045639
+24,BP,Intracellular Signaling Cassette (GO:0141124),0.0199538162551955,Up,EnrichR,GO:0141124
+24,BP,Positive Regulation of Bone Mineralization (GO:0030501),0.0199538162551955,Up,EnrichR,GO:0030501
+24,BP,Cellular Response to Nitrogen Compound (GO:1901699),0.020375208799032,Up,EnrichR,GO:1901699
+24,BP,Defense Response to Fungus (GO:0050832),0.020375208799032,Up,EnrichR,GO:0050832
+24,BP,Positive Regulation of Biomineral Tissue Development (GO:0070169),0.020375208799032,Up,EnrichR,GO:0070169
+25,BP,Cellular Response to Calcium Ion (GO:0071277),0.0965392730316209,Up,EnrichR,GO:0071277
+25,BP,Negative Regulation of Apoptotic Signaling Pathway (GO:2001234),0.0965392730316209,Up,EnrichR,GO:2001234
+25,BP,Regulation of Trans-Synaptic Signaling (GO:0099177),0.0965392730316209,Up,EnrichR,GO:0099177
+26,BP,Cellular Response to Calcium Ion (GO:0071277),0.0965392730316209,Up,EnrichR,GO:0071277
+26,BP,Negative Regulation of Apoptotic Signaling Pathway (GO:2001234),0.0965392730316209,Up,EnrichR,GO:2001234
+26,BP,Regulation of Trans-Synaptic Signaling (GO:0099177),0.0965392730316209,Up,EnrichR,GO:0099177
+27,BP,Regulation of DNA-templated Transcription (GO:0006355),0.002962097184045,Up,EnrichR,GO:0006355
+27,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0143811797316722,Up,EnrichR,GO:0006357
+27,BP,Cellular Response to Sterol (GO:0036315),0.0180275186362421,Up,EnrichR,GO:0036315
+27,BP,Cholesterol Homeostasis (GO:0042632),0.0180275186362421,Up,EnrichR,GO:0042632
+27,BP,Epidermis Development (GO:0008544),0.0180275186362421,Up,EnrichR,GO:0008544
+27,BP,Positive Regulation of RNA Biosynthetic Process (GO:1902680),0.0180275186362421,Up,EnrichR,GO:1902680
+27,BP,Sterol Homeostasis (GO:0055092),0.0180275186362421,Up,EnrichR,GO:0055092
+27,BP,Regulation of Epithelial Cell Differentiation (GO:0030856),0.0239088885392075,Up,EnrichR,GO:0030856
+27,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0247810012554627,Up,EnrichR,GO:0045893
+27,BP,Negative Regulation of Type II Interferon Production (GO:0032689),0.034197046382477,Up,EnrichR,GO:0032689
+27,BP,Integrated Stress Response Signaling (GO:0140467),0.0445554135223954,Up,EnrichR,GO:0140467
+27,BP,Positive Regulation of Macromolecule Metabolic Process (GO:0010604),0.0445554135223954,Up,EnrichR,GO:0010604
+28,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.0003169543830031,Up,EnrichR,GO:0045944
+28,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0003169543830031,Up,EnrichR,GO:0006357
+28,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0017191795506726,Up,EnrichR,GO:0045893
+28,BP,Regulation of DNA-templated Transcription (GO:0006355),0.0135994265607101,Up,EnrichR,GO:0006355
+28,BP,Mucosal Immune Response (GO:0002385),0.0242797474777256,Up,EnrichR,GO:0002385
+28,BP,B Cell Receptor Signaling Pathway (GO:0050853),0.0281448482992477,Up,EnrichR,GO:0050853
+29,BP,Regulation of DNA-templated Transcription (GO:0006355),3.0052018916656804e-17,Up,EnrichR,GO:0006355
+29,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),4.12711450828154e-17,Up,EnrichR,GO:0006357
+29,BP,Regulation of RNA Biosynthetic Process (GO:2001141),4.61720759542329e-06,Up,EnrichR,GO:2001141
+29,BP,Regulation of Gene Expression (GO:0010468),0.0011515941776565,Up,EnrichR,GO:0010468
+29,BP,Protein Heterooligomerization (GO:0051291),0.0017751728116969,Up,EnrichR,GO:0051291
+29,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.0033826556672422,Up,EnrichR,GO:0045892
+29,BP,Negative Regulation of RNA Biosynthetic Process (GO:1902679),0.0084319284135359,Up,EnrichR,GO:1902679
+29,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0087848495171169,Up,EnrichR,GO:0045893
+29,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.014943565332318,Up,EnrichR,GO:0045944
+29,BP,Negative Regulation of Striated Muscle Tissue Development (GO:0045843),0.0266598237292171,Up,EnrichR,GO:0045843
+29,BP,Protein Complex Oligomerization (GO:0051259),0.0266598237292171,Up,EnrichR,GO:0051259
+29,BP,Regulation of Striated Muscle Tissue Development (GO:0016202),0.0274796185398207,Up,EnrichR,GO:0016202
+29,BP,Positive Regulation of Cell Morphogenesis (GO:0010770),0.0361826360026189,Up,EnrichR,GO:0010770
+3,BP,Regulation of DNA-templated Transcription (GO:0006355),4.1095705777851e-49,Up,EnrichR,GO:0006355
+3,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),2.6052623785748703e-44,Up,EnrichR,GO:0006357
+3,BP,Regulation of RNA Biosynthetic Process (GO:2001141),0.0499692689835315,Up,EnrichR,GO:2001141
+30,BP,Embryonic Organ Development (GO:0048568),0.0049632332123428,Up,EnrichR,GO:0048568
+30,BP,Embryonic Placenta Development (GO:0001892),0.0104777892918559,Up,EnrichR,GO:0001892
+30,BP,Enteric Nervous System Development (GO:0048484),0.0104777892918559,Up,EnrichR,GO:0048484
+30,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.0104777892918559,Up,EnrichR,GO:0045944
+30,BP,Chordate Embryonic Development (GO:0043009),0.0193155107421938,Up,EnrichR,GO:0043009
+30,BP,Embryonic Cranial Skeleton Morphogenesis (GO:0048701),0.0193155107421938,Up,EnrichR,GO:0048701
+30,BP,Nervous System Development (GO:0007399),0.0193155107421938,Up,EnrichR,GO:0007399
+30,BP,Autonomic Nervous System Development (GO:0048483),0.0211548324529597,Up,EnrichR,GO:0048483
+30,BP,Embryonic Digestive Tract Development (GO:0048566),0.0211548324529597,Up,EnrichR,GO:0048566
+30,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.0211548324529597,Up,EnrichR,GO:0045892
+30,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),0.0211548324529597,Up,EnrichR,GO:0000122
+30,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0211548324529597,Up,EnrichR,GO:0045893
+30,BP,Metanephros Development (GO:0001656),0.0270043810610395,Up,EnrichR,GO:0001656
+30,BP,Negative Regulation of Extrinsic Apoptotic Signaling Pathway in Absence of Ligand (GO:2001240),0.0270043810610395,Up,EnrichR,GO:2001240
+30,BP,Negative Regulation of Signal Transduction in Absence of Ligand (GO:1901099),0.0270043810610395,Up,EnrichR,GO:1901099
+30,BP,in Utero Embryonic Development (GO:0001701),0.0320774986041504,Up,EnrichR,GO:0001701
+30,BP,Regulation of Extrinsic Apoptotic Signaling Pathway in Absence of Ligand (GO:2001239),0.0324729689441777,Up,EnrichR,GO:2001239
+30,BP,Natural Killer Cell Mediated Immunity (GO:0002228),0.0356103361102412,Up,EnrichR,GO:0002228
+30,BP,Negative Regulation of Blood Coagulation (GO:0030195),0.0356103361102412,Up,EnrichR,GO:0030195
+30,BP,Embryonic Skeletal System Morphogenesis (GO:0048704),0.0374796676461681,Up,EnrichR,GO:0048704
+30,BP,Regulation of Anatomical Structure Morphogenesis (GO:0022603),0.0374796676461681,Up,EnrichR,GO:0022603
+30,BP,Acetylcholine Receptor Signaling Pathway (GO:0095500),0.0391593312168012,Up,EnrichR,GO:0095500
+30,BP,Cell Surface Receptor Protein Tyrosine Kinase Signaling Pathway (GO:0007169),0.0455135806001404,Up,EnrichR,GO:0007169
+30,BP,Embryonic Skeletal System Development (GO:0048706),0.0467687734177141,Up,EnrichR,GO:0048706
+30,BP,Regulation of Dendrite Development (GO:0050773),0.0479508493311537,Up,EnrichR,GO:0050773
+30,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0479508493311537,Up,EnrichR,GO:0006357
+30,BP,Skeletal System Morphogenesis (GO:0048705),0.0479508493311537,Up,EnrichR,GO:0048705
+33,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),1.12761444470623e-10,Up,EnrichR,GO:0045944
+33,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),1.12761444470623e-10,Up,EnrichR,GO:0006357
+33,BP,Regulation of DNA-templated Transcription (GO:0006355),1.00480108077428e-09,Up,EnrichR,GO:0006355
+33,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),1.19820671834451e-09,Up,EnrichR,GO:0045893
+33,BP,Positive Regulation of miRNA Transcription (GO:1902895),1.71531291659739e-08,Up,EnrichR,GO:1902895
+33,BP,Positive Regulation of miRNA Metabolic Process (GO:2000630),2.66617453623661e-08,Up,EnrichR,GO:2000630
+33,BP,Fat Cell Differentiation (GO:0045444),6.18706636635838e-08,Up,EnrichR,GO:0045444
+33,BP,Regulation of miRNA Transcription (GO:1902893),6.18706636635838e-08,Up,EnrichR,GO:1902893
+33,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),1.76383948654035e-05,Up,EnrichR,GO:0045892
+33,BP,Cell Migration Involved in Sprouting Angiogenesis (GO:0002042),1.91300432475529e-05,Up,EnrichR,GO:0002042
+33,BP,Blood Vessel Endothelial Cell Migration (GO:0043534),2.68582559939997e-05,Up,EnrichR,GO:0043534
+33,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),2.68582559939997e-05,Up,EnrichR,GO:0000122
+33,BP,Positive Regulation of RNA Biosynthetic Process (GO:1902680),8.01963862047168e-05,Up,EnrichR,GO:1902680
+33,BP,Regulation of Type B Pancreatic Cell Proliferation (GO:0061469),0.0001788680145608,Up,EnrichR,GO:0061469
+33,BP,Sprouting Angiogenesis (GO:0002040),0.0002507529042086,Up,EnrichR,GO:0002040
+33,BP,Endothelial Cell Chemotaxis (GO:0035767),0.000375063128669,Up,EnrichR,GO:0035767
+33,BP,Cellular Response to Peptide Hormone Stimulus (GO:0071375),0.000943165365863,Up,EnrichR,GO:0071375
+33,BP,SMAD Protein Signal Transduction (GO:0060395),0.0014105619719631,Up,EnrichR,GO:0060395
+33,BP,Response to Fibroblast Growth Factor (GO:0071774),0.0014927910841562,Up,EnrichR,GO:0071774
+33,BP,Positive Regulation of Epithelial Cell Proliferation (GO:0050679),0.0015763752808233,Up,EnrichR,GO:0050679
+33,BP,Positive Regulation of Vascular Associated Smooth Muscle Cell Proliferation (GO:1904707),0.0016570019422014,Up,EnrichR,GO:1904707
+33,BP,Cell Surface Receptor Protein Serine/Threonine Kinase Signaling Pathway (GO:0007178),0.0022550408064421,Up,EnrichR,GO:0007178
+33,BP,Cellular Response to Growth Factor Stimulus (GO:0071363),0.0027840319702229,Up,EnrichR,GO:0071363
+33,BP,Integrated Stress Response Signaling (GO:0140467),0.0038481841678815,Up,EnrichR,GO:0140467
+33,BP,Cellular Response to Vascular Endothelial Growth Factor Stimulus (GO:0035924),0.0041444895215935,Up,EnrichR,GO:0035924
+33,BP,Regulation of Vascular Associated Smooth Muscle Cell Proliferation (GO:1904705),0.0044424111986364,Up,EnrichR,GO:1904705
+33,BP,Endothelial Cell Migration (GO:0043542),0.0060033018010295,Up,EnrichR,GO:0043542
+33,BP,Positive Regulation of Smooth Muscle Cell Proliferation (GO:0048661),0.0068627886296674,Up,EnrichR,GO:0048661
+33,BP,Cellular Response to Fibroblast Growth Factor Stimulus (GO:0044344),0.0086468152326121,Up,EnrichR,GO:0044344
+33,BP,Positive Regulation of DNA-templated Transcription Initiation (GO:2000144),0.0092728180687023,Up,EnrichR,GO:2000144
+34,BP,Defense Response to Virus (GO:0051607),4.21185310332622e-27,Up,EnrichR,GO:0051607
+34,BP,Negative Regulation of Viral Process (GO:0048525),3.02710996657225e-13,Up,EnrichR,GO:0048525
+34,BP,Cellular Response to Type I Interferon (GO:0071357),9.50348643785384e-11,Up,EnrichR,GO:0071357
+34,BP,Negative Regulation of Viral Genome Replication (GO:0045071),1.61866398490547e-10,Up,EnrichR,GO:0045071
+34,BP,Interferon-Mediated Signaling Pathway (GO:0140888),3.53849014890437e-10,Up,EnrichR,GO:0140888
+34,BP,Regulation of Viral Genome Replication (GO:0045069),1.11651313595256e-09,Up,EnrichR,GO:0045069
+34,BP,Type I Interferon-Mediated Signaling Pathway (GO:0060337),4.56889241472855e-09,Up,EnrichR,GO:0060337
+34,BP,Response to Type I Interferon (GO:0034340),4.29084875997196e-08,Up,EnrichR,GO:0034340
+34,BP,Response to Cytokine (GO:0034097),6.32980246960064e-08,Up,EnrichR,GO:0034097
+34,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),1.50181941816657e-06,Up,EnrichR,GO:0006357
+34,BP,Antiviral Innate Immune Response (GO:0140374),2.32815050173481e-06,Up,EnrichR,GO:0140374
+34,BP,Interleukin-27-Mediated Signaling Pathway (GO:0070106),2.84506142209006e-06,Up,EnrichR,GO:0070106
+34,BP,Response to Interferon-Beta (GO:0035456),4.85581794412833e-06,Up,EnrichR,GO:0035456
+34,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),8.09213734199786e-06,Up,EnrichR,GO:0000122
+34,BP,Regulation of Immune Response (GO:0050776),1.30446189342989e-05,Up,EnrichR,GO:0050776
+34,BP,Type II Interferon-Mediated Signaling Pathway (GO:0060333),1.30446189342989e-05,Up,EnrichR,GO:0060333
+34,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),1.38763886698411e-05,Up,EnrichR,GO:0045892
+34,BP,Cellular Response to Type II Interferon (GO:0071346),2.57557879379302e-05,Up,EnrichR,GO:0071346
+34,BP,Response to Type II Interferon (GO:0034341),6.56419262396484e-05,Up,EnrichR,GO:0034341
+34,BP,Cytokine-Mediated Signaling Pathway (GO:0019221),8.01268537297311e-05,Up,EnrichR,GO:0019221
+34,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),8.01268537297311e-05,Up,EnrichR,GO:0045944
+34,BP,Positive Regulation of Type I Interferon Production (GO:0032481),9.37433927086553e-05,Up,EnrichR,GO:0032481
+34,BP,Positive Regulation of Immune Response (GO:0050778),0.0003389869748711,Up,EnrichR,GO:0050778
+34,BP,Positive Regulation of Release of Sequestered Calcium Ion Into Cytosol (GO:0051281),0.000470324445255,Up,EnrichR,GO:0051281
+34,BP,Regulation of Type I Interferon-Mediated Signaling Pathway (GO:0060338),0.000470324445255,Up,EnrichR,GO:0060338
+34,BP,Regulation of DNA-templated Transcription (GO:0006355),0.0004729299066763,Up,EnrichR,GO:0006355
+34,BP,Positive Regulation of Interferon-Beta Production (GO:0032728),0.0004733431616591,Up,EnrichR,GO:0032728
+34,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0005593022275236,Up,EnrichR,GO:0045893
+34,BP,Apoptotic Process (GO:0006915),0.0005916147681399,Up,EnrichR,GO:0006915
+34,BP,Positive Regulation of Calcium Ion Transmembrane Transport (GO:1904427),0.0007705776460532,Up,EnrichR,GO:1904427
+36,BP,Cilium Movement (GO:0003341),3.22055001285506e-06,Up,EnrichR,GO:0003341
+36,BP,Axonemal Dynein Complex Assembly (GO:0070286),0.0011227628110591,Up,EnrichR,GO:0070286
+36,BP,Motile Cilium Assembly (GO:0044458),0.0098965692711919,Up,EnrichR,GO:0044458
+36,BP,Cilium Movement Involved in Cell Motility (GO:0060294),0.0103416511754054,Up,EnrichR,GO:0060294
+36,BP,Cilium-Dependent Cell Motility (GO:0060285),0.015188050516995,Up,EnrichR,GO:0060285
+36,BP,Determination of Left/Right Symmetry (GO:0007368),0.0467531748725546,Up,EnrichR,GO:0007368
+37,BP,Regulation of DNA-templated Transcription (GO:0006355),4.38762212231848e-24,Up,EnrichR,GO:0006355
+37,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),6.48639648182928e-20,Up,EnrichR,GO:0006357
+37,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.0004261223327492,Up,EnrichR,GO:0045892
+37,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),0.0004261223327492,Up,EnrichR,GO:0000122
+38,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),6.1914487537319905e-09,Up,EnrichR,GO:0006357
+38,BP,Regulation of DNA-templated Transcription (GO:0006355),1.57282242110732e-08,Up,EnrichR,GO:0006355
+38,BP,Regulation of Gene Expression (GO:0010468),0.0156349034385955,Up,EnrichR,GO:0010468
+38,BP,Regulation of Neural Precursor Cell Proliferation (GO:2000177),0.0252866500412491,Up,EnrichR,GO:2000177
+38,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.0253475226658971,Up,EnrichR,GO:0045892
+38,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),0.0253475226658971,Up,EnrichR,GO:0000122
+38,BP,Negative Regulation of Notch Signaling Pathway (GO:0045746),0.02700091510135,Up,EnrichR,GO:0045746
+39,BP,Regulation of Short-Term Neuronal Synaptic Plasticity (GO:0048172),0.0173425937619259,Up,EnrichR,GO:0048172
+4,BP,Inflammatory Response (GO:0006954),2.07521958552552e-15,Up,EnrichR,GO:0006954
+4,BP,Regulation of Inflammatory Response (GO:0050727),5.741491644437091e-09,Up,EnrichR,GO:0050727
+4,BP,Granulocyte Chemotaxis (GO:0071621),5.960179056852291e-09,Up,EnrichR,GO:0071621
+4,BP,Neutrophil Chemotaxis (GO:0030593),1.24108851635184e-08,Up,EnrichR,GO:0030593
+4,BP,Neutrophil Migration (GO:1990266),3.02615943977e-08,Up,EnrichR,GO:1990266
+4,BP,Response to Lipopolysaccharide (GO:0032496),2.30740241752552e-07,Up,EnrichR,GO:0032496
+4,BP,Cellular Response to Oxygen-Containing Compound (GO:1901701),2.38369359775416e-07,Up,EnrichR,GO:1901701
+4,BP,Cellular Response to Lipopolysaccharide (GO:0071222),4.10310595911639e-07,Up,EnrichR,GO:0071222
+4,BP,Cellular Response to Molecule of Bacterial Origin (GO:0071219),4.10310595911639e-07,Up,EnrichR,GO:0071219
+4,BP,Positive Regulation of Cytokine Production (GO:0001819),4.10310595911639e-07,Up,EnrichR,GO:0001819
+4,BP,Positive Regulation of Intracellular Signal Transduction (GO:1902533),7.19549197904897e-07,Up,EnrichR,GO:1902533
+4,BP,Cellular Response to Cytokine Stimulus (GO:0071345),1.36031835308021e-06,Up,EnrichR,GO:0071345
+4,BP,Negative Regulation of Apoptotic Process (GO:0043066),1.37643911928981e-06,Up,EnrichR,GO:0043066
+4,BP,Positive Regulation of Response to External Stimulus (GO:0032103),2.3604186836889e-06,Up,EnrichR,GO:0032103
+4,BP,Cellular Response to Lipid (GO:0071396),2.40945117924073e-06,Up,EnrichR,GO:0071396
+4,BP,Antimicrobial Humoral Immune Response Mediated by Antimicrobial Peptide (GO:0061844),3.7655456992697e-06,Up,EnrichR,GO:0061844
+4,BP,Positive Regulation of Acute Inflammatory Response (GO:0002675),4.1744291588824e-06,Up,EnrichR,GO:0002675
+4,BP,Positive Regulation of Gene Expression (GO:0010628),4.19684125846968e-06,Up,EnrichR,GO:0010628
+4,BP,Positive Regulation of MAPK Cascade (GO:0043410),7.08682743770515e-06,Up,EnrichR,GO:0043410
+4,BP,Positive Regulation of Tumor Necrosis Factor Superfamily Cytokine Production (GO:1903557),1.08518419008092e-05,Up,EnrichR,GO:1903557
+4,BP,Antimicrobial Humoral Response (GO:0019730),1.45360016644341e-05,Up,EnrichR,GO:0019730
+4,BP,Positive Regulation of Cellular Process (GO:0048522),1.51298955757162e-05,Up,EnrichR,GO:0048522
+4,BP,Positive Regulation of Multicellular Organismal Process (GO:0051240),1.7207407571917e-05,Up,EnrichR,GO:0051240
+4,BP,Regulation of Calcidiol 1-Monooxygenase Activity (GO:0060558),2.03590193084418e-05,Up,EnrichR,GO:0060558
+4,BP,Leukocyte Aggregation (GO:0070486),3.36244835545844e-05,Up,EnrichR,GO:0070486
+4,BP,Non-Canonical NF-kappaB Signal Transduction (GO:0038061),3.36244835545844e-05,Up,EnrichR,GO:0038061
+4,BP,Cytokine-Mediated Signaling Pathway (GO:0019221),3.74890611944606e-05,Up,EnrichR,GO:0019221
+4,BP,Intracellular Signaling Cassette (GO:0141124),4.04596574149405e-05,Up,EnrichR,GO:0141124
+4,BP,Positive Regulation of Macromolecule Biosynthetic Process (GO:0010557),4.04596574149405e-05,Up,EnrichR,GO:0010557
+4,BP,Positive Regulation of Vascular Endothelial Growth Factor Production (GO:0010575),4.04596574149405e-05,Up,EnrichR,GO:0010575
+40,BP,Peripheral Nervous System Development (GO:0007422),0.0002700099215059,Up,EnrichR,GO:0007422
+40,BP,Galactolipid Biosynthetic Process (GO:0019375),0.0007196216813871,Up,EnrichR,GO:0019375
+40,BP,Galactosylceramide Biosynthetic Process (GO:0006682),0.0007196216813871,Up,EnrichR,GO:0006682
+40,BP,Galactosylceramide Metabolic Process (GO:0006681),0.0007546518946358,Up,EnrichR,GO:0006681
+40,BP,Glycosylceramide Biosynthetic Process (GO:0046476),0.0007546518946358,Up,EnrichR,GO:0046476
+40,BP,Myelination (GO:0042552),0.0007546518946358,Up,EnrichR,GO:0042552
+40,BP,Oligodendrocyte Development (GO:0014003),0.0036753040685667,Up,EnrichR,GO:0014003
+40,BP,Oligodendrocyte Differentiation (GO:0048709),0.0050789666556884,Up,EnrichR,GO:0048709
+40,BP,Glial Cell Development (GO:0021782),0.0060002022059649,Up,EnrichR,GO:0021782
+40,BP,Glial Cell Differentiation (GO:0010001),0.0080427851529618,Up,EnrichR,GO:0010001
+40,BP,Glycosphingolipid Biosynthetic Process (GO:0006688),0.0084035338977444,Up,EnrichR,GO:0006688
+40,BP,Glycosphingolipid Metabolic Process (GO:0006687),0.0130476037750611,Up,EnrichR,GO:0006687
+40,BP,Glycolipid Biosynthetic Process (GO:0009247),0.0221870565020525,Up,EnrichR,GO:0009247
+40,BP,Nervous System Development (GO:0007399),0.0221870565020525,Up,EnrichR,GO:0007399
+40,BP,Central Nervous System Development (GO:0007417),0.0437081342416722,Up,EnrichR,GO:0007417
+40,BP,Sphingolipid Biosynthetic Process (GO:0030148),0.0437081342416722,Up,EnrichR,GO:0030148
+41,BP,Peripheral Nervous System Development (GO:0007422),0.0002700099215059,Up,EnrichR,GO:0007422
+41,BP,Galactolipid Biosynthetic Process (GO:0019375),0.0007196216813871,Up,EnrichR,GO:0019375
+41,BP,Galactosylceramide Biosynthetic Process (GO:0006682),0.0007196216813871,Up,EnrichR,GO:0006682
+41,BP,Galactosylceramide Metabolic Process (GO:0006681),0.0007546518946358,Up,EnrichR,GO:0006681
+41,BP,Glycosylceramide Biosynthetic Process (GO:0046476),0.0007546518946358,Up,EnrichR,GO:0046476
+41,BP,Myelination (GO:0042552),0.0007546518946358,Up,EnrichR,GO:0042552
+41,BP,Oligodendrocyte Development (GO:0014003),0.0036753040685667,Up,EnrichR,GO:0014003
+41,BP,Oligodendrocyte Differentiation (GO:0048709),0.0050789666556884,Up,EnrichR,GO:0048709
+41,BP,Glial Cell Development (GO:0021782),0.0060002022059649,Up,EnrichR,GO:0021782
+41,BP,Glial Cell Differentiation (GO:0010001),0.0080427851529618,Up,EnrichR,GO:0010001
+41,BP,Glycosphingolipid Biosynthetic Process (GO:0006688),0.0084035338977444,Up,EnrichR,GO:0006688
+41,BP,Glycosphingolipid Metabolic Process (GO:0006687),0.0130476037750611,Up,EnrichR,GO:0006687
+41,BP,Glycolipid Biosynthetic Process (GO:0009247),0.0221870565020525,Up,EnrichR,GO:0009247
+41,BP,Nervous System Development (GO:0007399),0.0221870565020525,Up,EnrichR,GO:0007399
+41,BP,Central Nervous System Development (GO:0007417),0.0437081342416722,Up,EnrichR,GO:0007417
+41,BP,Sphingolipid Biosynthetic Process (GO:0030148),0.0437081342416722,Up,EnrichR,GO:0030148
+42,BP,Peripheral Nervous System Development (GO:0007422),0.0002700099215059,Up,EnrichR,GO:0007422
+42,BP,Galactolipid Biosynthetic Process (GO:0019375),0.0007196216813871,Up,EnrichR,GO:0019375
+42,BP,Galactosylceramide Biosynthetic Process (GO:0006682),0.0007196216813871,Up,EnrichR,GO:0006682
+42,BP,Galactosylceramide Metabolic Process (GO:0006681),0.0007546518946358,Up,EnrichR,GO:0006681
+42,BP,Glycosylceramide Biosynthetic Process (GO:0046476),0.0007546518946358,Up,EnrichR,GO:0046476
+42,BP,Myelination (GO:0042552),0.0007546518946358,Up,EnrichR,GO:0042552
+42,BP,Oligodendrocyte Development (GO:0014003),0.0036753040685667,Up,EnrichR,GO:0014003
+42,BP,Oligodendrocyte Differentiation (GO:0048709),0.0050789666556884,Up,EnrichR,GO:0048709
+42,BP,Glial Cell Development (GO:0021782),0.0060002022059649,Up,EnrichR,GO:0021782
+42,BP,Glial Cell Differentiation (GO:0010001),0.0080427851529618,Up,EnrichR,GO:0010001
+42,BP,Glycosphingolipid Biosynthetic Process (GO:0006688),0.0084035338977444,Up,EnrichR,GO:0006688
+42,BP,Glycosphingolipid Metabolic Process (GO:0006687),0.0130476037750611,Up,EnrichR,GO:0006687
+42,BP,Glycolipid Biosynthetic Process (GO:0009247),0.0221870565020525,Up,EnrichR,GO:0009247
+42,BP,Nervous System Development (GO:0007399),0.0221870565020525,Up,EnrichR,GO:0007399
+42,BP,Central Nervous System Development (GO:0007417),0.0437081342416722,Up,EnrichR,GO:0007417
+42,BP,Sphingolipid Biosynthetic Process (GO:0030148),0.0437081342416722,Up,EnrichR,GO:0030148
+43,BP,+ Reg of Blood Vessel Endothelial Cell Proliferation Inv in Sprouting Angiogenesis (GO:1903589),0.0051316239152314,Up,EnrichR,GO:1903589
+43,BP,Cellular Response to Decreased Oxygen Levels (GO:0036294),0.0051316239152314,Up,EnrichR,GO:0036294
+43,BP,Cellular Response to Hypoxia (GO:0071456),0.0051316239152314,Up,EnrichR,GO:0071456
+43,BP,Monocyte Differentiation (GO:0030224),0.0051316239152314,Up,EnrichR,GO:0030224
+43,BP,Positive Regulation of Cell Migration Involved in Sprouting Angiogenesis (GO:0090050),0.0052978087961109,Up,EnrichR,GO:0090050
+43,BP,Positive Regulation of Lipid Storage (GO:0010884),0.0052978087961109,Up,EnrichR,GO:0010884
+43,BP,Reg of Blood Vessel Endothelial Cell Proliferation Inv in Sprouting Angiogenesis (GO:1903587),0.0052978087961109,Up,EnrichR,GO:1903587
+43,BP,Regulation of Leukocyte Migration (GO:0002685),0.0052978087961109,Up,EnrichR,GO:0002685
+43,BP,Positive Regulation of Vasculature Development (GO:1904018),0.0061705902498177,Up,EnrichR,GO:1904018
+43,BP,Positive Regulation of Angiogenesis (GO:0045766),0.0085178841559349,Up,EnrichR,GO:0045766
+43,BP,Negative Regulation of Programmed Cell Death (GO:0043069),0.0137387749914797,Up,EnrichR,GO:0043069
+43,BP,Regulation of Cell Migration Involved in Sprouting Angiogenesis (GO:0090049),0.0137387749914797,Up,EnrichR,GO:0090049
+43,BP,Cellular Response to Heat (GO:0034605),0.0138648926094038,Up,EnrichR,GO:0034605
+43,BP,Cellular Response to Vascular Endothelial Growth Factor Stimulus (GO:0035924),0.0138648926094038,Up,EnrichR,GO:0035924
+43,BP,Blood Vessel Morphogenesis (GO:0048514),0.0194662390279898,Up,EnrichR,GO:0048514
+43,BP,Cellular Defense Response (GO:0006968),0.0194662390279898,Up,EnrichR,GO:0006968
+43,BP,Intracellular Monoatomic Cation Homeostasis (GO:0030003),0.0194662390279898,Up,EnrichR,GO:0030003
+43,BP,Mononuclear Cell Differentiation (GO:1903131),0.0194662390279898,Up,EnrichR,GO:1903131
+43,BP,Positive Regulation of Blood Vessel Endothelial Cell Migration (GO:0043536),0.0194662390279898,Up,EnrichR,GO:0043536
+43,BP,Regulation of Angiogenesis (GO:0045765),0.0194662390279898,Up,EnrichR,GO:0045765
+43,BP,Positive Regulation of Endothelial Cell Proliferation (GO:0001938),0.0347183709660517,Up,EnrichR,GO:0001938
+43,BP,Myeloid Leukocyte Differentiation (GO:0002573),0.0369763224444029,Up,EnrichR,GO:0002573
+43,BP,Autocrine Signaling (GO:0035425),0.0421545463168649,Up,EnrichR,GO:0035425
+43,BP,Cellular Heat Acclimation (GO:0070370),0.0421545463168649,Up,EnrichR,GO:0070370
+43,BP,Heat Acclimation (GO:0010286),0.0421545463168649,Up,EnrichR,GO:0010286
+43,BP,Inflammatory Response to Wounding (GO:0090594),0.0421545463168649,Up,EnrichR,GO:0090594
+43,BP,Lipid Droplet Disassembly (GO:1905691),0.0421545463168649,Up,EnrichR,GO:1905691
+43,BP,Negative Regulation of Cellular Response to Hypoxia (GO:1900038),0.0421545463168649,Up,EnrichR,GO:1900038
+43,BP,Negative Regulation of Growth (GO:0045926),0.0421545463168649,Up,EnrichR,GO:0045926
+43,BP,Negative Regulation of Leukocyte Migration (GO:0002686),0.0421545463168649,Up,EnrichR,GO:0002686
+44,BP,Positive Regulation of Sodium Ion Export Across Plasma Membrane (GO:1903278),0.0126337282859926,Up,EnrichR,GO:1903278
+44,BP,Regulation of Sodium Ion Export Across Plasma Membrane (GO:1903276),0.0126337282859926,Up,EnrichR,GO:1903276
+44,BP,Positive Regulation of Sodium Ion Transmembrane Transport (GO:1902307),0.0211841697373664,Up,EnrichR,GO:1902307
+44,BP,Positive Regulation of Synaptic Transmission (GO:0050806),0.0231295759544925,Up,EnrichR,GO:0050806
+44,BP,Membrane Repolarization (GO:0086009),0.0237656324438805,Up,EnrichR,GO:0086009
+45,BP,Genitalia Development (GO:0048806),0.0163529486503943,Up,EnrichR,GO:0048806
+45,BP,Negative Regulation of Intracellular Steroid Hormone Receptor Signaling Pathway (GO:0033144),0.0267352200915273,Up,EnrichR,GO:0033144
+45,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0267352200915273,Up,EnrichR,GO:0006357
+45,BP,Epithelial to Mesenchymal Transition (GO:0001837),0.0487002540897433,Up,EnrichR,GO:0001837
+45,BP,"Anterior/Posterior Axis Specification, Embryo (GO:0008595)",0.0496739937604381,Up,EnrichR,GO:0008595
+45,BP,Apoptotic DNA Fragmentation (GO:0006309),0.0496739937604381,Up,EnrichR,GO:0006309
+45,BP,Cardiac Pacemaker Cell Development (GO:0060926),0.0496739937604381,Up,EnrichR,GO:0060926
+45,BP,Cellular Response to Erythropoietin (GO:0036018),0.0496739937604381,Up,EnrichR,GO:0036018
+45,BP,Detection of Mechanical Stimulus Involved in Sensory Perception of Sound (GO:0050910),0.0496739937604381,Up,EnrichR,GO:0050910
+45,BP,Determination of Left/Right Asymmetry in Lateral Mesoderm (GO:0003140),0.0496739937604381,Up,EnrichR,GO:0003140
+45,BP,Embryonic Forelimb Morphogenesis (GO:0035115),0.0496739937604381,Up,EnrichR,GO:0035115
+45,BP,Erythropoietin-Mediated Signaling Pathway (GO:0038162),0.0496739937604381,Up,EnrichR,GO:0038162
+45,BP,Forelimb Morphogenesis (GO:0035136),0.0496739937604381,Up,EnrichR,GO:0035136
+45,BP,Hemopoiesis (GO:0030097),0.0496739937604381,Up,EnrichR,GO:0030097
+45,BP,Heterochromatin Organization (GO:0070828),0.0496739937604381,Up,EnrichR,GO:0070828
+45,BP,Host-Mediated Regulation of Intestinal Microbiota Composition (GO:0048874),0.0496739937604381,Up,EnrichR,GO:0048874
+45,BP,Lateral Mesoderm Development (GO:0048368),0.0496739937604381,Up,EnrichR,GO:0048368
+45,BP,Mast Cell Activation Involved in Immune Response (GO:0002279),0.0496739937604381,Up,EnrichR,GO:0002279
+45,BP,Mast Cell Degranulation (GO:0043303),0.0496739937604381,Up,EnrichR,GO:0043303
+45,BP,Megakaryocyte Development (GO:0035855),0.0496739937604381,Up,EnrichR,GO:0035855
+45,BP,Melanocyte Differentiation (GO:0030318),0.0496739937604381,Up,EnrichR,GO:0030318
+45,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.0496739937604381,Up,EnrichR,GO:0045892
+45,BP,Negative Regulation of Intracellular Estrogen Receptor Signaling Pathway (GO:0033147),0.0496739937604381,Up,EnrichR,GO:0033147
+45,BP,Negative Regulation of RNA Biosynthetic Process (GO:1902679),0.0496739937604381,Up,EnrichR,GO:1902679
+45,BP,Negative Regulation of Trophoblast Cell Migration (GO:1901164),0.0496739937604381,Up,EnrichR,GO:1901164
+45,BP,Positive Regulation of Cell Population Proliferation (GO:0008284),0.0496739937604381,Up,EnrichR,GO:0008284
+45,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0496739937604381,Up,EnrichR,GO:0045893
+45,BP,Positive Regulation of Dendritic Cell Cytokine Production (GO:0002732),0.0496739937604381,Up,EnrichR,GO:0002732
+45,BP,Positive Regulation of Protein Maturation (GO:1903319),0.0496739937604381,Up,EnrichR,GO:1903319
+45,BP,Positive Regulation of Smooth Muscle Cell Differentiation (GO:0051152),0.0496739937604381,Up,EnrichR,GO:0051152
+46,BP,Positive Regulation of Cytokine Production (GO:0001819),0.0034837237360226,Up,EnrichR,GO:0001819
+46,BP,"Regulation of CD4-positive, Alpha-Beta T Cell Differentiation (GO:0043370)",0.0034837237360226,Up,EnrichR,GO:0043370
+46,BP,Alpha-Beta T Cell Differentiation (GO:0046632),0.0131502695303455,Up,EnrichR,GO:0046632
+46,BP,Axonemal Central Apparatus Assembly (GO:1904158),0.0131502695303455,Up,EnrichR,GO:1904158
+46,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0131502695303455,Up,EnrichR,GO:0006357
+46,BP,Negative Regulation of Alpha-Beta T Cell Differentiation (GO:0046639),0.0228663123933079,Up,EnrichR,GO:0046639
+46,BP,"Regulation of CD8-positive, Alpha-Beta T Cell Differentiation (GO:0043376)",0.0228663123933079,Up,EnrichR,GO:0043376
+46,BP,Regulation of Immune Response (GO:0050776),0.0228663123933079,Up,EnrichR,GO:0050776
+46,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.0235012909441274,Up,EnrichR,GO:0045944
+46,BP,MHC Class II Protein Complex Assembly (GO:0002399),0.0325995195072305,Up,EnrichR,GO:0002399
+46,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),0.0325995195072305,Up,EnrichR,GO:0000122
+46,BP,Peptide Antigen Assembly With MHC Class II Protein Complex (GO:0002503),0.0325995195072305,Up,EnrichR,GO:0002503
+46,BP,Positive Regulation of Alpha-Beta T Cell Differentiation (GO:0046638),0.0325995195072305,Up,EnrichR,GO:0046638
+46,BP,Positive Regulation of Brown Fat Cell Differentiation (GO:0090336),0.0325995195072305,Up,EnrichR,GO:0090336
+46,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0325995195072305,Up,EnrichR,GO:0045893
+46,BP,Positive Regulation of Fat Cell Differentiation (GO:0045600),0.0325995195072305,Up,EnrichR,GO:0045600
+46,BP,Regulation of Chemokine (C-X-C Motif) Ligand 2 Production (GO:2000341),0.0345278520231767,Up,EnrichR,GO:2000341
+46,BP,Motile Cilium Assembly (GO:0044458),0.0458763752357127,Up,EnrichR,GO:0044458
+46,BP,Regulation of Brown Fat Cell Differentiation (GO:0090335),0.0458763752357127,Up,EnrichR,GO:0090335
+46,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.047307633284036,Up,EnrichR,GO:0045892
+46,BP,Peptide Antigen Assembly With MHC Protein Complex (GO:0002501),0.047307633284036,Up,EnrichR,GO:0002501
+47,BP,Metal Ion Transport (GO:0030001),0.131907943172583,Up,EnrichR,GO:0030001
+47,BP,Potassium Ion Transport (GO:0006813),0.131907943172583,Up,EnrichR,GO:0006813
+47,BP,Regulation of Dendritic Spine Morphogenesis (GO:0061001),0.131907943172583,Up,EnrichR,GO:0061001
+49,BP,Synapse Organization (GO:0050808),0.0004429308237421,Up,EnrichR,GO:0050808
+49,BP,Synaptic Membrane Adhesion (GO:0099560),0.0040920801296925,Up,EnrichR,GO:0099560
+49,BP,Cell-Cell Adhesion via Plasma-Membrane Adhesion Molecules (GO:0098742),0.010667858495998,Up,EnrichR,GO:0098742
+49,BP,Regulation of Trans-Synaptic Signaling (GO:0099177),0.0160372387772968,Up,EnrichR,GO:0099177
+49,BP,Action Potential (GO:0001508),0.0242405276806862,Up,EnrichR,GO:0001508
+49,BP,Central Nervous System Development (GO:0007417),0.0242405276806862,Up,EnrichR,GO:0007417
+49,BP,Cell Junction Assembly (GO:0034329),0.0372219361366493,Up,EnrichR,GO:0034329
+49,BP,Galactolipid Biosynthetic Process (GO:0019375),0.0372219361366493,Up,EnrichR,GO:0019375
+49,BP,Galactosylceramide Biosynthetic Process (GO:0006682),0.0372219361366493,Up,EnrichR,GO:0006682
+49,BP,Glycosylceramide Biosynthetic Process (GO:0046476),0.0372219361366493,Up,EnrichR,GO:0046476
+49,BP,Modulation of Chemical Synaptic Transmission (GO:0050804),0.0372219361366493,Up,EnrichR,GO:0050804
+49,BP,"Negative Regulation of Complement Activation, Classical Pathway (GO:0045959)",0.0372219361366493,Up,EnrichR,GO:0045959
+49,BP,Vitamin A Metabolic Process (GO:0006776),0.0372219361366493,Up,EnrichR,GO:0006776
+49,BP,Galactosylceramide Metabolic Process (GO:0006681),0.037621434165998,Up,EnrichR,GO:0006681
+49,BP,"Regulation of Complement Activation, Classical Pathway (GO:0030450)",0.037621434165998,Up,EnrichR,GO:0030450
+49,BP,Negative Regulation of Humoral Immune Response Mediated by Circulating Immunoglobulin (GO:0002924),0.0402935969472511,Up,EnrichR,GO:0002924
+49,BP,Detection of Light Stimulus Involved in Sensory Perception (GO:0050962),0.0414690126176411,Up,EnrichR,GO:0050962
+49,BP,Detection of Light Stimulus Involved in Visual Perception (GO:0050908),0.0414690126176411,Up,EnrichR,GO:0050908
+49,BP,Detection of Stimulus Involved in Sensory Perception of Pain (GO:0062149),0.0414690126176411,Up,EnrichR,GO:0062149
+49,BP,Negative Regulation of Complement Activation (GO:0045916),0.0414690126176411,Up,EnrichR,GO:0045916
+49,BP,Negative Regulation of Muscle Cell Apoptotic Process (GO:0010656),0.0414690126176411,Up,EnrichR,GO:0010656
+49,BP,Negative Regulation of Smooth Muscle Cell Apoptotic Process (GO:0034392),0.0414690126176411,Up,EnrichR,GO:0034392
+49,BP,Neuron Cell-Cell Adhesion (GO:0007158),0.0414690126176411,Up,EnrichR,GO:0007158
+49,BP,Regulation of Complement Activation (GO:0030449),0.0414690126176411,Up,EnrichR,GO:0030449
+49,BP,Regulation of Humoral Immune Response (GO:0002920),0.0414690126176411,Up,EnrichR,GO:0002920
+49,BP,Regulation of Immune Effector Process (GO:0002697),0.0414690126176411,Up,EnrichR,GO:0002697
+49,BP,Regulation of Presynapse Assembly (GO:1905606),0.0414690126176411,Up,EnrichR,GO:1905606
+49,BP,Regulation of Presynapse Organization (GO:0099174),0.0414690126176411,Up,EnrichR,GO:0099174
+49,BP,Regulation of Smooth Muscle Cell Apoptotic Process (GO:0034391),0.0414690126176411,Up,EnrichR,GO:0034391
+49,BP,Retina Homeostasis (GO:0001895),0.0414690126176411,Up,EnrichR,GO:0001895
+5,BP,Neuron Development (GO:0048666),0.0007157794747415,Up,EnrichR,GO:0048666
+5,BP,Long-Term Synaptic Potentiation (GO:0060291),0.0042749364036979,Up,EnrichR,GO:0060291
+5,BP,Positive Regulation of Synaptic Transmission (GO:0050806),0.0042749364036979,Up,EnrichR,GO:0050806
+5,BP,Regulation of Microtubule Polymerization or Depolymerization (GO:0031110),0.0042749364036979,Up,EnrichR,GO:0031110
+5,BP,Regulation of Glutamate Receptor Signaling Pathway (GO:1900449),0.0071349810243783,Up,EnrichR,GO:1900449
+5,BP,Regulation of Microtubule Cytoskeleton Organization (GO:0070507),0.0071349810243783,Up,EnrichR,GO:0070507
+5,BP,Regulation of Anatomical Structure Morphogenesis (GO:0022603),0.012153383650495,Up,EnrichR,GO:0022603
+5,BP,"Regulation of Alternative mRNA Splicing, via Spliceosome (GO:0000381)",0.012365743093338,Up,EnrichR,GO:0000381
+5,BP,Regulation of Microtubule Polymerization (GO:0031113),0.012365743093338,Up,EnrichR,GO:0031113
+5,BP,Plasma Membrane Bounded Cell Projection Organization (GO:0120036),0.0126796436510861,Up,EnrichR,GO:0120036
+5,BP,Ionotropic Glutamate Receptor Signaling Pathway (GO:0035235),0.0210095072417905,Up,EnrichR,GO:0035235
+5,BP,Microtubule Depolymerization (GO:0007019),0.0210095072417905,Up,EnrichR,GO:0007019
+5,BP,Response to Ethanol (GO:0045471),0.0210095072417905,Up,EnrichR,GO:0045471
+5,BP,Neuron Projection Development (GO:0031175),0.0349297868782927,Up,EnrichR,GO:0031175
+5,BP,Positive Regulation of Excitatory Postsynaptic Potential (GO:2000463),0.0349297868782927,Up,EnrichR,GO:2000463
+5,BP,Microtubule Polymerization or Depolymerization (GO:0031109),0.0357752281986109,Up,EnrichR,GO:0031109
+5,BP,Protein Depolymerization (GO:0051261),0.0357752281986109,Up,EnrichR,GO:0051261
+5,BP,"Regulation of mRNA Splicing, via Spliceosome (GO:0048024)",0.0357752281986109,Up,EnrichR,GO:0048024
+5,BP,Positive Regulation of Microtubule Polymerization or Depolymerization (GO:0031112),0.0381355717536713,Up,EnrichR,GO:0031112
+5,BP,Regulation of Dendrite Morphogenesis (GO:0048814),0.0381355717536713,Up,EnrichR,GO:0048814
+5,BP,mRNA Splice Site Recognition (GO:0006376),0.0381355717536713,Up,EnrichR,GO:0006376
+5,BP,Membrane Depolarization (GO:0051899),0.0405832428790307,Up,EnrichR,GO:0051899
+5,BP,Modulation of Excitatory Postsynaptic Potential (GO:0098815),0.0405832428790307,Up,EnrichR,GO:0098815
+5,BP,Response to Alcohol (GO:0097305),0.0405832428790307,Up,EnrichR,GO:0097305
+5,BP,Acetylcholine Receptor Signaling Pathway (GO:0095500),0.0455468266836473,Up,EnrichR,GO:0095500
+5,BP,Establishment or Maintenance of Epithelial Cell Apical/Basal Polarity (GO:0045197),0.0455468266836473,Up,EnrichR,GO:0045197
+5,BP,Glutamate Receptor Signaling Pathway (GO:0007215),0.0455468266836473,Up,EnrichR,GO:0007215
+50,BP,Regulation of DNA-templated Transcription (GO:0006355),6.61844684521137e-21,Up,EnrichR,GO:0006355
+50,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),1.2204356962516901e-20,Up,EnrichR,GO:0006357
+51,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),1.4108134730949698e-12,Up,EnrichR,GO:0006357
+51,BP,Regulation of DNA-templated Transcription (GO:0006355),1.44645666816436e-11,Up,EnrichR,GO:0006355
+51,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0052361183805808,Up,EnrichR,GO:0045893
+51,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.0072289663394873,Up,EnrichR,GO:0045892
+51,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.0072289663394873,Up,EnrichR,GO:0045944
+51,BP,Intracellular Receptor Signaling Pathway (GO:0030522),0.0104855654216523,Up,EnrichR,GO:0030522
+51,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),0.0104855654216523,Up,EnrichR,GO:0000122
+51,BP,Regulation of RNA Biosynthetic Process (GO:2001141),0.0138365375115959,Up,EnrichR,GO:2001141
+51,BP,mRNA Transcription (GO:0009299),0.0138365375115959,Up,EnrichR,GO:0009299
+51,BP,Cellular Component Assembly (GO:0022607),0.0317620489306107,Up,EnrichR,GO:0022607
+51,BP,Cellular Response to Arsenic-Containing Substance (GO:0071243),0.0461951062759512,Up,EnrichR,GO:0071243
+51,BP,Cellular Response to Cadmium Ion (GO:0071276),0.0461951062759512,Up,EnrichR,GO:0071276
+51,BP,Cellular Response to Copper Ion (GO:0071280),0.0461951062759512,Up,EnrichR,GO:0071280
+51,BP,Cellular Response to Gamma Radiation (GO:0071480),0.0461951062759512,Up,EnrichR,GO:0071480
+51,BP,DNA-templated Transcription (GO:0006351),0.0461951062759512,Up,EnrichR,GO:0006351
+51,BP,Glucose Mediated Signaling Pathway (GO:0010255),0.0461951062759512,Up,EnrichR,GO:0010255
+51,BP,Hexose Mediated Signaling (GO:0009757),0.0461951062759512,Up,EnrichR,GO:0009757
+51,BP,Leukocyte Apoptotic Process (GO:0071887),0.0461951062759512,Up,EnrichR,GO:0071887
+51,BP,MyD88-independent Toll-Like Receptor Signaling Pathway (GO:0002756),0.0461951062759512,Up,EnrichR,GO:0002756
+51,BP,Negative Regulation of Cholesterol Storage (GO:0010887),0.0461951062759512,Up,EnrichR,GO:0010887
+51,BP,Negative Regulation of Double-Strand Break Repair via Nonhomologous End Joining (GO:2001033),0.0461951062759512,Up,EnrichR,GO:2001033
+51,BP,Negative Regulation of Epidermal Growth Factor-Activated Receptor Activity (GO:0007175),0.0461951062759512,Up,EnrichR,GO:0007175
+51,BP,Negative Regulation of Lipid Localization (GO:1905953),0.0461951062759512,Up,EnrichR,GO:1905953
+51,BP,Negative Regulation of Lipid Transport (GO:0032369),0.0461951062759512,Up,EnrichR,GO:0032369
+51,BP,Negative Regulation of Macrophage Derived Foam Cell Differentiation (GO:0010745),0.0461951062759512,Up,EnrichR,GO:0010745
+51,BP,Negative Regulation of Protein Tyrosine Kinase Activity (GO:0061099),0.0461951062759512,Up,EnrichR,GO:0061099
+51,BP,Negative Regulation of RNA Biosynthetic Process (GO:1902679),0.0461951062759512,Up,EnrichR,GO:1902679
+51,BP,Negative Regulation of Response to Type II Interferon (GO:0060331),0.0461951062759512,Up,EnrichR,GO:0060331
+51,BP,Negative Regulation of Signaling Receptor Activity (GO:2000272),0.0461951062759512,Up,EnrichR,GO:2000272
+51,BP,Negative Regulation of Type II Interferon-Mediated Signaling Pathway (GO:0060336),0.0461951062759512,Up,EnrichR,GO:0060336
+52,BP,Apical Protein Localization (GO:0045176),0.0497261029499089,Up,EnrichR,GO:0045176
+52,BP,Cellular Response to Platelet-Derived Growth Factor Stimulus (GO:0036120),0.0497261029499089,Up,EnrichR,GO:0036120
+52,BP,Epithelial Tube Branching Involved in Lung Morphogenesis (GO:0060441),0.0497261029499089,Up,EnrichR,GO:0060441
+52,BP,Establishment of Planar Polarity (GO:0001736),0.0497261029499089,Up,EnrichR,GO:0001736
+52,BP,Glucocorticoid Biosynthetic Process (GO:0006704),0.0497261029499089,Up,EnrichR,GO:0006704
+52,BP,Glucocorticoid Metabolic Process (GO:0008211),0.0497261029499089,Up,EnrichR,GO:0008211
+52,BP,Hyaluronan Biosynthetic Process (GO:0030213),0.0497261029499089,Up,EnrichR,GO:0030213
+52,BP,Intracellular Phosphate Ion Homeostasis (GO:0030643),0.0497261029499089,Up,EnrichR,GO:0030643
+52,BP,Negative Regulation of B Cell Apoptotic Process (GO:0002903),0.0497261029499089,Up,EnrichR,GO:0002903
+52,BP,Negative Regulation of Cell Growth (GO:0030308),0.0497261029499089,Up,EnrichR,GO:0030308
+52,BP,Negative Regulation of Growth (GO:0045926),0.0497261029499089,Up,EnrichR,GO:0045926
+52,BP,Negative Regulation of Lymphocyte Apoptotic Process (GO:0070229),0.0497261029499089,Up,EnrichR,GO:0070229
+52,BP,Nose Development (GO:0043584),0.0497261029499089,Up,EnrichR,GO:0043584
+52,BP,Polysaccharide Metabolic Process (GO:0005976),0.0497261029499089,Up,EnrichR,GO:0005976
+52,BP,Positive Regulation of Animal Organ Morphogenesis (GO:0110110),0.0497261029499089,Up,EnrichR,GO:0110110
+52,BP,Positive Regulation of Apoptotic Cell Clearance (GO:2000427),0.0497261029499089,Up,EnrichR,GO:2000427
+52,BP,Positive Regulation of Intrinsic Apoptotic Signaling Pathway by P53 Class Mediator (GO:1902255),0.0497261029499089,Up,EnrichR,GO:1902255
+52,BP,Positive Regulation of Potassium Ion Transmembrane Transporter Activity (GO:1901018),0.0497261029499089,Up,EnrichR,GO:1901018
+52,BP,Regulation of Apoptotic Cell Clearance (GO:2000425),0.0497261029499089,Up,EnrichR,GO:2000425
+52,BP,Regulation of B Cell Apoptotic Process (GO:0002902),0.0497261029499089,Up,EnrichR,GO:0002902
+52,BP,Regulation of Intrinsic Apoptotic Signaling Pathway by P53 Class Mediator (GO:1902253),0.0497261029499089,Up,EnrichR,GO:1902253
+52,BP,Regulation of Odontoblast Differentiation (GO:1901329),0.0497261029499089,Up,EnrichR,GO:1901329
+52,BP,Regulation of Urine Volume (GO:0035809),0.0497261029499089,Up,EnrichR,GO:0035809
+52,BP,Response to Platelet-Derived Growth Factor (GO:0036119),0.0497261029499089,Up,EnrichR,GO:0036119
+52,BP,Sodium-Dependent Phosphate Transport (GO:0044341),0.0497261029499089,Up,EnrichR,GO:0044341
+53,BP,Calcium-Dependent Cell-Cell Adhesion via Plasma Membrane Cell Adhesion Molecules (GO:0016339),6.84089385933347e-06,Up,EnrichR,GO:0016339
+53,BP,Synapse Assembly (GO:0007416),8.05365568315984e-05,Up,EnrichR,GO:0007416
+53,BP,Cell Junction Assembly (GO:0034329),9.74960556370442e-05,Up,EnrichR,GO:0034329
+53,BP,Synapse Organization (GO:0050808),0.0002982684300542,Up,EnrichR,GO:0050808
+53,BP,Cell-Cell Adhesion via Plasma-Membrane Adhesion Molecules (GO:0098742),0.0004684610796887,Up,EnrichR,GO:0098742
+53,BP,Anterograde Trans-Synaptic Signaling (GO:0098916),0.0005770116779186,Up,EnrichR,GO:0098916
+53,BP,Chemical Synaptic Transmission (GO:0007268),0.0016975707644544,Up,EnrichR,GO:0007268
+53,BP,Regulation of DNA-templated Transcription (GO:0006355),0.0119005388437897,Up,EnrichR,GO:0006355
+53,BP,Nervous System Development (GO:0007399),0.0132221197186541,Up,EnrichR,GO:0007399
+53,BP,Glomerular Epithelial Cell Differentiation (GO:0072311),0.0349261146393124,Up,EnrichR,GO:0072311
+53,BP,Renal Filtration Cell Differentiation (GO:0061318),0.0349261146393124,Up,EnrichR,GO:0061318
+53,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0487745826058211,Up,EnrichR,GO:0006357
+55,BP,Adrenal Gland Development (GO:0030325),0.0297501659194636,Up,EnrichR,GO:0030325
+55,BP,Atrial Cardiac Muscle Tissue Development (GO:0003228),0.0297501659194636,Up,EnrichR,GO:0003228
+55,BP,Carbohydrate Derivative Catabolic Process (GO:1901136),0.0297501659194636,Up,EnrichR,GO:1901136
+55,BP,Cardiac Atrium Morphogenesis (GO:0003209),0.0297501659194636,Up,EnrichR,GO:0003209
+55,BP,Cardiac Pacemaker Cell Development (GO:0060926),0.0297501659194636,Up,EnrichR,GO:0060926
+55,BP,Endocrine System Development (GO:0035270),0.0297501659194636,Up,EnrichR,GO:0035270
+55,BP,Glial Cell Development (GO:0021782),0.0297501659194636,Up,EnrichR,GO:0021782
+55,BP,Glycoprotein Catabolic Process (GO:0006516),0.0297501659194636,Up,EnrichR,GO:0006516
+55,BP,Leukocyte Chemotaxis Involved in Inflammatory Response (GO:0002232),0.0297501659194636,Up,EnrichR,GO:0002232
+55,BP,Lymphocyte Activation Involved in Immune Response (GO:0002285),0.0297501659194636,Up,EnrichR,GO:0002285
+55,BP,NAD Biosynthetic Process (GO:0009435),0.0297501659194636,Up,EnrichR,GO:0009435
+55,BP,NAD Metabolic Process (GO:0019674),0.0297501659194636,Up,EnrichR,GO:0019674
+55,BP,Negative Regulation of Cardiac Muscle Cell Apoptotic Process (GO:0010667),0.0297501659194636,Up,EnrichR,GO:0010667
+55,BP,Negative Regulation of Epithelial Cell Apoptotic Process (GO:1904036),0.0297501659194636,Up,EnrichR,GO:1904036
+55,BP,Negative Regulation of Inflammatory Response to Wounding (GO:0106015),0.0297501659194636,Up,EnrichR,GO:0106015
+55,BP,Negative Regulation of Mitotic Nuclear Division (GO:0045839),0.0297501659194636,Up,EnrichR,GO:0045839
+55,BP,Negative Regulation of Nuclear Division (GO:0051784),0.0297501659194636,Up,EnrichR,GO:0051784
+55,BP,Negative Regulation of Response to Wounding (GO:1903035),0.0297501659194636,Up,EnrichR,GO:1903035
+55,BP,Negative Regulation of Striated Muscle Cell Apoptotic Process (GO:0010664),0.0297501659194636,Up,EnrichR,GO:0010664
+55,BP,Negative Regulation of T Cell Differentiation (GO:0045581),0.0297501659194636,Up,EnrichR,GO:0045581
+55,BP,Nicotinamide Nucleotide Biosynthetic Process (GO:0019359),0.0297501659194636,Up,EnrichR,GO:0019359
+55,BP,Nucleoside Phosphate Biosynthetic Process (GO:1901293),0.0297501659194636,Up,EnrichR,GO:1901293
+55,BP,Nucleotide Biosynthetic Process (GO:0009165),0.0297501659194636,Up,EnrichR,GO:0009165
+55,BP,Nucleotide Metabolic Process (GO:0009117),0.0297501659194636,Up,EnrichR,GO:0009117
+55,BP,Oogenesis (GO:0048477),0.0297501659194636,Up,EnrichR,GO:0048477
+55,BP,Positive Regulation of Cartilage Development (GO:0061036),0.0297501659194636,Up,EnrichR,GO:0061036
+55,BP,Positive Regulation of Cellular Extravasation (GO:0002693),0.0297501659194636,Up,EnrichR,GO:0002693
+55,BP,Positive Regulation of Glial Cell Differentiation (GO:0045687),0.0297501659194636,Up,EnrichR,GO:0045687
+55,BP,Positive Regulation of Granulocyte Chemotaxis (GO:0071624),0.0297501659194636,Up,EnrichR,GO:0071624
+55,BP,Positive Regulation of Keratinocyte Proliferation (GO:0010838),0.0297501659194636,Up,EnrichR,GO:0010838
+57,BP,Central Nervous System Neuron Axonogenesis (GO:0021955),0.0074773756417887,Up,EnrichR,GO:0021955
+57,BP,Calcium Ion Import Across Plasma Membrane (GO:0098703),0.023997746394414,Up,EnrichR,GO:0098703
+57,BP,Calcium Ion Import Into Cytosol (GO:1902656),0.023997746394414,Up,EnrichR,GO:1902656
+57,BP,Calcium Ion Import (GO:0070509),0.0242718843577335,Up,EnrichR,GO:0070509
+57,BP,Positive Regulation of Synapse Assembly (GO:0051965),0.0242718843577335,Up,EnrichR,GO:0051965
+57,BP,Myelination (GO:0042552),0.0321456701485628,Up,EnrichR,GO:0042552
+57,BP,Negative Regulation of Protein Serine/Threonine Kinase Activity (GO:0071901),0.0321456701485628,Up,EnrichR,GO:0071901
+57,BP,Positive Regulation of Nervous System Development (GO:0051962),0.0321456701485628,Up,EnrichR,GO:0051962
+57,BP,Positive Regulation of Cell Junction Assembly (GO:1901890),0.0415451963313049,Up,EnrichR,GO:1901890
+57,BP,Regulation of Synapse Assembly (GO:0051963),0.0415451963313049,Up,EnrichR,GO:0051963
+57,BP,Calcium Ion Transmembrane Import Into Cytosol (GO:0097553),0.0487373630448887,Up,EnrichR,GO:0097553
+58,BP,Bone Morphogenesis (GO:0060349),0.0414806229425701,Up,EnrichR,GO:0060349
+58,BP,Cellular Response to Estrogen Stimulus (GO:0071391),0.0414806229425701,Up,EnrichR,GO:0071391
+58,BP,Cellular Response to Iron Ion (GO:0071281),0.0414806229425701,Up,EnrichR,GO:0071281
+58,BP,Defense Response to Tumor Cell (GO:0002357),0.0414806229425701,Up,EnrichR,GO:0002357
+58,BP,Immunological Synapse Formation (GO:0001771),0.0414806229425701,Up,EnrichR,GO:0001771
+58,BP,Intracellular Monoatomic Cation Homeostasis (GO:0030003),0.0414806229425701,Up,EnrichR,GO:0030003
+58,BP,Lens Fiber Cell Differentiation (GO:0070306),0.0414806229425701,Up,EnrichR,GO:0070306
+58,BP,Negative Regulation of Granulocyte Differentiation (GO:0030853),0.0414806229425701,Up,EnrichR,GO:0030853
+58,BP,Neuropeptide Signaling Pathway (GO:0007218),0.0414806229425701,Up,EnrichR,GO:0007218
+58,BP,Parallel Actin Filament Bundle Assembly (GO:0030046),0.0414806229425701,Up,EnrichR,GO:0030046
+58,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0414806229425701,Up,EnrichR,GO:0045893
+58,BP,Positive Regulation of Interleukin-13 Production (GO:0032736),0.0414806229425701,Up,EnrichR,GO:0032736
+58,BP,Positive Regulation of Interleukin-5 Production (GO:0032754),0.0414806229425701,Up,EnrichR,GO:0032754
+58,BP,Positive Regulation of Peptide Secretion (GO:0002793),0.0414806229425701,Up,EnrichR,GO:0002793
+58,BP,Positive Regulation of Protein Maturation (GO:1903319),0.0414806229425701,Up,EnrichR,GO:1903319
+58,BP,Positive Regulation of T-helper 2 Cell Differentiation (GO:0045630),0.0414806229425701,Up,EnrichR,GO:0045630
+58,BP,Positive Regulation of T-helper Cell Differentiation (GO:0045624),0.0414806229425701,Up,EnrichR,GO:0045624
+58,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.0414806229425701,Up,EnrichR,GO:0045944
+58,BP,Positive Regulation of Type 2 Immune Response (GO:0002830),0.0414806229425701,Up,EnrichR,GO:0002830
+58,BP,Positive Regulation of Voltage-Gated Calcium Channel Activity (GO:1901387),0.0414806229425701,Up,EnrichR,GO:1901387
+58,BP,Programmed Necrotic Cell Death (GO:0097300),0.0414806229425701,Up,EnrichR,GO:0097300
+58,BP,Protein Import (GO:0017038),0.0414806229425701,Up,EnrichR,GO:0017038
+58,BP,Protein Localization to Phagophore Assembly Site (GO:0034497),0.0414806229425701,Up,EnrichR,GO:0034497
+58,BP,Regulation of Cilium Beat Frequency (GO:0003356),0.0414806229425701,Up,EnrichR,GO:0003356
+58,BP,Regulation of Cilium Movement (GO:0003352),0.0414806229425701,Up,EnrichR,GO:0003352
+58,BP,Regulation of Granulocyte Differentiation (GO:0030852),0.0414806229425701,Up,EnrichR,GO:0030852
+58,BP,Regulation of Hormone Biosynthetic Process (GO:0046885),0.0414806229425701,Up,EnrichR,GO:0046885
+58,BP,Regulation of Interleukin-5 Production (GO:0032674),0.0414806229425701,Up,EnrichR,GO:0032674
+58,BP,Regulation of T-helper 2 Cell Differentiation (GO:0045628),0.0414806229425701,Up,EnrichR,GO:0045628
+58,BP,Regulation of Voltage-Gated Calcium Channel Activity (GO:1901385),0.0414806229425701,Up,EnrichR,GO:1901385
+59,BP,Antimicrobial Humoral Immune Response Mediated by Antimicrobial Peptide (GO:0061844),0.201712712162162,Up,EnrichR,GO:0061844
+59,BP,Low-Density Lipoprotein Particle Remodeling (GO:0034374),0.201712712162162,Up,EnrichR,GO:0034374
+59,BP,Negative Regulation of Hydrolase Activity (GO:0051346),0.201712712162162,Up,EnrichR,GO:0051346
+6,BP,Regulation of DNA-templated Transcription (GO:0006355),2.15683331843252e-41,Up,EnrichR,GO:0006355
+6,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),1.73478517257453e-27,Up,EnrichR,GO:0006357
+6,BP,Regulation of RNA Biosynthetic Process (GO:2001141),7.11172355753166e-11,Up,EnrichR,GO:2001141
+6,BP,Regulation of Gene Expression (GO:0010468),6.83100055937802e-08,Up,EnrichR,GO:0010468
+6,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.0425706291193751,Up,EnrichR,GO:0045892
+6,BP,SMAD Protein Signal Transduction (GO:0060395),0.0425706291193751,Up,EnrichR,GO:0060395
+61,BP,Inorganic Anion Transport (GO:0015698),0.0233221895409933,Up,EnrichR,GO:0015698
+61,BP,Monoatomic Anion Transport (GO:0006820),0.0233221895409933,Up,EnrichR,GO:0006820
+61,BP,Cellular Response to Interleukin-4 (GO:0071353),0.0369764342237469,Up,EnrichR,GO:0071353
+61,BP,Chloride Transport (GO:0006821),0.0369764342237469,Up,EnrichR,GO:0006821
+61,BP,Digestive Tract Morphogenesis (GO:0048546),0.0369764342237469,Up,EnrichR,GO:0048546
+61,BP,Embryonic Heart Tube Development (GO:0035050),0.0369764342237469,Up,EnrichR,GO:0035050
+61,BP,Endothelial Cell Differentiation (GO:0045446),0.0369764342237469,Up,EnrichR,GO:0045446
+61,BP,Granulocyte Differentiation (GO:0030851),0.0369764342237469,Up,EnrichR,GO:0030851
+61,BP,Lymphatic Endothelial Cell Differentiation (GO:0060836),0.0369764342237469,Up,EnrichR,GO:0060836
+61,BP,Membrane Lipid Catabolic Process (GO:0046466),0.0369764342237469,Up,EnrichR,GO:0046466
+61,BP,Membrane Lipid Metabolic Process (GO:0006643),0.0369764342237469,Up,EnrichR,GO:0006643
+61,BP,Negative Regulation of RNA Biosynthetic Process (GO:1902679),0.0369764342237469,Up,EnrichR,GO:1902679
+61,BP,Negative Regulation of Toll-Like Receptor Signaling Pathway (GO:0034122),0.0369764342237469,Up,EnrichR,GO:0034122
+61,BP,Positive Regulation by Host of Viral Transcription (GO:0043923),0.0369764342237469,Up,EnrichR,GO:0043923
+61,BP,Positive Regulation of Cardiac Muscle Cell Proliferation (GO:0060045),0.0369764342237469,Up,EnrichR,GO:0060045
+61,BP,Positive Regulation of Cardiac Muscle Tissue Growth (GO:0055023),0.0369764342237469,Up,EnrichR,GO:0055023
+61,BP,Positive Regulation of Cell Motility (GO:2000147),0.0369764342237469,Up,EnrichR,GO:2000147
+61,BP,Positive Regulation of Endothelial Cell-Matrix Adhesion via Fibronectin (GO:1904906),0.0369764342237469,Up,EnrichR,GO:1904906
+61,BP,Positive Regulation of Granulocyte Differentiation (GO:0030854),0.0369764342237469,Up,EnrichR,GO:0030854
+61,BP,Positive Regulation of Neuroepithelial Cell Differentiation (GO:1902913),0.0369764342237469,Up,EnrichR,GO:1902913
+61,BP,Positive Regulation of Odontoblast Differentiation (GO:1901331),0.0369764342237469,Up,EnrichR,GO:1901331
+61,BP,Positive Regulation of RNA Biosynthetic Process (GO:1902680),0.0369764342237469,Up,EnrichR,GO:1902680
+61,BP,Regulation of DNA-templated Transcription (GO:0006355),0.0369764342237469,Up,EnrichR,GO:0006355
+61,BP,Regulation of Endothelial Cell-Matrix Adhesion via Fibronectin (GO:1904904),0.0369764342237469,Up,EnrichR,GO:1904904
+61,BP,Regulation of Granulocyte Differentiation (GO:0030852),0.0369764342237469,Up,EnrichR,GO:0030852
+61,BP,Regulation of Interleukin-13 Production (GO:0032656),0.0369764342237469,Up,EnrichR,GO:0032656
+61,BP,Regulation of Interleukin-5 Production (GO:0032674),0.0369764342237469,Up,EnrichR,GO:0032674
+61,BP,Regulation of Odontoblast Differentiation (GO:1901329),0.0369764342237469,Up,EnrichR,GO:1901329
+61,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0369764342237469,Up,EnrichR,GO:0006357
+61,BP,Response to Interleukin-4 (GO:0070670),0.0369764342237469,Up,EnrichR,GO:0070670
+63,BP,Positive Regulation of Response to Endoplasmic Reticulum Stress (GO:1905898),0.0041621203641505,Up,EnrichR,GO:1905898
+63,BP,Endocytosis Involved in Viral Entry Into Host Cell (GO:0075509),0.0146486221835075,Up,EnrichR,GO:0075509
+63,BP,Receptor-Mediated Endocytosis of Virus by Host Cell (GO:0019065),0.0146486221835075,Up,EnrichR,GO:0019065
+63,BP,Response to Molecule of Bacterial Origin (GO:0002237),0.0146486221835075,Up,EnrichR,GO:0002237
+63,BP,Positive Regulation of ERAD Pathway (GO:1904294),0.0228145300581483,Up,EnrichR,GO:1904294
+63,BP,Regulation of Adaptive Immune Response (GO:0002819),0.0228145300581483,Up,EnrichR,GO:0002819
+63,BP,Regulation of Immune Response (GO:0050776),0.0228145300581483,Up,EnrichR,GO:0050776
+63,BP,Regulation of ERAD Pathway (GO:1904292),0.0299242485772974,Up,EnrichR,GO:1904292
+63,BP,Negative Regulation of Endocytosis (GO:0045806),0.0375436429305739,Up,EnrichR,GO:0045806
+63,BP,Positive Regulation of Cholesterol Transport (GO:0032376),0.0375436429305739,Up,EnrichR,GO:0032376
+63,BP,Receptor-Mediated Endocytosis (GO:0006898),0.0375436429305739,Up,EnrichR,GO:0006898
+63,BP,Regulation of Response to Biotic Stimulus (GO:0002831),0.0375436429305739,Up,EnrichR,GO:0002831
+63,BP,Regulation of Response to External Stimulus (GO:0032101),0.0375436429305739,Up,EnrichR,GO:0032101
+63,BP,Regulation of Vasoconstriction (GO:0019229),0.0375436429305739,Up,EnrichR,GO:0019229
+63,BP,Regulation of Cytosolic Calcium Ion Concentration (GO:0051480),0.0392799522414371,Up,EnrichR,GO:0051480
+63,BP,Negative Regulation of Endothelial Cell Proliferation (GO:0001937),0.0410182545253844,Up,EnrichR,GO:0001937
+63,BP,Regulation of Potassium Ion Transmembrane Transport (GO:1901379),0.0427570552491263,Up,EnrichR,GO:1901379
+63,BP,Skeletal Muscle Tissue Development (GO:0007519),0.0444951962483025,Up,EnrichR,GO:0007519
+63,BP,Cellular Response to Nitrogen Compound (GO:1901699),0.0460686094643197,Up,EnrichR,GO:1901699
+65,BP,Negative Regulation of Cell Differentiation (GO:0045596),0.0009912049604981,Up,EnrichR,GO:0045596
+65,BP,Response to Estradiol (GO:0032355),0.0161120227196541,Up,EnrichR,GO:0032355
+65,BP,Cellular Response to Growth Factor Stimulus (GO:0071363),0.0374388925664024,Up,EnrichR,GO:0071363
+65,BP,Coronary Vasculature Morphogenesis (GO:0060977),0.0374388925664024,Up,EnrichR,GO:0060977
+65,BP,ERBB2-EGFR Signaling Pathway (GO:0038134),0.0374388925664024,Up,EnrichR,GO:0038134
+65,BP,Ear Development (GO:0043583),0.0374388925664024,Up,EnrichR,GO:0043583
+65,BP,Enamel Mineralization (GO:0070166),0.0374388925664024,Up,EnrichR,GO:0070166
+65,BP,Negative Regulation of Apoptotic Process (GO:0043066),0.0374388925664024,Up,EnrichR,GO:0043066
+65,BP,Negative Regulation of Cardiocyte Differentiation (GO:1905208),0.0374388925664024,Up,EnrichR,GO:1905208
+65,BP,Negative Regulation of Neuron Migration (GO:2001223),0.0374388925664024,Up,EnrichR,GO:2001223
+65,BP,Negative Regulation of Osteoblast Proliferation (GO:0033689),0.0374388925664024,Up,EnrichR,GO:0033689
+65,BP,Osteoblast Development (GO:0002076),0.0374388925664024,Up,EnrichR,GO:0002076
+65,BP,Positive Regulation of Cell Population Proliferation (GO:0008284),0.0374388925664024,Up,EnrichR,GO:0008284
+65,BP,Positive Regulation of Epithelial Cell Proliferation (GO:0050679),0.0374388925664024,Up,EnrichR,GO:0050679
+65,BP,Positive Regulation of Phosphorylation (GO:0042327),0.0374388925664024,Up,EnrichR,GO:0042327
+65,BP,Positive Regulation of Protein Modification Process (GO:0031401),0.0374388925664024,Up,EnrichR,GO:0031401
+65,BP,Positive Regulation of Protein Phosphorylation (GO:0001934),0.0374388925664024,Up,EnrichR,GO:0001934
+65,BP,"Post-Translational Protein Targeting to Membrane, Translocation (GO:0031204)",0.0374388925664024,Up,EnrichR,GO:0031204
+65,BP,Regulation of Epithelial Cell Proliferation (GO:0050678),0.0374388925664024,Up,EnrichR,GO:0050678
+65,BP,Regulation of Growth Hormone Receptor Signaling Pathway (GO:0060398),0.0374388925664024,Up,EnrichR,GO:0060398
+65,BP,Regulation of Protein Phosphorylation (GO:0001932),0.0374388925664024,Up,EnrichR,GO:0001932
+65,BP,Thyroid Gland Development (GO:0030878),0.0374388925664024,Up,EnrichR,GO:0030878
+65,BP,Tongue Development (GO:0043586),0.0374388925664024,Up,EnrichR,GO:0043586
+65,BP,Cellular Response to Growth Hormone Stimulus (GO:0071378),0.0382040999202048,Up,EnrichR,GO:0071378
+65,BP,Cellular Response to Lipid (GO:0071396),0.0382040999202048,Up,EnrichR,GO:0071396
+65,BP,Cochlea Morphogenesis (GO:0090103),0.0382040999202048,Up,EnrichR,GO:0090103
+65,BP,Dendrite Self-Avoidance (GO:0070593),0.0382040999202048,Up,EnrichR,GO:0070593
+65,BP,ERBB2 Signaling Pathway (GO:0038128),0.0382040999202048,Up,EnrichR,GO:0038128
+65,BP,Embryonic Cranial Skeleton Morphogenesis (GO:0048701),0.0382040999202048,Up,EnrichR,GO:0048701
+65,BP,Glucan Metabolic Process (GO:0044042),0.0382040999202048,Up,EnrichR,GO:0044042
+67,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0031403609626847,Up,EnrichR,GO:0045893
+67,BP,Regulation of DNA-templated Transcription (GO:0006355),0.0031403609626847,Up,EnrichR,GO:0006355
+67,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0031403609626847,Up,EnrichR,GO:0006357
+67,BP,Glucose Mediated Signaling Pathway (GO:0010255),0.0395449829112759,Up,EnrichR,GO:0010255
+67,BP,Hexose Mediated Signaling (GO:0009757),0.0395449829112759,Up,EnrichR,GO:0009757
+67,BP,Lipid Hydroxylation (GO:0002933),0.0395449829112759,Up,EnrichR,GO:0002933
+67,BP,Negative Regulation of Cytokinesis (GO:0032466),0.0395449829112759,Up,EnrichR,GO:0032466
+67,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.0395449829112759,Up,EnrichR,GO:0045944
+67,BP,Cellular Response to Nutrient (GO:0031670),0.0445536973394604,Up,EnrichR,GO:0031670
+67,BP,Negative Regulation of Cell Division (GO:0051782),0.0445536973394604,Up,EnrichR,GO:0051782
+67,BP,Negative Regulation of Fibrinolysis (GO:0051918),0.0445536973394604,Up,EnrichR,GO:0051918
+67,BP,Oxidative Demethylation (GO:0070989),0.0445536973394604,Up,EnrichR,GO:0070989
+67,BP,Positive Regulation of DNA-templated DNA Replication (GO:2000105),0.0445536973394604,Up,EnrichR,GO:2000105
+68,BP,Regulation of DNA-templated Transcription (GO:0006355),8.681534791667719e-11,Up,EnrichR,GO:0006355
+68,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),2.1857265437258204e-09,Up,EnrichR,GO:0006357
+7,BP,Regulation of DNA-templated Transcription (GO:0006355),2.15683331843252e-41,Up,EnrichR,GO:0006355
+7,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),1.73478517257453e-27,Up,EnrichR,GO:0006357
+7,BP,Regulation of RNA Biosynthetic Process (GO:2001141),7.11172355753166e-11,Up,EnrichR,GO:2001141
+7,BP,Regulation of Gene Expression (GO:0010468),6.83100055937802e-08,Up,EnrichR,GO:0010468
+7,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.0425706291193751,Up,EnrichR,GO:0045892
+7,BP,SMAD Protein Signal Transduction (GO:0060395),0.0425706291193751,Up,EnrichR,GO:0060395
+70,BP,Cilium Movement (GO:0003341),1.5936740808630799e-16,Up,EnrichR,GO:0003341
+70,BP,Axoneme Assembly (GO:0035082),2.47530786013574e-12,Up,EnrichR,GO:0035082
+70,BP,Cilium-Dependent Cell Motility (GO:0060285),1.0836858148960801e-09,Up,EnrichR,GO:0060285
+70,BP,Axonemal Dynein Complex Assembly (GO:0070286),5.019902078221721e-09,Up,EnrichR,GO:0070286
+70,BP,Cilium Assembly (GO:0060271),5.019902078221721e-09,Up,EnrichR,GO:0060271
+70,BP,Cilium Organization (GO:0044782),4.12081058390486e-08,Up,EnrichR,GO:0044782
+70,BP,Regulation of Cilium Movement (GO:0003352),1.23184790535528e-07,Up,EnrichR,GO:0003352
+70,BP,Determination of Left/Right Symmetry (GO:0007368),1.53788691525691e-06,Up,EnrichR,GO:0007368
+70,BP,Microtubule Bundle Formation (GO:0001578),1.53788691525691e-06,Up,EnrichR,GO:0001578
+70,BP,Outer Dynein Arm Assembly (GO:0036158),1.53788691525691e-06,Up,EnrichR,GO:0036158
+70,BP,Plasma Membrane Bounded Cell Projection Assembly (GO:0120031),1.98722908337607e-06,Up,EnrichR,GO:0120031
+70,BP,Left/Right Pattern Formation (GO:0060972),1.22997622690574e-05,Up,EnrichR,GO:0060972
+70,BP,Cilium Movement Involved in Cell Motility (GO:0060294),0.0001008985702118,Up,EnrichR,GO:0060294
+70,BP,Organelle Assembly (GO:0070925),0.0001008985702118,Up,EnrichR,GO:0070925
+70,BP,Cellular Component Assembly (GO:0022607),0.000283191222089,Up,EnrichR,GO:0022607
+70,BP,Axonemal Central Apparatus Assembly (GO:1904158),0.0003273214181233,Up,EnrichR,GO:1904158
+70,BP,Determination of Bilateral Symmetry (GO:0009855),0.0003273214181233,Up,EnrichR,GO:0009855
+70,BP,Regulation of Cilium Beat Frequency (GO:0003356),0.0006472896597055,Up,EnrichR,GO:0003356
+70,BP,Inner Dynein Arm Assembly (GO:0036159),0.0026301917413117,Up,EnrichR,GO:0036159
+70,BP,Motile Cilium Assembly (GO:0044458),0.0037179272927898,Up,EnrichR,GO:0044458
+70,BP,Epithelial Cilium Movement Involved in Extracellular Fluid Movement (GO:0003351),0.0054356238500505,Up,EnrichR,GO:0003351
+70,BP,Lung Development (GO:0030324),0.0135998805369131,Up,EnrichR,GO:0030324
+70,BP,Protein-Containing Complex Assembly (GO:0065003),0.0300129781901076,Up,EnrichR,GO:0065003
+71,BP,Regulation of DNA-templated Transcription (GO:0006355),1.42054456380228e-30,Up,EnrichR,GO:0006355
+71,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),4.37486046171412e-30,Up,EnrichR,GO:0006357
+72,BP,Cellular Response to Type II Interferon (GO:0071346),0.0007300043654003,Up,EnrichR,GO:0071346
+72,BP,Defense Response to Virus (GO:0051607),0.0007300043654003,Up,EnrichR,GO:0051607
+72,BP,Regulation of Innate Immune Response (GO:0045088),0.0012502337557736,Up,EnrichR,GO:0045088
+72,BP,Type II Interferon-Mediated Signaling Pathway (GO:0060333),0.0012502337557736,Up,EnrichR,GO:0060333
+72,BP,Negative Regulation of T Cell Mediated Immunity (GO:0002710),0.0024306430918727,Up,EnrichR,GO:0002710
+72,BP,Response to Cytokine (GO:0034097),0.0024306430918727,Up,EnrichR,GO:0034097
+72,BP,Response to Interferon-Beta (GO:0035456),0.0052633939724768,Up,EnrichR,GO:0035456
+72,BP,Negative Regulation of Cytokine Production (GO:0001818),0.0067124715930517,Up,EnrichR,GO:0001818
+72,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.0076333341519524,Up,EnrichR,GO:0045892
+72,BP,Positive Regulation of Response to Biotic Stimulus (GO:0002833),0.0085377468647064,Up,EnrichR,GO:0002833
+72,BP,Positive Regulation of Innate Immune Response (GO:0045089),0.0092412814885499,Up,EnrichR,GO:0045089
+72,BP,Interferon-Mediated Signaling Pathway (GO:0140888),0.0111236495126268,Up,EnrichR,GO:0140888
+72,BP,Response to Type II Interferon (GO:0034341),0.0122162093660223,Up,EnrichR,GO:0034341
+72,BP,Negative Regulation of Viral Process (GO:0048525),0.0128022977668195,Up,EnrichR,GO:0048525
+72,BP,Regulation of Type I Interferon Production (GO:0032479),0.0128022977668195,Up,EnrichR,GO:0032479
+72,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),0.014347448131054,Up,EnrichR,GO:0000122
+72,BP,Positive Regulation of Cytokine Production (GO:0001819),0.014893584605815,Up,EnrichR,GO:0001819
+72,BP,Integrin-Mediated Signaling Pathway (GO:0007229),0.0178924474878939,Up,EnrichR,GO:0007229
+72,BP,Regulation of Endothelial Cell Migration (GO:0010594),0.0178924474878939,Up,EnrichR,GO:0010594
+72,BP,Positive Regulation of Immune Response (GO:0050778),0.0182886786158315,Up,EnrichR,GO:0050778
+72,BP,Regulation of Immune Response (GO:0050776),0.0182886786158315,Up,EnrichR,GO:0050776
+72,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0182886786158315,Up,EnrichR,GO:0006357
+72,BP,Cell-Matrix Adhesion (GO:0007160),0.021745044284742,Up,EnrichR,GO:0007160
+72,BP,Antigen Processing and Presentation of Endogenous Peptide Antigen via MHC Class I (GO:0019885),0.0261460764019492,Up,EnrichR,GO:0019885
+72,BP,Negative Regulation of Granulocyte Differentiation (GO:0030853),0.0261460764019492,Up,EnrichR,GO:0030853
+72,BP,Negative Regulation of RNA Biosynthetic Process (GO:1902679),0.0261460764019492,Up,EnrichR,GO:1902679
+72,BP,Positive Regulation of Defense Response (GO:0031349),0.0261460764019492,Up,EnrichR,GO:0031349
+72,BP,Positive Regulation of Interleukin-18 Production (GO:0032741),0.0261460764019492,Up,EnrichR,GO:0032741
+72,BP,Positive Regulation of Pyroptotic Inflammatory Response (GO:0140639),0.0261460764019492,Up,EnrichR,GO:0140639
+72,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.0261460764019492,Up,EnrichR,GO:0045944
+73,BP,Neutrophil Chemotaxis (GO:0030593),0.0004666737436524,Up,EnrichR,GO:0030593
+73,BP,Neutrophil Migration (GO:1990266),0.0004666737436524,Up,EnrichR,GO:1990266
+73,BP,Granulocyte Chemotaxis (GO:0071621),0.0006568467954775,Up,EnrichR,GO:0071621
+73,BP,Carbon Dioxide Transport (GO:0015670),0.0007623896600251,Up,EnrichR,GO:0015670
+73,BP,Oxygen Transport (GO:0015671),0.0007623896600251,Up,EnrichR,GO:0015671
+73,BP,Gas Transport (GO:0015669),0.0011853790087359,Up,EnrichR,GO:0015669
+73,BP,One-Carbon Compound Transport (GO:0019755),0.0011853790087359,Up,EnrichR,GO:0019755
+73,BP,Hydrogen Peroxide Catabolic Process (GO:0042744),0.0016391877387974,Up,EnrichR,GO:0042744
+73,BP,Hydrogen Peroxide Metabolic Process (GO:0042743),0.0028879897235179,Up,EnrichR,GO:0042743
+73,BP,Response to Hydrogen Peroxide (GO:0042542),0.0058818747048319,Up,EnrichR,GO:0042542
+73,BP,Cytokine-Mediated Signaling Pathway (GO:0019221),0.0096802780356406,Up,EnrichR,GO:0019221
+73,BP,Inflammatory Response (GO:0006954),0.0096802780356406,Up,EnrichR,GO:0006954
+73,BP,Response to Reactive Oxygen Species (GO:0000302),0.0096802780356406,Up,EnrichR,GO:0000302
+73,BP,Positive Regulation of Tumor Necrosis Factor Production (GO:0032760),0.0159058874635844,Up,EnrichR,GO:0032760
+73,BP,Positive Regulation of Tumor Necrosis Factor Superfamily Cytokine Production (GO:1903557),0.0159362831818813,Up,EnrichR,GO:1903557
+73,BP,Calcium-Mediated Signaling (GO:0019722),0.017089530528308,Up,EnrichR,GO:0019722
+73,BP,Intracellular Signaling Cassette (GO:0141124),0.0177033494560091,Up,EnrichR,GO:0141124
+73,BP,Antibody-Dependent Cellular Cytotoxicity (GO:0001788),0.0193040696685023,Up,EnrichR,GO:0001788
+73,BP,Antimicrobial Humoral Immune Response Mediated by Antimicrobial Peptide (GO:0061844),0.0193040696685023,Up,EnrichR,GO:0061844
+73,BP,Cellular Response to Interleukin-18 (GO:0071351),0.0193040696685023,Up,EnrichR,GO:0071351
+73,BP,Hemoglobin Metabolic Process (GO:0020027),0.0193040696685023,Up,EnrichR,GO:0020027
+73,BP,Interleukin-18-Mediated Signaling Pathway (GO:0035655),0.0193040696685023,Up,EnrichR,GO:0035655
+73,BP,Natural Killer Cell Degranulation (GO:0043320),0.0193040696685023,Up,EnrichR,GO:0043320
+73,BP,Type IIa Hypersensitivity (GO:0001794),0.0193040696685023,Up,EnrichR,GO:0001794
+73,BP,Cellular Response to Lipopolysaccharide (GO:0071222),0.0195906372702649,Up,EnrichR,GO:0071222
+73,BP,Cellular Response to Molecule of Bacterial Origin (GO:0071219),0.0195906372702649,Up,EnrichR,GO:0071219
+73,BP,Hemostasis (GO:0007599),0.0199312210553692,Up,EnrichR,GO:0007599
+73,BP,Regulation of Tumor Necrosis Factor Production (GO:0032680),0.0199312210553692,Up,EnrichR,GO:0032680
+73,BP,Interleukin-33-Mediated Signaling Pathway (GO:0038172),0.0223493668312859,Up,EnrichR,GO:0038172
+73,BP,Antimicrobial Humoral Response (GO:0019730),0.0232697924592851,Up,EnrichR,GO:0019730
+74,BP,AMP Metabolic Process (GO:0046033),0.046534839724518,Up,EnrichR,GO:0046033
+74,BP,Leukocyte Cell-Cell Adhesion (GO:0007159),0.046534839724518,Up,EnrichR,GO:0007159
+74,BP,Nucleic Acid Metabolic Process (GO:0090304),0.046534839724518,Up,EnrichR,GO:0090304
+74,BP,Purine Ribonucleoside Monophosphate Catabolic Process (GO:0009169),0.046534839724518,Up,EnrichR,GO:0009169
+74,BP,Purine Ribonucleoside Triphosphate Metabolic Process (GO:0009205),0.046534839724518,Up,EnrichR,GO:0009205
+74,BP,Purine Ribonucleotide Catabolic Process (GO:0009154),0.046534839724518,Up,EnrichR,GO:0009154
+74,BP,Response to ATP (GO:0033198),0.046534839724518,Up,EnrichR,GO:0033198
+74,BP,Response to Purine-Containing Compound (GO:0014074),0.046534839724518,Up,EnrichR,GO:0014074
+74,BP,Sodium Ion Import Across Plasma Membrane (GO:0098719),0.046534839724518,Up,EnrichR,GO:0098719
+78,BP,Epithelial to Mesenchymal Transition Involved in Endocardial Cushion Formation (GO:0003198),0.0170056269617599,Up,EnrichR,GO:0003198
+78,BP,Regulation of Inflammatory Response (GO:0050727),0.0170056269617599,Up,EnrichR,GO:0050727
+78,BP,Negative Regulation of Cartilage Development (GO:0061037),0.0316413780745956,Up,EnrichR,GO:0061037
+78,BP,Negative Regulation of Chondrocyte Differentiation (GO:0032331),0.0316413780745956,Up,EnrichR,GO:0032331
+78,BP,Cardiac Epithelial to Mesenchymal Transition (GO:0060317),0.0410434989361818,Up,EnrichR,GO:0060317
+8,BP,Cilium Movement (GO:0003341),1.50995157272042e-15,Up,EnrichR,GO:0003341
+8,BP,Axoneme Assembly (GO:0035082),1.9254135301332e-15,Up,EnrichR,GO:0035082
+8,BP,Axonemal Dynein Complex Assembly (GO:0070286),1.33948532420664e-11,Up,EnrichR,GO:0070286
+8,BP,Cilium Assembly (GO:0060271),1.33948532420664e-11,Up,EnrichR,GO:0060271
+8,BP,Cilium-Dependent Cell Motility (GO:0060285),1.53649373522821e-10,Up,EnrichR,GO:0060285
+8,BP,Regulation of Cilium Movement (GO:0003352),5.507175360731e-08,Up,EnrichR,GO:0003352
+8,BP,Cilium Organization (GO:0044782),1.14301601232749e-07,Up,EnrichR,GO:0044782
+8,BP,Plasma Membrane Bounded Cell Projection Assembly (GO:0120031),4.25324140084459e-07,Up,EnrichR,GO:0120031
+8,BP,Determination of Left/Right Symmetry (GO:0007368),4.48935011120338e-07,Up,EnrichR,GO:0007368
+8,BP,Microtubule Bundle Formation (GO:0001578),4.48935011120338e-07,Up,EnrichR,GO:0001578
+8,BP,Outer Dynein Arm Assembly (GO:0036158),5.37678249469304e-07,Up,EnrichR,GO:0036158
+8,BP,Left/Right Pattern Formation (GO:0060972),4.75590056450962e-06,Up,EnrichR,GO:0060972
+8,BP,Organelle Assembly (GO:0070925),2.25602180123241e-05,Up,EnrichR,GO:0070925
+8,BP,Motile Cilium Assembly (GO:0044458),2.8362214816795e-05,Up,EnrichR,GO:0044458
+8,BP,Cilium Movement Involved in Cell Motility (GO:0060294),4.4209343656764e-05,Up,EnrichR,GO:0060294
+8,BP,Cellular Component Assembly (GO:0022607),6.90792990636075e-05,Up,EnrichR,GO:0022607
+8,BP,Determination of Bilateral Symmetry (GO:0009855),0.0001516693511534,Up,EnrichR,GO:0009855
+8,BP,Axonemal Central Apparatus Assembly (GO:1904158),0.0001880401605841,Up,EnrichR,GO:1904158
+8,BP,Regulation of Cilium Beat Frequency (GO:0003356),0.000373231393998,Up,EnrichR,GO:0003356
+8,BP,Inner Dynein Arm Assembly (GO:0036159),0.0014754419813437,Up,EnrichR,GO:0036159
+8,BP,Protein-Containing Complex Assembly (GO:0065003),0.0014754419813437,Up,EnrichR,GO:0065003
+8,BP,Epithelial Cilium Movement Involved in Extracellular Fluid Movement (GO:0003351),0.0031712282525366,Up,EnrichR,GO:0003351
+8,BP,Lung Development (GO:0030324),0.0079816975868249,Up,EnrichR,GO:0030324
+8,BP,Determination of Liver Left/Right Asymmetry (GO:0071910),0.0391707988154916,Up,EnrichR,GO:0071910
+8,BP,- Reg of Adaptive Imm Resp Based on Som Recomb of Imm Rcptrs Built Frm IgSF Domains (GO:0002823),0.0417446518440168,Up,EnrichR,GO:0002823
+8,BP,Determination of Digestive Tract Left/Right Asymmetry (GO:0071907),0.0417446518440168,Up,EnrichR,GO:0071907
+8,BP,Negative Regulation of T Cell Differentiation in Thymus (GO:0033085),0.0417446518440168,Up,EnrichR,GO:0033085
+8,BP,Regulation of Mitotic Cytokinesis (GO:1902412),0.0469205504621216,Up,EnrichR,GO:1902412
+8,BP,Negative Regulation of Humoral Immune Response Mediated by Circulating Immunoglobulin (GO:0002924),0.0483906187667909,Up,EnrichR,GO:0002924
+8,BP,Reelin-Mediated Signaling Pathway (GO:0038026),0.0483906187667909,Up,EnrichR,GO:0038026
+81,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.005931040807229,Up,EnrichR,GO:0006357
+81,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.0061386960385821,Up,EnrichR,GO:0045944
+81,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0127876390942101,Up,EnrichR,GO:0045893
+81,BP,Regulation of DNA-templated Transcription (GO:0006355),0.0127876390942101,Up,EnrichR,GO:0006355
+81,BP,Regulation of Cytokinesis (GO:0032465),0.01740297944694,Up,EnrichR,GO:0032465
+81,BP,Signal Transduction in Response to DNA Damage (GO:0042770),0.01740297944694,Up,EnrichR,GO:0042770
+81,BP,Regulation of Mitotic Cell Cycle Phase Transition (GO:1901990),0.0175870084805941,Up,EnrichR,GO:1901990
+81,BP,Positive Regulation of Cell Cycle Process (GO:0090068),0.0279633266436331,Up,EnrichR,GO:0090068
+81,BP,Negative Regulation of Cytokinesis (GO:0032466),0.0356312591110194,Up,EnrichR,GO:0032466
+81,BP,Positive Regulation of RNA Biosynthetic Process (GO:1902680),0.0356312591110194,Up,EnrichR,GO:1902680
+81,BP,Apoptotic Nuclear Changes (GO:0030262),0.0358469877629691,Up,EnrichR,GO:0030262
+81,BP,Centromere Complex Assembly (GO:0034508),0.0358469877629691,Up,EnrichR,GO:0034508
+81,BP,DNA Conformation Change (GO:0071103),0.0358469877629691,Up,EnrichR,GO:0071103
+81,BP,DNA Topological Change (GO:0006265),0.0358469877629691,Up,EnrichR,GO:0006265
+81,BP,Kinetochore Assembly (GO:0051382),0.0358469877629691,Up,EnrichR,GO:0051382
+81,BP,Kinetochore Organization (GO:0051383),0.0358469877629691,Up,EnrichR,GO:0051383
+81,BP,Negative Regulation of Cell Division (GO:0051782),0.0358469877629691,Up,EnrichR,GO:0051782
+81,BP,Negative Regulation of Sprouting Angiogenesis (GO:1903671),0.0358469877629691,Up,EnrichR,GO:1903671
+81,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),0.0358469877629691,Up,EnrichR,GO:0000122
+81,BP,Nuclear Chromosome Segregation (GO:0098813),0.0358469877629691,Up,EnrichR,GO:0098813
+81,BP,Positive Regulation of DNA-templated DNA Replication (GO:2000105),0.0358469877629691,Up,EnrichR,GO:2000105
+81,BP,Positive Regulation of Metaphase/Anaphase Transition of Cell Cycle (GO:1902101),0.0358469877629691,Up,EnrichR,GO:1902101
+81,BP,Positive Regulation of Mitotic Metaphase/Anaphase Transition (GO:0045842),0.0358469877629691,Up,EnrichR,GO:0045842
+81,BP,Positive Regulation of Mitotic Sister Chromatid Separation (GO:1901970),0.0358469877629691,Up,EnrichR,GO:1901970
+81,BP,Positive Regulation of Programmed Cell Death (GO:0043068),0.0358469877629691,Up,EnrichR,GO:0043068
+81,BP,Positive Regulation of Ubiquitin Protein Ligase Activity (GO:1904668),0.0358469877629691,Up,EnrichR,GO:1904668
+81,BP,Positive Regulation of Ubiquitin-Protein Transferase Activity (GO:0051443),0.0358469877629691,Up,EnrichR,GO:0051443
+81,BP,Reg of Single Stranded Viral RNA Replication via Double Stranded DNA Intermediate (GO:0045091),0.0358469877629691,Up,EnrichR,GO:0045091
+81,BP,Regulation of Exit From Mitosis (GO:0007096),0.0358469877629691,Up,EnrichR,GO:0007096
+81,BP,Regulation of Ubiquitin Protein Ligase Activity (GO:1904666),0.0358469877629691,Up,EnrichR,GO:1904666
+82,BP,T Cell Activation (GO:0042110),5.79366888862009e-10,Up,EnrichR,GO:0042110
+82,BP,Regulation of T Cell Activation (GO:0050863),5.67297021998183e-08,Up,EnrichR,GO:0050863
+82,BP,Positive Regulation of T Cell Activation (GO:0050870),3.8620229895225e-05,Up,EnrichR,GO:0050870
+82,BP,Regulation of Lymphocyte Activation (GO:0051249),0.0001378826754634,Up,EnrichR,GO:0051249
+82,BP,Regulation of Lymphocyte Differentiation (GO:0045619),0.0001378826754634,Up,EnrichR,GO:0045619
+82,BP,Positive Regulation of Cytokine Production (GO:0001819),0.0002139625797925,Up,EnrichR,GO:0001819
+82,BP,T Cell Receptor Signaling Pathway (GO:0050852),0.0002671069989631,Up,EnrichR,GO:0050852
+82,BP,Natural Killer Cell Mediated Cytotoxicity (GO:0042267),0.0003875441808163,Up,EnrichR,GO:0042267
+82,BP,Natural Killer Cell Mediated Immunity (GO:0002228),0.0003875441808163,Up,EnrichR,GO:0002228
+82,BP,Antigen Receptor-Mediated Signaling Pathway (GO:0050851),0.0004749004376344,Up,EnrichR,GO:0050851
+82,BP,Regulation of Natural Killer Cell Mediated Cytotoxicity (GO:0042269),0.0004749004376344,Up,EnrichR,GO:0042269
+82,BP,Enzyme-Linked Receptor Protein Signaling Pathway (GO:0007167),0.0005506641692428,Up,EnrichR,GO:0007167
+82,BP,Positive Regulation of Cell-Cell Adhesion (GO:0022409),0.0010431970524399,Up,EnrichR,GO:0022409
+82,BP,Positive Regulation of Type II Interferon Production (GO:0032729),0.0014131174160088,Up,EnrichR,GO:0032729
+82,BP,Regulation of Cell-Cell Adhesion Mediated by Integrin (GO:0033632),0.0014131174160088,Up,EnrichR,GO:0033632
+82,BP,Positive Regulation of T Cell Proliferation (GO:0042102),0.0018636288604766,Up,EnrichR,GO:0042102
+82,BP,Positive Regulation of Lymphocyte Proliferation (GO:0050671),0.0029058783336102,Up,EnrichR,GO:0050671
+82,BP,Regulation of T Cell Proliferation (GO:0042129),0.0034286500175965,Up,EnrichR,GO:0042129
+82,BP,Regulation of Type II Interferon Production (GO:0032649),0.0038620147130306,Up,EnrichR,GO:0032649
+82,BP,Positive Regulation of Cell Adhesion Mediated by Integrin (GO:0033630),0.003877573958817,Up,EnrichR,GO:0033630
+82,BP,Alpha-Beta T Cell Activation (GO:0046631),0.0042324980675021,Up,EnrichR,GO:0046631
+82,BP,Immunoglobulin Mediated Immune Response (GO:0016064),0.0042324980675021,Up,EnrichR,GO:0016064
+82,BP,Regulation of B Cell Differentiation (GO:0045577),0.0042324980675021,Up,EnrichR,GO:0045577
+82,BP,B Cell Mediated Immunity (GO:0019724),0.0043229552833829,Up,EnrichR,GO:0019724
+82,BP,T Cell Mediated Immunity (GO:0002456),0.0043229552833829,Up,EnrichR,GO:0002456
+82,BP,Positive Regulation of Natural Killer Cell Mediated Cytotoxicity (GO:0045954),0.0050452548328416,Up,EnrichR,GO:0045954
+82,BP,Adaptive Imm Resp Based on Som Recomb of Imm Rcptrs Built Frm IgSF Domains (GO:0002460),0.0057951828698809,Up,EnrichR,GO:0002460
+82,BP,Positive Regulation of Natural Killer Cell Mediated Immunity (GO:0002717),0.0065693824936598,Up,EnrichR,GO:0002717
+82,BP,Cell Surface Receptor Protein Tyrosine Kinase Signaling Pathway (GO:0007169),0.0071551818016197,Up,EnrichR,GO:0007169
+82,BP,Heterophilic Cell-Cell Adhesion via Plasma Membrane Cell Adhesion Molecules (GO:0007157),0.0160288561709748,Up,EnrichR,GO:0007157
+83,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),5.36022135130655e-18,Up,EnrichR,GO:0006357
+83,BP,Regulation of DNA-templated Transcription (GO:0006355),4.66774297851106e-15,Up,EnrichR,GO:0006355
+86,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),1.28290913569168e-19,Up,EnrichR,GO:0006357
+86,BP,Regulation of DNA-templated Transcription (GO:0006355),2.02916829371207e-12,Up,EnrichR,GO:0006355
+86,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),1.6656196390705e-06,Up,EnrichR,GO:0045892
+86,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),1.6656196390705e-06,Up,EnrichR,GO:0045893
+86,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),1.6656196390705e-06,Up,EnrichR,GO:0045944
+86,BP,Negative Regulation of Transcription by RNA Polymerase II (GO:0000122),0.0001680714940103,Up,EnrichR,GO:0000122
+86,BP,Intracellular Receptor Signaling Pathway (GO:0030522),0.0005421199112866,Up,EnrichR,GO:0030522
+86,BP,Negative Regulation of RNA Biosynthetic Process (GO:1902679),0.0010790891167737,Up,EnrichR,GO:1902679
+86,BP,Positive Regulation of RNA Biosynthetic Process (GO:1902680),0.0024186089064039,Up,EnrichR,GO:1902680
+86,BP,Regulation of Behavior (GO:0050795),0.0080481786961379,Up,EnrichR,GO:0050795
+86,BP,Positive Regulation of Vascular Associated Smooth Muscle Cell Proliferation (GO:1904707),0.0089702681597583,Up,EnrichR,GO:1904707
+86,BP,Regulation of Vascular Associated Smooth Muscle Cell Proliferation (GO:1904705),0.0271401300496394,Up,EnrichR,GO:1904705
+86,BP,Regulation of DNA Binding (GO:0051101),0.027750253411647,Up,EnrichR,GO:0051101
+86,BP,mRNA Transcription (GO:0009299),0.0297572200097806,Up,EnrichR,GO:0009299
+86,BP,Negative Regulation of Cold-Induced Thermogenesis (GO:0120163),0.0331377705787658,Up,EnrichR,GO:0120163
+86,BP,Positive Regulation of Smooth Muscle Cell Proliferation (GO:0048661),0.0337407261820675,Up,EnrichR,GO:0048661
+86,BP,DNA-templated Transcription (GO:0006351),0.0380522087710863,Up,EnrichR,GO:0006351
+86,BP,Transcription by RNA Polymerase II (GO:0006366),0.0380522087710863,Up,EnrichR,GO:0006366
+86,BP,Muscle Organ Development (GO:0007517),0.0396405337361873,Up,EnrichR,GO:0007517
+86,BP,Negative Regulation of Cell Differentiation (GO:0045596),0.0421988080548938,Up,EnrichR,GO:0045596
+86,BP,Negative Regulation of Metabolic Process (GO:0009892),0.0421988080548938,Up,EnrichR,GO:0009892
+89,BP,Lymphocyte Differentiation (GO:0030098),0.0033431413589428,Up,EnrichR,GO:0030098
+89,BP,Regulation of DNA-templated Transcription (GO:0006355),0.0037700332417434,Up,EnrichR,GO:0006355
+89,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),0.0037700332417434,Up,EnrichR,GO:0006357
+89,BP,Mononuclear Cell Differentiation (GO:1903131),0.0191925077581156,Up,EnrichR,GO:1903131
+89,BP,B Cell Differentiation (GO:0030183),0.0203804937744148,Up,EnrichR,GO:0030183
+89,BP,Cellular Response to Cytokine Stimulus (GO:0071345),0.021499652407429,Up,EnrichR,GO:0071345
+89,BP,Cellular Response to Virus (GO:0098586),0.021499652407429,Up,EnrichR,GO:0098586
+89,BP,Regulation of Type I Interferon Production (GO:0032479),0.021499652407429,Up,EnrichR,GO:0032479
+89,BP,Positive Regulation of DNA-templated Transcription (GO:0045893),0.0291693687075392,Up,EnrichR,GO:0045893
+89,BP,B Cell Activation (GO:0042113),0.0330992806718784,Up,EnrichR,GO:0042113
+89,BP,Definitive Hemopoiesis (GO:0060216),0.0374728247151396,Up,EnrichR,GO:0060216
+89,BP,Lipoprotein Metabolic Process (GO:0042157),0.0374728247151396,Up,EnrichR,GO:0042157
+89,BP,Negative Regulation of Actin Filament Depolymerization (GO:0030835),0.0374728247151396,Up,EnrichR,GO:0030835
+89,BP,Negative Regulation of DNA-templated Transcription (GO:0045892),0.0374728247151396,Up,EnrichR,GO:0045892
+89,BP,Negative Regulation of Digestive System Process (GO:0060457),0.0374728247151396,Up,EnrichR,GO:0060457
+89,BP,Nucleotide-Binding Oligomerization Domain Containing 2 Signaling Pathway (GO:0070431),0.0374728247151396,Up,EnrichR,GO:0070431
+89,BP,Positive Regulation of Megakaryocyte Differentiation (GO:0045654),0.0374728247151396,Up,EnrichR,GO:0045654
+89,BP,Positive Regulation of Receptor Catabolic Process (GO:2000646),0.0374728247151396,Up,EnrichR,GO:2000646
+89,BP,Positive Regulation of Transcription by RNA Polymerase II (GO:0045944),0.0374728247151396,Up,EnrichR,GO:0045944
+89,BP,Regulation of Leukocyte Proliferation (GO:0070663),0.0374728247151396,Up,EnrichR,GO:0070663
+89,BP,Regulation of Protein Polyubiquitination (GO:1902914),0.0374728247151396,Up,EnrichR,GO:1902914
+89,BP,Regulation of Receptor Catabolic Process (GO:2000644),0.0374728247151396,Up,EnrichR,GO:2000644
+89,BP,Response to Peptidoglycan (GO:0032494),0.0374728247151396,Up,EnrichR,GO:0032494
+89,BP,Cellular Response to Muramyl Dipeptide (GO:0071225),0.0403862789632167,Up,EnrichR,GO:0071225
+89,BP,Negative Regulation of Vascular Endothelial Growth Factor Receptor Signaling Pathway (GO:0030948),0.0414073559434076,Up,EnrichR,GO:0030948
+89,BP,Positive Regulation of Actin Nucleation (GO:0051127),0.0414073559434076,Up,EnrichR,GO:0051127
+89,BP,Actin Filament Capping (GO:0051693),0.0424589355917014,Up,EnrichR,GO:0051693
+89,BP,Barbed-End Actin Filament Capping (GO:0051016),0.0424589355917014,Up,EnrichR,GO:0051016
+89,BP,Calcium-Ion Regulated Exocytosis (GO:0017156),0.0424589355917014,Up,EnrichR,GO:0017156
+89,BP,Cell Projection Assembly (GO:0030031),0.0424589355917014,Up,EnrichR,GO:0030031
+9,BP,Regulation of DNA-templated Transcription (GO:0006355),1.02220955792343e-68,Up,EnrichR,GO:0006355
+9,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),1.30089892186421e-63,Up,EnrichR,GO:0006357
+90,BP,Regulation of Transcription by RNA Polymerase II (GO:0006357),1.76811319481279e-12,Up,EnrichR,GO:0006357
+90,BP,Regulation of DNA-templated Transcription (GO:0006355),2.6403420029957597e-11,Up,EnrichR,GO:0006355
+90,BP,Regulation of RNA Biosynthetic Process (GO:2001141),0.0030828441790191,Up,EnrichR,GO:2001141
+95,BP,Smoothened Signaling Pathway (GO:0007224),0.0169860186940748,Up,EnrichR,GO:0007224
+95,BP,Regulation of Smoothened Signaling Pathway (GO:0008589),0.0195754297449808,Up,EnrichR,GO:0008589
+95,BP,Actin Filament Capping (GO:0051693),0.0357248622816044,Up,EnrichR,GO:0051693
+95,BP,Barbed-End Actin Filament Capping (GO:0051016),0.0357248622816044,Up,EnrichR,GO:0051016
+95,BP,Cellular Response to Cholesterol (GO:0071397),0.0357248622816044,Up,EnrichR,GO:0071397
+95,BP,Cellular Response to Sterol (GO:0036315),0.0357248622816044,Up,EnrichR,GO:0036315
+95,BP,Collecting Duct Development (GO:0072044),0.0357248622816044,Up,EnrichR,GO:0072044
+95,BP,Digestive Tract Morphogenesis (GO:0048546),0.0357248622816044,Up,EnrichR,GO:0048546
+95,BP,Embryonic Appendage Morphogenesis (GO:0035113),0.0357248622816044,Up,EnrichR,GO:0035113
+95,BP,Embryonic Axis Specification (GO:0000578),0.0357248622816044,Up,EnrichR,GO:0000578
+95,BP,Energy Reserve Metabolic Process (GO:0006112),0.0357248622816044,Up,EnrichR,GO:0006112
+95,BP,Epithelial Cell-Cell Adhesion (GO:0090136),0.0357248622816044,Up,EnrichR,GO:0090136
+95,BP,Glucan Catabolic Process (GO:0009251),0.0357248622816044,Up,EnrichR,GO:0009251
+95,BP,Glucan Metabolic Process (GO:0044042),0.0357248622816044,Up,EnrichR,GO:0044042
+95,BP,Glycogen Catabolic Process (GO:0005980),0.0357248622816044,Up,EnrichR,GO:0005980
+95,BP,Glycogen Metabolic Process (GO:0005977),0.0357248622816044,Up,EnrichR,GO:0005977
+95,BP,Limb Morphogenesis (GO:0035108),0.0357248622816044,Up,EnrichR,GO:0035108
+95,BP,Muscle Cell Migration (GO:0014812),0.0357248622816044,Up,EnrichR,GO:0014812
+95,BP,Muscle Tissue Development (GO:0060537),0.0357248622816044,Up,EnrichR,GO:0060537
+95,BP,Myoblast Migration (GO:0051451),0.0357248622816044,Up,EnrichR,GO:0051451
+95,BP,Negative Regulation of Smoothened Signaling Pathway (GO:0045879),0.0357248622816044,Up,EnrichR,GO:0045879
+95,BP,Neural Tube Development (GO:0021915),0.0357248622816044,Up,EnrichR,GO:0021915
+95,BP,Pharyngeal System Development (GO:0060037),0.0357248622816044,Up,EnrichR,GO:0060037
+95,BP,Positive Regulation of BMP Signaling Pathway (GO:0030513),0.0357248622816044,Up,EnrichR,GO:0030513
+95,BP,Positive Regulation of Cardiac Muscle Cell Proliferation (GO:0060045),0.0357248622816044,Up,EnrichR,GO:0060045
+95,BP,Positive Regulation of Cardiac Muscle Tissue Growth (GO:0055023),0.0357248622816044,Up,EnrichR,GO:0055023
+95,BP,Positive Regulation of Cell Cycle Phase Transition (GO:1901989),0.0357248622816044,Up,EnrichR,GO:1901989
+95,BP,Positive Regulation of Cholesterol Efflux (GO:0010875),0.0357248622816044,Up,EnrichR,GO:0010875
+95,BP,Positive Regulation of DNA Replication (GO:0045740),0.0357248622816044,Up,EnrichR,GO:0045740
+95,BP,Positive Regulation of Granulocyte Chemotaxis (GO:0071624),0.0357248622816044,Up,EnrichR,GO:0071624
+96,BP,Elastic Fiber Assembly (GO:0048251),0.0333161573730783,Up,EnrichR,GO:0048251
+96,BP,Nucleoside Diphosphate Metabolic Process (GO:0009132),0.0333161573730783,Up,EnrichR,GO:0009132
+96,BP,UV Protection (GO:0009650),0.0333161573730783,Up,EnrichR,GO:0009650
+96,BP,Cellular Response to UV-B (GO:0071493),0.036615137500747,Up,EnrichR,GO:0071493
+96,BP,Extracellular Matrix Assembly (GO:0085029),0.036615137500747,Up,EnrichR,GO:0085029
+96,BP,Nucleoside Phosphate Catabolic Process (GO:1901292),0.036615137500747,Up,EnrichR,GO:1901292
+96,BP,Response to UV-B (GO:0010224),0.036615137500747,Up,EnrichR,GO:0010224

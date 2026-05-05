@@ -1,0 +1,17 @@
+Node	Label	Type
+glycerol_3_phosphate	glycerol_3_phosphate	metabolite
+TFAP4	TFAP4	TF
+FASN	FASN	bridge_node
+STAT3	STAT3	TF
+AGPAT1	AGPAT1	bridge_node
+SNAI1	SNAI1	TF
+CMAS	CMAS	bridge_node
+MYCN	MYCN	TF
+ALOX12	ALOX12	bridge_node
+ELF4	ELF4	TF
+B3GALT4	B3GALT4	bridge_node
+EPAS1	EPAS1	TF
+CYBRD1	CYBRD1	bridge_node
+ZFP41	ZFP41	TF
+HIF1A	HIF1A	TF
+PNPLA6	PNPLA6	bridge_node

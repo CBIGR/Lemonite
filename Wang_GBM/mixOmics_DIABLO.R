@@ -194,6 +194,10 @@ write.table(lipidomics, paste0(base_dir, './LemonPreprocessed_lipidomics.txt'), 
 lipidomics <- lipidomics[!duplicated(lipidomics$symbol),]
 rownames(lipidomics) <- lipidomics$symbol; lipidomics$symbol <- NULL; lipidomics$ensembl_gene_id <- NULL
 
+# Load name mapping for restoring original names in visualizations
+name_mapping <- fread(paste0(base_dir, 'data/name_mapping.tsv'), data.table = FALSE)
+name_lookup <- setNames(name_mapping$original, name_mapping$cleaned)
+
 ###########################################################################################
 #### Initial exploratory analyses
 ###########################################################################################
@@ -455,42 +459,61 @@ plotVar(final.diablo.model, var.names = FALSE, comp = c(1,3),
         col = c('darkorchid', 'brown1', 'lightgreen'))
 dev.off()
 
+# Ensure name_lookup is available (may need to reload if starting from saved model)
+if (!exists('name_lookup')) {
+  name_mapping <- fread(paste0(base_dir, 'data/name_mapping.tsv'), data.table = FALSE)
+  name_lookup <- setNames(name_mapping$original, name_mapping$cleaned)
+}
 
+# Create a display copy of the model with original metabolite/lipid names for visualizations
+diablo_display <- final.diablo.model
+for (block in c('Metabolomics', 'Lipidomics')) {
+  if (block %in% names(diablo_display$X)) {
+    original <- name_lookup[colnames(diablo_display$X[[block]])]
+    original[is.na(original)] <- colnames(diablo_display$X[[block]])[is.na(original)]
+    colnames(diablo_display$X[[block]]) <- original
+  }
+  if (block %in% names(diablo_display$loadings)) {
+    original <- name_lookup[rownames(diablo_display$loadings[[block]])]
+    original[is.na(original)] <- rownames(diablo_display$loadings[[block]])[is.na(original)]
+    rownames(diablo_display$loadings[[block]]) <- original
+  }
+}
 
 
 png(paste0(base_dir, 'results/MixOmics/Diablo_final_cimDiablo_comp1.png'), width = 12, height = 7, units = "in", res = 300)
-cimDiablo(final.diablo.model, color.blocks = c('darkorchid', 'brown1', 'lightgreen'),
+cimDiablo(diablo_display, color.blocks = c('darkorchid', 'brown1', 'lightgreen'),
           comp = c(1), margin=c(8,20), legend.position = "right", size.legend=0.7)
 
 dev.off()
 
 # component 2
 png(paste0(base_dir, 'results/MixOmics/Diablo_final_cimDiablo_comp2.png'), width = 12, height = 7, units = "in", res = 300)
-cimDiablo(final.diablo.model, color.blocks = c('darkorchid', 'brown1', 'lightgreen'),
+cimDiablo(diablo_display, color.blocks = c('darkorchid', 'brown1', 'lightgreen'),
           comp = c(2), margin=c(8,20), legend.position = "right", size.legend=0.7)
 dev.off()
 
 # component 3
 png(paste0(base_dir, 'results/MixOmics/Diablo_final_cimDiablo_comp3.png'), width = 12, height = 7, units = "in", res = 300)
-cimDiablo(final.diablo.model, color.blocks = c('darkorchid', 'brown1', 'lightgreen'),
+cimDiablo(diablo_display, color.blocks = c('darkorchid', 'brown1', 'lightgreen'),
           comp = c(3), margin=c(8,20), legend.position = "right", size.legend=0.7)
 dev.off()
 
 # component 4
 png(paste0(base_dir, 'results/MixOmics/Diablo_final_cimDiablo_comp4.png'), width = 12, height = 7, units = "in", res = 300)
-cimDiablo(final.diablo.model, color.blocks = c('darkorchid', 'brown1', 'lightgreen'),
+cimDiablo(diablo_display, color.blocks = c('darkorchid', 'brown1', 'lightgreen'),
           comp = c(4), margin=c(8,20), legend.position = "right", size.legend=0.7)
 dev.off()
 
 # component 5
 png(paste0(base_dir, 'results/MixOmics/Diablo_final_cimDiablo_comp5.png'), width = 12, height = 7, units = "in", res = 300)
-cimDiablo(final.diablo.model, color.blocks = c('darkorchid', 'brown1', 'lightgreen'),
+cimDiablo(diablo_display, color.blocks = c('darkorchid', 'brown1', 'lightgreen'),
           comp = c(5), margin=c(8,20), legend.position = "right", size.legend=0.7)
 dev.off()
 
 # component 6
 png(paste0(base_dir, 'results/MixOmics/Diablo_final_cimDiablo_comp6.png'), width = 12, height = 7, units = "in", res = 300)
-cimDiablo(final.diablo.model, color.blocks = c('darkorchid', 'brown1', 'lightgreen'),
+cimDiablo(diablo_display, color.blocks = c('darkorchid', 'brown1', 'lightgreen'),
           comp = c(6), margin=c(8,20), legend.position = "right", size.legend=0.7)
 dev.off()
 
@@ -499,7 +522,7 @@ dev.off()
 # create circosplot for each component
 for (comp in 1:ncomp) {
   png(paste0(base_dir, 'results/MixOmics/Diablo_final_circosPlot_comp', comp, '.png'), width = 9, height = 9, units = 'in', res = 600)
-  circosPlot(final.diablo.model, cutoff = 0.7, line = TRUE,
+  circosPlot(diablo_display, cutoff = 0.7, line = TRUE,
              color.blocks= c('darkorchid', 'brown1', 'lightgreen'),
              color.cor = c("chocolate3","grey20"), size.labels = 1.5, comp = comp, size.variables = 0.6)
   dev.off()
@@ -520,7 +543,7 @@ weights_dir <- paste0(base_dir, 'results/MixOmics/feature_weights_all_components
 dir.create(weights_dir, showWarnings = FALSE, recursive = TRUE)
 
 # Get the number of components
-n_components <- final.diablo.model$ncomp
+n_components <- final.diablo.model$ncomp[[1]]
 for (comp in 1:n_components) {
   cat(sprintf("Saving weights for Component %d\n", comp))
   
@@ -549,7 +572,7 @@ for (comp in 1:n_components) {
   # Save top features plots
   tryCatch({
     pdf(paste0(weights_dir, "/Component", comp, "_top_loadings.pdf"), width = 10, height = 8)
-    plotLoadings(final.diablo.model, comp = comp, contrib = 'max', method = 'median',
+    plotLoadings(diablo_display, comp = comp, contrib = 'max', method = 'median',
                  size.name = 0.7, ndisplay = 5, title = paste('DIABLO Loadings comp', comp))
     dev.off()
   }, error = function(e) {
@@ -572,12 +595,14 @@ library(patchwork)
 loadings_list <- lapply(final.diablo.model$loadings, function(x) x[, 1:4, drop = FALSE])
 blocks <- rep(names(loadings_list), sapply(loadings_list, nrow))
 feature_names <- unlist(lapply(loadings_list, rownames))
+# Map feature names to original names for display
+feature_names_display <- ifelse(feature_names %in% names(name_lookup), name_lookup[feature_names], feature_names)
 loadings_matrix <- do.call(rbind, loadings_list)
 
 # --- 2. Convert to long format ---
 df_long <- as.data.frame(loadings_matrix) %>%
   mutate(
-    Feature = feature_names,
+    Feature = feature_names_display,
     Block = blocks
   ) %>%
   pivot_longer(
@@ -805,7 +830,7 @@ gsea_dir <- paste0(base_dir, 'results/MixOmics/GSEA_all_components')
 dir.create(gsea_dir, showWarnings = FALSE, recursive = TRUE)
 
 # Get the number of components
-n_components <- final.diablo.model$ncomp
+n_components <- final.diablo.model$ncomp[[1]]
 
 # Run GSEA for all components
 for (comp in 1:n_components) {

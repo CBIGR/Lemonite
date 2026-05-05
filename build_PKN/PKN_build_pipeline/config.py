@@ -12,13 +12,15 @@ import os
 from pathlib import Path
 
 # ===== CONFIGURATION - Change output directory here =====
-WORKDIR = '/home/borisvdm/Documents/PhD/Lemonite'
-OUTPUT_DIR_NAME = 'PKN'  # Change this to use a different output folder
+# These can be overridden via environment variables for container use:
+#   PKN_WORKDIR, PKN_OUTPUT_DIR_NAME, PKN_DB_DIR
+WORKDIR = os.environ.get('PKN_WORKDIR', '/home/borisvdm/Documents/PhD/Lemonite')
+OUTPUT_DIR_NAME = os.environ.get('PKN_OUTPUT_DIR_NAME', 'PKN')
 # ========================================================
 
 # Set up paths
 OUTPUT_DIR = os.path.join(WORKDIR, OUTPUT_DIR_NAME)
-DB_DIR = '/home/borisvdm/Documents/PhD/resources/databases'
+DB_DIR = os.environ.get('PKN_DB_DIR', '/run/media/borisvdm/5250-D000/resources/databases')
 
 # Ensure output directory exists
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -28,7 +30,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # =========================================================================
 
 # HMDB metabolites XML database
-HMDB_METABOLITES_XML = '/home/borisvdm/Documents/PhD/resources/databases/HMDB/hmdb_metabolites.xml'
+HMDB_METABOLITES_XML = os.path.join(DB_DIR, 'HMDB/hmdb_metabolites.xml')
 
 # BioGRID chemical-protein interactions
 BIOGRID_LOCATION = os.path.join(DB_DIR, 'BioGRID/BIOGRID-CHEMICALS-4.4.238.chemtab.txt')
@@ -55,12 +57,20 @@ LINCS_TARGET_DICTIONARY = os.path.join(DB_DIR, 'LINCS/lsp_target_dictionary.csv'
 LINCS_BIOCHEM_AGG = os.path.join(DB_DIR, 'LINCS/lsp_biochem_agg.csv')
 LINCS_REFERENCES = os.path.join(DB_DIR, 'LINCS/lsp_references.csv')
 
-# L1000 gene expression signatures (2.1GB GMT file)
-L1000_GMT_LOCATION = os.path.join(DB_DIR, 'LINCS/L1000/l1000_cp.gmt')
-L1000_COMPOUNDS_LOCATION = os.path.join(DB_DIR, 'LINCS/L1000/LINCS_small_molecules.tsv')
-
 # Pathway distance for GEM (how many reactions away to include)
 PATHWAY_DISTANCE = 2
+
+# Ubiquitous metabolites to exclude from GEM graph (cofactors, common currency)
+# These are Human-GEM metabolite IDs (without compartment suffix)
+GEM_UBIQUITOUS_METABOLITES = [
+    'MAM02039', 'MAM02040', 'MAM01371', 'MAM02751', 'MAM01285',
+    'MAM02555', 'MAM0254', 'MAM02630', 'MAM01597', 'MAM02552',
+    'MAM02553', 'MAM02554', 'MAM02759', 'MAM02046', 'MAM01334',
+    '2 MAM02039', '2 MAM02040'
+]
+
+# Compartment suffixes used in Human-GEM
+GEM_COMPARTMENT_SUFFIXES = ['c', 'g', 'l', 'm', 'n', 'x', 'r', 'e']
 
 # =========================================================================
 # STEP 2: PROTEIN-PROTEIN INTERACTION SOURCES
@@ -71,6 +81,12 @@ BIOGRID_PPI_LOCATION = os.path.join(DB_DIR, 'BioGRID/BIOGRID-ALL-4.4.238.tab3.tx
 
 # HuRI human protein-protein interactome
 HURI_LOCATION = os.path.join(DB_DIR, 'HuRI/HuRI_Tong_2021.tsv')
+
+# HumanNet PPI interactions
+HUMANNET_LOCATION = os.path.join(DB_DIR, 'HumanNet/HS-PI.symbol.tsv')
+
+# Ensembl ID to gene symbol mapping (for HuRI)
+ENSEMBL_MAPPING_FILE = os.path.join(DB_DIR, 'Ensembl/ensembl_to_hgnc.tsv')
 
 # STRING API endpoint
 STRING_API_URL = "https://string-db.org/api"
@@ -96,10 +112,10 @@ DB_OUTPUT_FILES = {
     'STITCH': os.path.join(OUTPUT_DIR, 'HMDB_metabolites_STITCH_processed.csv'),
     'BioGRID': os.path.join(OUTPUT_DIR, 'HMDB_metabolites_BioGRID_processed.csv'),
     'LINCS': os.path.join(OUTPUT_DIR, 'HMDB_metabolites_LINCS_processed.csv'),
-    'L1000': os.path.join(OUTPUT_DIR, 'HMDB_metabolites_L1000_processed.csv'),
     'Human1_GEM_dist1': os.path.join(OUTPUT_DIR, 'HMDB_metabolites_Human1_GEM_dist1_processed.csv'),
     'Human1_GEM_dist2': os.path.join(OUTPUT_DIR, 'HMDB_metabolites_Human1_GEM_dist2_processed.csv'),
-    'MetalinksDB': os.path.join(OUTPUT_DIR, 'HMDB_metabolites_MetalinksDB_processed.csv')
+    'MetalinksDB': os.path.join(OUTPUT_DIR, 'HMDB_metabolites_MetalinksDB_processed.csv'),
+    'HumanNet': os.path.join(OUTPUT_DIR, 'HMDB_metabolites_HumanNet_processed.csv')
 }
 
 URL_FILES = {
@@ -120,6 +136,7 @@ OUTPUT_FILE_FINAL = os.path.join(OUTPUT_DIR, 'HMDB_metabolites_gene_interactions
 PPI_OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'PPI_network.tsv')
 PPI_STRING_CACHE = os.path.join(OUTPUT_DIR, 'cache/string_ppi_cache.csv')
 PPI_BIOGRID_CACHE = os.path.join(OUTPUT_DIR, 'cache/biogrid_ppi_cache.csv')
+PPI_HUMANNET_CACHE = os.path.join(OUTPUT_DIR, 'cache/humannet_ppi_cache.csv')
 PPI_HURI_CACHE = os.path.join(OUTPUT_DIR, 'cache/huri_ppi_cache.csv')
 
 # =========================================================================
@@ -129,6 +146,13 @@ PPI_HURI_CACHE = os.path.join(OUTPUT_DIR, 'cache/huri_ppi_cache.csv')
 METABOLITE_GENE_PKN = os.path.join(OUTPUT_DIR, 'metabolite_gene_PKN.tsv')
 FINAL_PKN_OUTPUT = os.path.join(OUTPUT_DIR, 'LemonIte_PKN.tsv')
 FINAL_PKN_WITH_URLS = os.path.join(OUTPUT_DIR, 'LemonIte_PKN_with_URLs.tsv')
+
+# Aliases used by various modules
+BIOGRID_PPI_FILE = BIOGRID_PPI_LOCATION
+HURI_FILE = HURI_LOCATION
+PPI_NETWORK = PPI_OUTPUT_FILE
+FINAL_PKN_FILE = FINAL_PKN_OUTPUT
+FINAL_PKN_WITH_LINKS_FILE = FINAL_PKN_WITH_URLS
 
 # =========================================================================
 # API RETRY CONFIGURATION
@@ -174,6 +198,14 @@ API_RETRY_CONFIG = {
         'max_workers': 3,
         'pause_after': 10,
         'pause_duration': 5
+    },
+    'MyGene': {
+        'max_retries': 5,
+        'backoff_factor': 2,
+        'timeout': 30,
+        'max_workers': 1,
+        'pause_after': 5,
+        'pause_duration': 3
     }
 }
 
@@ -183,7 +215,6 @@ API_RETRY_CONFIG = {
 
 CHUNK_SIZE = 800  # For batching metabolite processing
 MAX_WORKERS_DEFAULT = 4  # Default thread pool size
-RESUME_SAVE_INTERVAL = 1000  # Save progress every N metabolites (for L1000)
 
 # =========================================================================
 # LOGGING CONFIGURATION
@@ -193,3 +224,52 @@ LOG_FILE_API_ERRORS = os.path.join(OUTPUT_DIR, 'api_errors.log')
 LOG_FILE_PIPELINE = os.path.join(OUTPUT_DIR, 'pipeline_progress.log')
 LOG_LEVEL = 'INFO'
 LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+
+
+def reconfigure_output_dir(output_dir_name: str):
+    """
+    Update OUTPUT_DIR and all derived output paths to use a new directory name.
+
+    Parameters
+    ----------
+    output_dir_name : str
+        Directory name (relative to WORKDIR) or an absolute path.
+    """
+    import sys
+    mod = sys.modules[__name__]
+
+    if os.path.isabs(output_dir_name):
+        new_dir = output_dir_name
+    else:
+        new_dir = os.path.join(mod.WORKDIR, output_dir_name)
+
+    os.makedirs(new_dir, exist_ok=True)
+    mod.OUTPUT_DIR = new_dir
+    mod.OUTPUT_DIR_NAME = output_dir_name
+
+    # Step 1 output files
+    mod.DB_OUTPUT_FILES = {k: os.path.join(new_dir, os.path.basename(v))
+                           for k, v in mod.DB_OUTPUT_FILES.items()}
+    mod.URL_FILES = {k: os.path.join(new_dir, os.path.basename(v))
+                     for k, v in mod.URL_FILES.items()}
+    mod.OUTPUT_FILE_FINAL = os.path.join(new_dir, 'HMDB_metabolites_gene_interactions.csv')
+
+    # Step 2 output files
+    mod.PPI_OUTPUT_FILE = os.path.join(new_dir, 'PPI_network.tsv')
+    mod.PPI_STRING_CACHE = os.path.join(new_dir, 'cache/string_ppi_cache.csv')
+    mod.PPI_BIOGRID_CACHE = os.path.join(new_dir, 'cache/biogrid_ppi_cache.csv')
+    mod.PPI_HURI_CACHE = os.path.join(new_dir, 'cache/huri_ppi_cache.csv')
+
+    # Step 3 output files
+    mod.METABOLITE_GENE_PKN = os.path.join(new_dir, 'metabolite_gene_PKN.tsv')
+    mod.FINAL_PKN_OUTPUT = os.path.join(new_dir, 'LemonIte_PKN.tsv')
+    mod.FINAL_PKN_WITH_URLS = os.path.join(new_dir, 'LemonIte_PKN_with_URLs.tsv')
+
+    # Aliases
+    mod.PPI_NETWORK = mod.PPI_OUTPUT_FILE
+    mod.FINAL_PKN_FILE = mod.FINAL_PKN_OUTPUT
+    mod.FINAL_PKN_WITH_LINKS_FILE = mod.FINAL_PKN_WITH_URLS
+
+    # Logging
+    mod.LOG_FILE_API_ERRORS = os.path.join(new_dir, 'api_errors.log')
+    mod.LOG_FILE_PIPELINE = os.path.join(new_dir, 'pipeline_progress.log')

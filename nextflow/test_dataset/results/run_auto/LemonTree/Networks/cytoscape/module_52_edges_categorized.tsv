@@ -1,0 +1,8 @@
+Node1	Node2	Source	Type	Category
+heptadecanoic_acid	HAS2	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+heptadecanoic_acid	CPA1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+heptadecanoic_acid	ABCA1	Human1_GEM_dist1	metabolite-gene	Metabolic_pathway
+heptadecanoic_acid	RPL36A	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+GLIS3	CPA1	STRING	PPI	PPI
+STAT3	ABCA1	STRING	PPI	PPI
+MAFB	RPL36A	BioGRID_genes	PPI	PPI

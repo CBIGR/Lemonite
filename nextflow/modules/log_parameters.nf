@@ -66,7 +66,6 @@ pkn_network                   = ${params.pkn_network}
 
 ENRICHMENT PARAMETERS:
 ----------------------
-use_megago                    = ${params.use_megago}
 enrichment_method             = ${params.enrichment_method}
 enrichr_libraries             = ${params.enrichr_libraries}
 
@@ -74,6 +73,7 @@ OVERVIEW PARAMETERS:
 --------------------
 prioritize_by_expression      = ${params.prioritize_by_expression}
 overview_n_clusters           = ${params.overview_n_clusters}
+overview_labeling_workflow    = canonical MegaGO top_30 + rrvgo
 
 RESOURCE LIMITS:
 ----------------

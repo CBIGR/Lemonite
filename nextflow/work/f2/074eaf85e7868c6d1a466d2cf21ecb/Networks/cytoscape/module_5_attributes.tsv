@@ -1,0 +1,10 @@
+Node	Label	Type
+creatinine	creatinine	metabolite
+L_cysteine	L_cysteine	metabolite
+GAD1	GAD1	module_gene
+capricacid	capricacid	metabolite
+MYT1L	MYT1L	TF
+PXDN	PXDN	bridge_node
+GAD2	GAD2	bridge_node
+STOX2	STOX2	TF
+SFXN3	SFXN3	bridge_node

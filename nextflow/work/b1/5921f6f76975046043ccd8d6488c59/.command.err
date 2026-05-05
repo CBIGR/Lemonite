@@ -1,0 +1,18 @@
+find: ‘standard output’: Broken pipe
+find: write error
+[DEBUG] Input dir: /home/borisvdm/repo/LemonIte/nextflow/test_dataset
+[DEBUG] Output dir: .
+[DEBUG] Search dirs: ['./LemonTree/Preprocessing', './LemonTree/Preprocessing', '/home/borisvdm/repo/LemonIte/nextflow/test_dataset/data', '/home/borisvdm/repo/LemonIte/nextflow/test_dataset', '/home/borisvdm/repo/LemonIte/nextflow/test_dataset/../data']
+[DEBUG] Searching for raw pattern: *counts*.tsv
+[DEBUG]   Searching in: /home/borisvdm/repo/LemonIte/nextflow/test_dataset/data
+[DEBUG]   Found 0 matches
+[DEBUG]   Searching in: /home/borisvdm/repo/LemonIte/nextflow/test_dataset
+[DEBUG]   Found 0 matches
+[DEBUG]   Dir doesn't exist: /home/borisvdm/repo/LemonIte/nextflow/test_dataset/../data
+[DEBUG] Searching for raw pattern: *Counts*.tsv
+[DEBUG]   Searching in: /home/borisvdm/repo/LemonIte/nextflow/test_dataset/data
+[DEBUG]   Found 1 matches
+[DEBUG]   Selected: /home/borisvdm/repo/LemonIte/nextflow/test_dataset/data/Counts.tsv
+[DEBUG] Expression file found: /home/borisvdm/repo/LemonIte/nextflow/test_dataset/data/Counts.tsv
+[DEBUG] DataFrame shape: (10000, 75), Columns: 75, Samples: 74
+[DEBUG MAIN] Input stats collected: samples=74, data_types=['Transcriptomics', 'Metabolites']

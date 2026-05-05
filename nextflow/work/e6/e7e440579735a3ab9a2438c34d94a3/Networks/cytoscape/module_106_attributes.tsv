@@ -1,0 +1,17 @@
+Node	Label	Type
+2_hydroxyglutaric_acid	2_hydroxyglutaric_acid	metabolite
+citricacid	citricacid	metabolite
+ELOVL2	ELOVL2	module_gene
+ZNF500	ZNF500	TF
+SLC6A11	SLC6A11	bridge_node
+DEAF1	DEAF1	TF
+CREBBP	CREBBP	bridge_node
+ARNT2	ARNT2	TF
+CYP1A1	CYP1A1	bridge_node
+ZIC2	ZIC2	TF
+CLYBL	CLYBL	bridge_node
+POU3F3	POU3F3	TF
+ALDH1A3	ALDH1A3	bridge_node
+NR5A2	NR5A2	TF
+CYP19A1	CYP19A1	bridge_node
+CEL	CEL	bridge_node

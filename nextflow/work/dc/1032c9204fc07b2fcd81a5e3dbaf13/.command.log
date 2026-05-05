@@ -1,0 +1,1048 @@
+=== Available staged files ===
+total 32
+drwxr-xr-x 5 borisvdm users  4096 Apr 30 13:30 .
+drwxr-xr-x 5 borisvdm users   120 Apr 30 13:30 ..
+-rw-r--r-- 1 borisvdm users     0 Apr 30 13:30 .command.begin
+-rw-r--r-- 1 borisvdm users     0 Apr 30 13:30 .command.err
+-rw-r--r-- 1 borisvdm users    31 Apr 30 13:30 .command.log
+-rw-r--r-- 1 borisvdm users    31 Apr 30 13:30 .command.out
+-rw-r--r-- 1 borisvdm users 13217 Apr 30 13:30 .command.run
+-rw-r--r-- 1 borisvdm users  2290 Apr 30 13:30 .command.sh
+-rw-r--r-- 1 borisvdm users     0 Apr 30 13:30 .command.trace
+lrwxrwxrwx 1 borisvdm users   117 Apr 30 13:30 DESeq_groups.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/6d/571901ffaab885488b719d4c07dc70/LemonTree/Preprocessing/DESeq_groups.txt
+lrwxrwxrwx 1 borisvdm users   134 Apr 30 13:30 expression_variance_histogram.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/6d/571901ffaab885488b719d4c07dc70/LemonTree/Preprocessing/expression_variance_histogram.pdf
+drwxr-xr-x 3 borisvdm users    27 Apr 30 13:30 Lemon_out
+lrwxrwxrwx 1 borisvdm users   131 Apr 30 13:30 LemonPreprocessed_complete.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/6d/571901ffaab885488b719d4c07dc70/LemonTree/Preprocessing/LemonPreprocessed_complete.txt
+lrwxrwxrwx 1 borisvdm users   133 Apr 30 13:30 LemonPreprocessed_expression.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/6d/571901ffaab885488b719d4c07dc70/LemonTree/Preprocessing/LemonPreprocessed_expression.txt
+lrwxrwxrwx 1 borisvdm users   135 Apr 30 13:30 LemonPreprocessed_metabolomics.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/6d/571901ffaab885488b719d4c07dc70/LemonTree/Preprocessing/LemonPreprocessed_metabolomics.txt
+drwxr-xr-x 2 borisvdm users    91 Apr 30 13:30 Lemon_results
+lrwxrwxrwx 1 borisvdm users   116 Apr 30 13:30 metabolites.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/6d/571901ffaab885488b719d4c07dc70/LemonTree/Preprocessing/metabolites.txt
+lrwxrwxrwx 1 borisvdm users   113 Apr 30 13:30 name_map.csv -> /home/borisvdm/repo/LemonIte/nextflow/work/6d/571901ffaab885488b719d4c07dc70/LemonTree/Preprocessing/name_map.csv
+lrwxrwxrwx 1 borisvdm users   117 Apr 30 13:30 name_mapping.tsv -> /home/borisvdm/repo/LemonIte/nextflow/work/6d/571901ffaab885488b719d4c07dc70/LemonTree/Preprocessing/name_mapping.tsv
+lrwxrwxrwx 1 borisvdm users   127 Apr 30 13:30 Normalized_metabolites.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/6d/571901ffaab885488b719d4c07dc70/LemonTree/Preprocessing/Normalized_metabolites.pdf
+lrwxrwxrwx 1 borisvdm users   120 Apr 30 13:30 PCA_metabolites.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/6d/571901ffaab885488b719d4c07dc70/LemonTree/Preprocessing/PCA_metabolites.pdf
+lrwxrwxrwx 1 borisvdm users   124 Apr 30 13:30 PCA_transcriptomics.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/6d/571901ffaab885488b719d4c07dc70/LemonTree/Preprocessing/PCA_transcriptomics.pdf
+drwxr-xr-x 2 borisvdm users     6 Apr 30 13:30 Preprocessing
+lrwxrwxrwx 1 borisvdm users   108 Apr 30 13:30 tfs.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/6d/571901ffaab885488b719d4c07dc70/LemonTree/Preprocessing/tfs.txt
+=============================
+=== Files in Preprocessing directory ===
+total 8424
+drwxr-xr-x 2 borisvdm users    4096 Apr 30 13:30 .
+drwxr-xr-x 5 borisvdm users    4096 Apr 30 13:30 ..
+-rw-r--r-- 1 borisvdm users    1156 Apr 30 13:30 DESeq_groups.txt
+-rw-r--r-- 1 borisvdm users   10178 Apr 30 13:30 expression_variance_histogram.pdf
+-rw-r--r-- 1 borisvdm users 4264576 Apr 30 13:30 LemonPreprocessed_complete.txt
+-rw-r--r-- 1 borisvdm users 4080745 Apr 30 13:30 LemonPreprocessed_expression.txt
+-rw-r--r-- 1 borisvdm users  184436 Apr 30 13:30 LemonPreprocessed_metabolomics.txt
+-rw-r--r-- 1 borisvdm users    1908 Apr 30 13:30 metabolites.txt
+-rwxr-xr-x 1 borisvdm users    8995 Apr 30 13:30 name_map.csv
+-rw-r--r-- 1 borisvdm users      17 Apr 30 13:30 name_mapping.tsv
+-rw-r--r-- 1 borisvdm users    3611 Apr 30 13:30 Normalized_metabolites.pdf
+-rw-r--r-- 1 borisvdm users   10159 Apr 30 13:30 PCA_metabolites.pdf
+-rw-r--r-- 1 borisvdm users   10328 Apr 30 13:30 PCA_transcriptomics.pdf
+-rw-r--r-- 1 borisvdm users    9088 Apr 30 13:30 tfs.txt
+========================================
+Running LemonTree post-clustering analysis...
+=====================================================
+LemonTree Post-Clustering Analysis
+=====================================================
+Regulator types: TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt
+LemonTree JAR: /home/borisvdm/repo/LemonIte/nextflow/LemonTree/lemontree_v3.1.1.jar
+Working directory: .
+=====================================================
+Running LemonTree post-clustering analysis...
+Creating consensus cluster file...
+Searching for cluster files...
+Found 10 cluster files
+Generating tight clusters...
+
+LemonTree - Version 3.1.1
+-------------------------
+
+Parameters
+----------
+task:               tight_clusters
+data_file:          Preprocessing/LemonPreprocessed_expression.txt
+cluster_file:       Lemon_out/clusterfile
+output_file:        Lemon_out/tight_clusters.txt
+node_clustering:    false
+min_weight:         0.25
+min_clust_size:     10
+min_clust_score:    2
+
+Reading expression data... [ok]
+Number of genes in the data matrix: 3227
+Number of conditions in the data matrix: 75
+Number of missing values in the data matrix: 25057
+Total number of expression values: 242025
+Reading multiple cluster files...
+Reading cluster file Lemon_results/cluster_1
+ [ok]
+Assigned genes: 3227
+Not assigned genes: 0
+Number of clusters: 129
+Reading cluster file Lemon_results/cluster_2
+ [ok]
+Assigned genes: 3227
+Not assigned genes: 0
+Number of clusters: 135
+Reading cluster file Lemon_results/cluster_3
+ [ok]
+Assigned genes: 3227
+Not assigned genes: 0
+Number of clusters: 139
+Reading cluster file Lemon_results/cluster_4
+ [ok]
+Assigned genes: 3227
+Not assigned genes: 0
+Number of clusters: 144
+Reading cluster file Lemon_results/cluster_5
+ [ok]
+Assigned genes: 3227
+Not assigned genes: 0
+Number of clusters: 137
+Reading cluster file Lemon_results/cluster_1
+ [ok]
+Assigned genes: 3227
+Not assigned genes: 0
+Number of clusters: 129
+Reading cluster file Lemon_results/cluster_2
+ [ok]
+Assigned genes: 3227
+Not assigned genes: 0
+Number of clusters: 135
+Reading cluster file Lemon_results/cluster_3
+ [ok]
+Assigned genes: 3227
+Not assigned genes: 0
+Number of clusters: 139
+Reading cluster file Lemon_results/cluster_4
+ [ok]
+Assigned genes: 3227
+Not assigned genes: 0
+Number of clusters: 144
+Reading cluster file Lemon_results/cluster_5
+ [ok]
+Assigned genes: 3227
+Not assigned genes: 0
+Number of clusters: 137
+[ok]
+Init CoClustering... [ok]
+Found cluster with score 73.95000000000007 and 80 nodes. Remaining network has 3058 nodes and 56854 edges.
+Found cluster with score 56.016091954023004 and 87 nodes. Remaining network has 3056 nodes and 53387 edges.
+Found cluster with score 43.186802030456846 and 197 nodes. Remaining network has 3016 nodes and 46597 edges.
+Found cluster with score 42.74153846153847 and 65 nodes. Remaining network has 3015 nodes and 44589 edges.
+Found cluster with score 28.049999999999997 and 88 nodes. Remaining network has 3015 nodes and 42458 edges.
+Found cluster with score 29.977777777777792 and 54 nodes. Remaining network has 3015 nodes and 41160 edges.
+Found cluster with score 35.988235294117636 and 51 nodes. Remaining network has 2985 nodes and 39892 edges.
+Found cluster with score 35.83243243243244 and 37 nodes. Remaining network has 2984 nodes and 39226 edges.
+Found cluster with score 29.314285714285706 and 56 nodes. Remaining network has 2984 nodes and 37923 edges.
+Found cluster with score 28.122222222222206 and 72 nodes. Remaining network has 2983 nodes and 36200 edges.
+Found cluster with score 25.23000000000001 and 40 nodes. Remaining network has 2983 nodes and 35443 edges.
+Found cluster with score 24.432911392405067 and 79 nodes. Remaining network has 2956 nodes and 33891 edges.
+Found cluster with score 20.66349206349207 and 189 nodes. Remaining network has 2945 nodes and 30455 edges.
+Found cluster with score 20.66382978723404 and 94 nodes. Remaining network has 2937 nodes and 28813 edges.
+Found cluster with score 26.489655172413784 and 29 nodes. Remaining network has 2909 nodes and 28407 edges.
+Found cluster with score 20.56190476190477 and 42 nodes. Remaining network has 2909 nodes and 27662 edges.
+Found cluster with score 23.25000000000001 and 24 nodes. Remaining network has 2909 nodes and 27386 edges.
+Found cluster with score 20.005128205128205 and 39 nodes. Remaining network has 2909 nodes and 26770 edges.
+Found cluster with score 20.6551724137931 and 29 nodes. Remaining network has 2909 nodes and 26403 edges.
+Found cluster with score 16.960563380281688 and 71 nodes. Remaining network has 2907 nodes and 25324 edges.
+Found cluster with score 18.173333333333332 and 30 nodes. Remaining network has 2906 nodes and 24927 edges.
+Found cluster with score 17.41428571428572 and 28 nodes. Remaining network has 2904 nodes and 24577 edges.
+Found cluster with score 16.451063829787223 and 188 nodes. Remaining network has 2890 nodes and 21916 edges.
+Found cluster with score 15.223529411764703 and 34 nodes. Remaining network has 2890 nodes and 21505 edges.
+Found cluster with score 16.93684210526316 and 19 nodes. Remaining network has 2890 nodes and 21334 edges.
+Found cluster with score 15.376470588235296 and 34 nodes. Remaining network has 2890 nodes and 20917 edges.
+Found cluster with score 14.538461538461544 and 117 nodes. Remaining network has 2888 nodes and 19489 edges.
+Found cluster with score 15.91428571428572 and 21 nodes. Remaining network has 2875 nodes and 19284 edges.
+Found cluster with score 13.578723404255319 and 141 nodes. Remaining network has 2869 nodes and 17656 edges.
+Found cluster with score 13.701960784313727 and 102 nodes. Remaining network has 2859 nodes and 16494 edges.
+Found cluster with score 12.533333333333333 and 24 nodes. Remaining network has 2859 nodes and 16242 edges.
+Found cluster with score 12.100000000000005 and 40 nodes. Remaining network has 2855 nodes and 15820 edges.
+Found cluster with score 12.955555555555556 and 18 nodes. Remaining network has 2845 nodes and 15673 edges.
+Found cluster with score 12.37021276595745 and 47 nodes. Remaining network has 2826 nodes and 15227 edges.
+Found cluster with score 12.31111111111111 and 18 nodes. Remaining network has 2822 nodes and 15075 edges.
+Found cluster with score 11.324324324324325 and 37 nodes. Remaining network has 2816 nodes and 14740 edges.
+Found cluster with score 13.858536585365854 and 82 nodes. Remaining network has 2799 nodes and 14044 edges.
+Found cluster with score 19.300636942675165 and 157 nodes. Remaining network has 2735 nodes and 12802 edges.
+Found cluster with score 26.846808510638272 and 47 nodes. Remaining network has 2699 nodes and 12510 edges.
+Found cluster with score 23.349714285714324 and 700 nodes. Remaining network has 2283 nodes and 8596 edges.
+Found cluster with score 12.43157894736842 and 38 nodes. Remaining network has 2275 nodes and 8267 edges.
+Found cluster with score 11.258064516129032 and 31 nodes. Remaining network has 2274 nodes and 8055 edges.
+Found cluster with score 9.145454545454543 and 11 nodes. Remaining network has 2274 nodes and 8000 edges.
+Found cluster with score 7.3578947368421055 and 19 nodes. Remaining network has 2274 nodes and 7880 edges.
+Found cluster with score 9.499999999999998 and 12 nodes. Remaining network has 2270 nodes and 7814 edges.
+Found cluster with score 9.733333333333334 and 12 nodes. Remaining network has 2260 nodes and 7754 edges.
+Found cluster with score 8.333333333333334 and 21 nodes. Remaining network has 2258 nodes and 7618 edges.
+Found cluster with score 7.6933333333333325 and 15 nodes. Remaining network has 2254 nodes and 7526 edges.
+Found cluster with score 7.036363636363637 and 11 nodes. Remaining network has 2254 nodes and 7471 edges.
+Found cluster with score 7.153846153846154 and 13 nodes. Remaining network has 2250 nodes and 7400 edges.
+Found cluster with score 8.25 and 16 nodes. Remaining network has 2245 nodes and 7310 edges.
+Found cluster with score 9.312500000000002 and 96 nodes. Remaining network has 2225 nodes and 6812 edges.
+Found cluster with score 10.511111111111111 and 18 nodes. Remaining network has 2220 nodes and 6716 edges.
+Found cluster with score 11.758620689655173 and 58 nodes. Remaining network has 2200 nodes and 6443 edges.
+Found cluster with score 12.894736842105264 and 38 nodes. Remaining network has 2188 nodes and 6232 edges.
+Found cluster with score 5.273684210526316 and 19 nodes. Remaining network has 2187 nodes and 6143 edges.
+Found cluster with score 9.304 and 25 nodes. Remaining network has 2185 nodes and 6030 edges.
+Found cluster with score 7.876190476190477 and 168 nodes. Remaining network has 2134 nodes and 5298 edges.
+Found cluster with score 5.1090909090909085 and 11 nodes. Remaining network has 2134 nodes and 5249 edges.
+Found cluster with score 12.074285714285718 and 35 nodes. Remaining network has 2122 nodes and 5108 edges.
+Found cluster with score 20.367656765676568 and 303 nodes. Remaining network has 1886 nodes and 4360 edges.
+Found cluster with score 9.145454545454548 and 22 nodes. Remaining network has 1872 nodes and 4271 edges.
+Found cluster with score 34.69230769230768 and 39 nodes. Remaining network has 1833 nodes and 4131 edges.
+Found cluster with score 13.249735449735454 and 378 nodes. Remaining network has 1569 nodes and 3191 edges.
+Found cluster with score 12.70526315789474 and 19 nodes. Remaining network has 1558 nodes and 3104 edges.
+Found cluster with score 8.161904761904761 and 21 nodes. Remaining network has 1552 nodes and 3031 edges.
+Found cluster with score 4.938461538461539 and 13 nodes. Remaining network has 1551 nodes and 2986 edges.
+Found cluster with score 4.200000000000001 and 10 nodes. Remaining network has 1550 nodes and 2953 edges.
+Found cluster with score 9.215384615384613 and 13 nodes. Remaining network has 1541 nodes and 2921 edges.
+Found cluster with score 5.981818181818183 and 11 nodes. Remaining network has 1534 nodes and 2892 edges.
+Found cluster with score 7.622222222222222 and 18 nodes. Remaining network has 1530 nodes and 2832 edges.
+Found cluster with score 17.260869565217398 and 23 nodes. Remaining network has 1512 nodes and 2756 edges.
+Found cluster with score 9.986666666666672 and 15 nodes. Remaining network has 1501 nodes and 2710 edges.
+Found cluster with score 13.592592592592593 and 27 nodes. Remaining network has 1484 nodes and 2647 edges.
+Found cluster with score 21.59259259259259 and 27 nodes. Remaining network has 1458 nodes and 2620 edges.
+Found cluster with score 3.8666666666666667 and 6 nodes. Remaining network has 1454 nodes and 2606 edges.
+Found cluster with score 9.981818181818182 and 11 nodes. Remaining network has 1443 nodes and 2551 edges.
+Found cluster with score 4.485714285714286 and 7 nodes. Remaining network has 1439 nodes and 2530 edges.
+Found cluster with score 4.466666666666666 and 12 nodes. Remaining network has 1436 nodes and 2493 edges.
+Found cluster with score 9.552380952380954 and 21 nodes. Remaining network has 1423 nodes and 2429 edges.
+Found cluster with score 14.266666666666671 and 18 nodes. Remaining network has 1408 nodes and 2382 edges.
+Found cluster with score 5.181818181818182 and 11 nodes. Remaining network has 1400 nodes and 2352 edges.
+Found cluster with score 3.8000000000000003 and 8 nodes. Remaining network has 1400 nodes and 2331 edges.
+Found cluster with score 4.714285714285714 and 14 nodes. Remaining network has 1395 nodes and 2299 edges.
+Found cluster with score 5.771428571428571 and 14 nodes. Remaining network has 1390 nodes and 2257 edges.
+Found cluster with score 3.35 and 8 nodes. Remaining network has 1389 nodes and 2237 edges.
+Found cluster with score 6.142857142857144 and 14 nodes. Remaining network has 1382 nodes and 2197 edges.
+Found cluster with score 3.7582089552238798 and 67 nodes. Remaining network has 1361 nodes and 2049 edges.
+Found cluster with score 10.5 and 24 nodes. Remaining network has 1345 nodes and 1984 edges.
+Found cluster with score 4.786666666666666 and 15 nodes. Remaining network has 1341 nodes and 1953 edges.
+Found cluster with score 4.466666666666667 and 6 nodes. Remaining network has 1337 nodes and 1944 edges.
+Found cluster with score 14.764705882352944 and 17 nodes. Remaining network has 1321 nodes and 1914 edges.
+Found cluster with score 3.0666666666666664 and 6 nodes. Remaining network has 1320 nodes and 1900 edges.
+Found cluster with score 6.12 and 10 nodes. Remaining network has 1314 nodes and 1876 edges.
+Found cluster with score 6.766666666666667 and 12 nodes. Remaining network has 1308 nodes and 1848 edges.
+Found cluster with score 4.717647058823529 and 17 nodes. Remaining network has 1306 nodes and 1813 edges.
+Found cluster with score 4.3 and 8 nodes. Remaining network has 1306 nodes and 1794 edges.
+Found cluster with score 5.76 and 10 nodes. Remaining network has 1301 nodes and 1771 edges.
+Found cluster with score 4.04 and 10 nodes. Remaining network has 1295 nodes and 1753 edges.
+Found cluster with score 4.9111111111111105 and 18 nodes. Remaining network has 1283 nodes and 1723 edges.
+Found cluster with score 12.234285714285713 and 35 nodes. Remaining network has 1248 nodes and 1689 edges.
+Found cluster with score 5.971428571428571 and 7 nodes. Remaining network has 1241 nodes and 1668 edges.
+Found cluster with score 4.8999999999999995 and 8 nodes. Remaining network has 1237 nodes and 1652 edges.
+Found cluster with score 5.0857142857142845 and 14 nodes. Remaining network has 1231 nodes and 1630 edges.
+Found cluster with score 4.3 and 8 nodes. Remaining network has 1231 nodes and 1614 edges.
+Found cluster with score 2.75 and 8 nodes. Remaining network has 1229 nodes and 1600 edges.
+Found cluster with score 2.5 and 4 nodes. Remaining network has 1228 nodes and 1595 edges.
+Found cluster with score 6.466666666666665 and 9 nodes. Remaining network has 1220 nodes and 1581 edges.
+Found cluster with score 3.5454545454545454 and 11 nodes. Remaining network has 1214 nodes and 1561 edges.
+Found cluster with score 4.749999999999999 and 8 nodes. Remaining network has 1208 nodes and 1545 edges.
+Found cluster with score 5.48 and 10 nodes. Remaining network has 1200 nodes and 1523 edges.
+Found cluster with score 3.6666666666666674 and 24 nodes. Remaining network has 1188 nodes and 1482 edges.
+Found cluster with score 4.066666666666667 and 12 nodes. Remaining network has 1183 nodes and 1461 edges.
+Found cluster with score 3.3499999999999996 and 8 nodes. Remaining network has 1181 nodes and 1447 edges.
+Found cluster with score 3.8000000000000003 and 12 nodes. Remaining network has 1177 nodes and 1429 edges.
+Found cluster with score 3.066666666666667 and 12 nodes. Remaining network has 1171 nodes and 1411 edges.
+Found cluster with score 5.1357575757575775 and 330 nodes. Remaining network has 888 nodes and 981 edges.
+Found cluster with score 5.258823529411764 and 17 nodes. Remaining network has 874 nodes and 961 edges.
+Found cluster with score 3.533333333333333 and 6 nodes. Remaining network has 869 nodes and 952 edges.
+Found cluster with score 3.5777777777777775 and 9 nodes. Remaining network has 866 nodes and 940 edges.
+Found cluster with score 8.733333333333333 and 12 nodes. Remaining network has 854 nodes and 920 edges.
+Found cluster with score 4.733333333333333 and 6 nodes. Remaining network has 848 nodes and 905 edges.
+Found cluster with score 4.68 and 5 nodes. Remaining network has 843 nodes and 895 edges.
+Found cluster with score 7.733333333333334 and 12 nodes. Remaining network has 831 nodes and 868 edges.
+Found cluster with score 2.8285714285714287 and 7 nodes. Remaining network has 828 nodes and 858 edges.
+Found cluster with score 2.6666666666666665 and 6 nodes. Remaining network has 826 nodes and 850 edges.
+Found cluster with score 2.4 and 4 nodes. Remaining network has 826 nodes and 845 edges.
+Found cluster with score 2.9000000000000004 and 12 nodes. Remaining network has 823 nodes and 829 edges.
+Found cluster with score 3.114285714285714 and 7 nodes. Remaining network has 819 nodes and 819 edges.
+Found cluster with score 3.7428571428571433 and 7 nodes. Remaining network has 814 nodes and 809 edges.
+Found cluster with score 4.413333333333332 and 45 nodes. Remaining network has 771 nodes and 761 edges.
+Found cluster with score 4.5200000000000005 and 5 nodes. Remaining network has 766 nodes and 754 edges.
+Found cluster with score 5.228571428571429 and 7 nodes. Remaining network has 761 nodes and 744 edges.
+Found cluster with score 4.724137931034484 and 29 nodes. Remaining network has 741 nodes and 707 edges.
+Found cluster with score 5.218181818181818 and 11 nodes. Remaining network has 730 nodes and 697 edges.
+Found cluster with score 3.5 and 4 nodes. Remaining network has 728 nodes and 691 edges.
+Found cluster with score 4.866666666666667 and 9 nodes. Remaining network has 721 nodes and 677 edges.
+Found cluster with score 2.8833333333333333 and 24 nodes. Remaining network has 703 nodes and 649 edges.
+Found cluster with score 2.84 and 5 nodes. Remaining network has 700 nodes and 643 edges.
+Found cluster with score 4.55 and 8 nodes. Remaining network has 692 nodes and 636 edges.
+Found cluster with score 5.742857142857143 and 7 nodes. Remaining network has 685 nodes and 630 edges.
+Found cluster with score 3.181818181818181 and 11 nodes. Remaining network has 674 nodes and 620 edges.
+Found cluster with score 3.986666666666667 and 30 nodes. Remaining network has 648 nodes and 588 edges.
+Found cluster with score 2.933333333333333 and 12 nodes. Remaining network has 636 nodes and 577 edges.
+Found cluster with score 1.7999999999999996 and 6 nodes. Remaining network has 634 nodes and 571 edges.
+Found cluster with score 4.714285714285714 and 14 nodes. Remaining network has 623 nodes and 549 edges.
+Found cluster with score 4.828571428571428 and 7 nodes. Remaining network has 616 nodes and 543 edges.
+Found cluster with score 3.109090909090909 and 11 nodes. Remaining network has 610 nodes and 530 edges.
+Found cluster with score 5.228571428571429 and 7 nodes. Remaining network has 603 nodes and 524 edges.
+Found cluster with score 3.2399999999999998 and 5 nodes. Remaining network has 599 nodes and 517 edges.
+Found cluster with score 5.640000000000001 and 10 nodes. Remaining network has 589 nodes and 493 edges.
+Found cluster with score 3.1333333333333333 and 27 nodes. Remaining network has 562 nodes and 467 edges.
+Found cluster with score 3.4347826086956528 and 23 nodes. Remaining network has 540 nodes and 441 edges.
+Found cluster with score 5.0 and 6 nodes. Remaining network has 534 nodes and 436 edges.
+Found cluster with score 3.4 and 5 nodes. Remaining network has 530 nodes and 430 edges.
+Found cluster with score 3.133333333333333 and 12 nodes. Remaining network has 521 nodes and 415 edges.
+Found cluster with score 2.6666666666666665 and 6 nodes. Remaining network has 515 nodes and 410 edges.
+Found cluster with score 2.9999999999999996 and 7 nodes. Remaining network has 510 nodes and 398 edges.
+Found cluster with score 2.55 and 8 nodes. Remaining network has 502 nodes and 391 edges.
+Found cluster with score 2.1999999999999997 and 6 nodes. Remaining network has 499 nodes and 385 edges.
+Found cluster with score 3.075 and 16 nodes. Remaining network has 483 nodes and 370 edges.
+Found cluster with score 2.7999999999999994 and 6 nodes. Remaining network has 477 nodes and 365 edges.
+Found cluster with score 2.84 and 5 nodes. Remaining network has 473 nodes and 359 edges.
+Found cluster with score 3.0 and 6 nodes. Remaining network has 469 nodes and 351 edges.
+Found cluster with score 3.0799999999999996 and 5 nodes. Remaining network has 464 nodes and 347 edges.
+Found cluster with score 1.9454545454545453 and 11 nodes. Remaining network has 453 nodes and 337 edges.
+Found cluster with score 2.6799999999999993 and 5 nodes. Remaining network has 451 nodes and 331 edges.
+Found cluster with score 3.3200000000000003 and 5 nodes. Remaining network has 446 nodes and 327 edges.
+Found cluster with score 4.199999999999999 and 6 nodes. Remaining network has 440 nodes and 319 edges.
+Found cluster with score 2.85 and 8 nodes. Remaining network has 432 nodes and 311 edges.
+Found cluster with score 2.1999999999999997 and 16 nodes. Remaining network has 416 nodes and 296 edges.
+Found cluster with score 2.1333333333333333 and 6 nodes. Remaining network has 413 nodes and 290 edges.
+Found cluster with score 2.7142857142857144 and 7 nodes. Remaining network has 406 nodes and 284 edges.
+Found cluster with score 2.3333333333333335 and 6 nodes. Remaining network has 400 nodes and 279 edges.
+Found cluster with score 3.04 and 10 nodes. Remaining network has 390 nodes and 270 edges.
+Found cluster with score 2.0 and 4 nodes. Remaining network has 386 nodes and 267 edges.
+Found cluster with score 1.64 and 5 nodes. Remaining network has 381 nodes and 263 edges.
+Found cluster with score 2.1999999999999997 and 4 nodes. Remaining network has 377 nodes and 260 edges.
+Found cluster with score 3.0999999999999996 and 4 nodes. Remaining network has 373 nodes and 257 edges.
+Found cluster with score 2.384615384615385 and 13 nodes. Remaining network has 360 nodes and 245 edges.
+Found cluster with score 2.8999999999999995 and 4 nodes. Remaining network has 356 nodes and 242 edges.
+Found cluster with score 2.9199999999999995 and 5 nodes. Remaining network has 352 nodes and 236 edges.
+Found cluster with score 2.04 and 5 nodes. Remaining network has 347 nodes and 232 edges.
+Found cluster with score 3.1 and 4 nodes. Remaining network has 343 nodes and 229 edges.
+Found cluster with score 3.56 and 5 nodes. Remaining network has 338 nodes and 223 edges.
+Found cluster with score 2.5999999999999996 and 4 nodes. Remaining network has 334 nodes and 220 edges.
+Found cluster with score 2.9428571428571426 and 7 nodes. Remaining network has 327 nodes and 214 edges.
+Found cluster with score 1.6 and 4 nodes. Remaining network has 323 nodes and 211 edges.
+Found cluster with score 3.0799999999999996 and 5 nodes. Remaining network has 318 nodes and 205 edges.
+Found cluster with score 2.142857142857143 and 7 nodes. Remaining network has 311 nodes and 199 edges.
+Found cluster with score 2.04 and 5 nodes. Remaining network has 306 nodes and 195 edges.
+Found cluster with score 2.533333333333333 and 6 nodes. Remaining network has 301 nodes and 189 edges.
+Found cluster with score 2.76 and 5 nodes. Remaining network has 296 nodes and 183 edges.
+Found cluster with score 2.2666666666666666 and 6 nodes. Remaining network has 290 nodes and 178 edges.
+Found cluster with score 1.7999999999999996 and 5 nodes. Remaining network has 285 nodes and 174 edges.
+Found cluster with score 2.0 and 2 nodes. Remaining network has 283 nodes and 173 edges.
+Found cluster with score 2.2 and 3 nodes. Remaining network has 280 nodes and 171 edges.
+Found cluster with score 1.5999999999999999 and 4 nodes. Remaining network has 276 nodes and 168 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 273 nodes and 166 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 270 nodes and 164 edges.
+Found cluster with score 1.5999999999999999 and 4 nodes. Remaining network has 266 nodes and 161 edges.
+Found cluster with score 2.44 and 5 nodes. Remaining network has 261 nodes and 157 edges.
+Found cluster with score 1.7999999999999998 and 4 nodes. Remaining network has 257 nodes and 154 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 254 nodes and 152 edges.
+Found cluster with score 2.066666666666667 and 3 nodes. Remaining network has 251 nodes and 150 edges.
+Found cluster with score 1.7999999999999998 and 3 nodes. Remaining network has 248 nodes and 148 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 245 nodes and 146 edges.
+Found cluster with score 2.066666666666667 and 3 nodes. Remaining network has 242 nodes and 144 edges.
+Found cluster with score 1.5999999999999999 and 4 nodes. Remaining network has 238 nodes and 141 edges.
+Found cluster with score 1.8 and 5 nodes. Remaining network has 233 nodes and 137 edges.
+Found cluster with score 1.5999999999999999 and 4 nodes. Remaining network has 229 nodes and 134 edges.
+Found cluster with score 2.1999999999999997 and 3 nodes. Remaining network has 226 nodes and 132 edges.
+Found cluster with score 2.1999999999999997 and 3 nodes. Remaining network has 223 nodes and 130 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 220 nodes and 128 edges.
+Found cluster with score 1.9333333333333333 and 3 nodes. Remaining network has 217 nodes and 126 edges.
+Found cluster with score 2.142857142857143 and 7 nodes. Remaining network has 210 nodes and 120 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 207 nodes and 118 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 204 nodes and 116 edges.
+Found cluster with score 2.0 and 4 nodes. Remaining network has 200 nodes and 113 edges.
+Found cluster with score 2.1999999999999997 and 3 nodes. Remaining network has 197 nodes and 111 edges.
+Found cluster with score 1.9 and 4 nodes. Remaining network has 193 nodes and 108 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 190 nodes and 106 edges.
+Found cluster with score 1.64 and 5 nodes. Remaining network has 185 nodes and 102 edges.
+Found cluster with score 1.7999999999999998 and 3 nodes. Remaining network has 182 nodes and 100 edges.
+Found cluster with score 2.1999999999999997 and 3 nodes. Remaining network has 179 nodes and 98 edges.
+Found cluster with score 2.066666666666667 and 3 nodes. Remaining network has 176 nodes and 96 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 173 nodes and 94 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 170 nodes and 92 edges.
+Found cluster with score 2.066666666666667 and 3 nodes. Remaining network has 167 nodes and 90 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 164 nodes and 88 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 161 nodes and 86 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 158 nodes and 84 edges.
+Found cluster with score 2.1999999999999997 and 3 nodes. Remaining network has 155 nodes and 82 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 152 nodes and 80 edges.
+Found cluster with score 2.1999999999999997 and 3 nodes. Remaining network has 149 nodes and 78 edges.
+Found cluster with score 1.9333333333333333 and 3 nodes. Remaining network has 146 nodes and 76 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 143 nodes and 74 edges.
+Found cluster with score 2.1999999999999997 and 3 nodes. Remaining network has 140 nodes and 72 edges.
+Found cluster with score 2.1999999999999997 and 3 nodes. Remaining network has 137 nodes and 70 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 134 nodes and 68 edges.
+Found cluster with score 2.1999999999999997 and 3 nodes. Remaining network has 131 nodes and 66 edges.
+Found cluster with score 1.9333333333333333 and 3 nodes. Remaining network has 128 nodes and 64 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 126 nodes and 63 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 124 nodes and 62 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 122 nodes and 61 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 120 nodes and 60 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 118 nodes and 59 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 116 nodes and 58 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 114 nodes and 57 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 112 nodes and 56 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 110 nodes and 55 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 108 nodes and 54 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 106 nodes and 53 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 104 nodes and 52 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 102 nodes and 51 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 100 nodes and 50 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 98 nodes and 49 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 96 nodes and 48 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 94 nodes and 47 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 92 nodes and 46 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 90 nodes and 45 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 88 nodes and 44 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 86 nodes and 43 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 84 nodes and 42 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 82 nodes and 41 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 80 nodes and 40 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 78 nodes and 39 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 76 nodes and 38 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 74 nodes and 37 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 72 nodes and 36 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 70 nodes and 35 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 68 nodes and 34 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 66 nodes and 33 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 64 nodes and 32 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 62 nodes and 31 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 60 nodes and 30 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 58 nodes and 29 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 56 nodes and 28 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 54 nodes and 27 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 52 nodes and 26 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 50 nodes and 25 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 48 nodes and 24 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 46 nodes and 23 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 44 nodes and 22 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 42 nodes and 21 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 40 nodes and 20 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 38 nodes and 19 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 36 nodes and 18 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 34 nodes and 17 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 32 nodes and 16 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 30 nodes and 15 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 28 nodes and 14 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 26 nodes and 13 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 24 nodes and 12 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 22 nodes and 11 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 20 nodes and 10 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 18 nodes and 9 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 16 nodes and 8 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 14 nodes and 7 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 12 nodes and 6 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 10 nodes and 5 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 8 nodes and 4 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 6 nodes and 3 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 4 nodes and 2 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 2 nodes and 1 edges.
+Found cluster with score 1.4 and 2 nodes. Remaining network has 0 nodes and 0 edges.
+Found 123 clusters with at least 10 nodes and score higher than 2.0.
+Printing clusters... [ok]
+Generating regulators for all regulator types...
+
+Processing TFs regulators...
+  Regulator list: ./Preprocessing/tfs.txt
+  Data type: c (c=continuous, d=discrete)
+  Output prefix: Lemon_out/TFs
+
+LemonTree - Version 3.1.1
+-------------------------
+
+Parameters
+----------
+task:               regulators
+data_file:          Preprocessing/LemonPreprocessed_complete.txt
+reg_file:           ./Preprocessing/tfs.txt
+cluster_file:       Lemon_out/tight_clusters.txt
+output_file:        Lemon_out/TFs
+lambda:             0.1
+mu:                 0.0
+alpha:              0.1
+beta:               0.1
+num_runs:           1
+num_steps:          1100
+burn_in:            100
+sample_steps:       100
+score_gain:         0.0
+num_reg:            10
+Reading expression data... [ok]
+Number of genes in the data matrix: 3362
+Number of conditions in the data matrix: 75
+Number of missing values in the data matrix: 25192
+Total number of expression values: 252150
+Reading cluster file Lemon_out/tight_clusters.txt
+ [ok]
+Assigned genes: 6055
+Not assigned genes: 0
+Number of clusters: 123
+Reading candidate regulators... [ok]
+Found 1364 regulators belonging to the geneset.
+0 of them are discrete
+92 regulators do not belong to the gene set
+dataMean: -1.900026152898926E-17
+dataSigma: 0.9932202608115017
+dataMin: -6.5847528461407
+dataMax: 6.03242842417542
+Gibbs sampling hierarchical trees...
+sampling module 0 timestamp: Thu Apr 30 13:30:41 CEST 2026
+sampling module 1 timestamp: Thu Apr 30 13:30:50 CEST 2026
+sampling module 2 timestamp: Thu Apr 30 13:30:58 CEST 2026
+sampling module 3 timestamp: Thu Apr 30 13:31:16 CEST 2026
+sampling module 4 timestamp: Thu Apr 30 13:31:20 CEST 2026
+sampling module 5 timestamp: Thu Apr 30 13:31:26 CEST 2026
+sampling module 6 timestamp: Thu Apr 30 13:31:32 CEST 2026
+sampling module 7 timestamp: Thu Apr 30 13:31:38 CEST 2026
+sampling module 8 timestamp: Thu Apr 30 13:31:43 CEST 2026
+sampling module 9 timestamp: Thu Apr 30 13:31:49 CEST 2026
+sampling module 10 timestamp: Thu Apr 30 13:31:53 CEST 2026
+sampling module 11 timestamp: Thu Apr 30 13:31:55 CEST 2026
+sampling module 12 timestamp: Thu Apr 30 13:32:01 CEST 2026
+sampling module 13 timestamp: Thu Apr 30 13:32:18 CEST 2026
+sampling module 14 timestamp: Thu Apr 30 13:32:22 CEST 2026
+sampling module 15 timestamp: Thu Apr 30 13:32:25 CEST 2026
+sampling module 16 timestamp: Thu Apr 30 13:32:27 CEST 2026
+sampling module 17 timestamp: Thu Apr 30 13:32:28 CEST 2026
+sampling module 18 timestamp: Thu Apr 30 13:32:30 CEST 2026
+sampling module 19 timestamp: Thu Apr 30 13:32:32 CEST 2026
+sampling module 20 timestamp: Thu Apr 30 13:32:35 CEST 2026
+sampling module 21 timestamp: Thu Apr 30 13:32:36 CEST 2026
+sampling module 22 timestamp: Thu Apr 30 13:32:38 CEST 2026
+sampling module 23 timestamp: Thu Apr 30 13:32:45 CEST 2026
+sampling module 24 timestamp: Thu Apr 30 13:32:47 CEST 2026
+sampling module 25 timestamp: Thu Apr 30 13:32:48 CEST 2026
+sampling module 26 timestamp: Thu Apr 30 13:32:49 CEST 2026
+sampling module 27 timestamp: Thu Apr 30 13:32:56 CEST 2026
+sampling module 28 timestamp: Thu Apr 30 13:32:57 CEST 2026
+sampling module 29 timestamp: Thu Apr 30 13:33:09 CEST 2026
+sampling module 30 timestamp: Thu Apr 30 13:33:16 CEST 2026
+sampling module 31 timestamp: Thu Apr 30 13:33:18 CEST 2026
+sampling module 32 timestamp: Thu Apr 30 13:33:19 CEST 2026
+sampling module 33 timestamp: Thu Apr 30 13:33:20 CEST 2026
+sampling module 34 timestamp: Thu Apr 30 13:33:23 CEST 2026
+sampling module 35 timestamp: Thu Apr 30 13:33:25 CEST 2026
+sampling module 36 timestamp: Thu Apr 30 13:33:29 CEST 2026
+sampling module 37 timestamp: Thu Apr 30 13:33:36 CEST 2026
+sampling module 38 timestamp: Thu Apr 30 13:33:46 CEST 2026
+sampling module 39 timestamp: Thu Apr 30 13:33:49 CEST 2026
+sampling module 40 timestamp: Thu Apr 30 13:34:47 CEST 2026
+sampling module 41 timestamp: Thu Apr 30 13:34:51 CEST 2026
+sampling module 42 timestamp: Thu Apr 30 13:34:54 CEST 2026
+sampling module 43 timestamp: Thu Apr 30 13:34:55 CEST 2026
+sampling module 44 timestamp: Thu Apr 30 13:34:56 CEST 2026
+sampling module 45 timestamp: Thu Apr 30 13:34:57 CEST 2026
+sampling module 46 timestamp: Thu Apr 30 13:34:58 CEST 2026
+sampling module 47 timestamp: Thu Apr 30 13:34:59 CEST 2026
+sampling module 48 timestamp: Thu Apr 30 13:35:00 CEST 2026
+sampling module 49 timestamp: Thu Apr 30 13:35:00 CEST 2026
+sampling module 50 timestamp: Thu Apr 30 13:35:01 CEST 2026
+sampling module 51 timestamp: Thu Apr 30 13:35:02 CEST 2026
+sampling module 52 timestamp: Thu Apr 30 13:35:05 CEST 2026
+sampling module 53 timestamp: Thu Apr 30 13:35:06 CEST 2026
+sampling module 54 timestamp: Thu Apr 30 13:35:09 CEST 2026
+sampling module 55 timestamp: Thu Apr 30 13:35:10 CEST 2026
+sampling module 56 timestamp: Thu Apr 30 13:35:11 CEST 2026
+sampling module 57 timestamp: Thu Apr 30 13:35:12 CEST 2026
+sampling module 58 timestamp: Thu Apr 30 13:35:20 CEST 2026
+sampling module 59 timestamp: Thu Apr 30 13:35:21 CEST 2026
+sampling module 60 timestamp: Thu Apr 30 13:35:22 CEST 2026
+sampling module 61 timestamp: Thu Apr 30 13:35:48 CEST 2026
+sampling module 62 timestamp: Thu Apr 30 13:35:49 CEST 2026
+sampling module 63 timestamp: Thu Apr 30 13:35:51 CEST 2026
+sampling module 64 timestamp: Thu Apr 30 13:36:20 CEST 2026
+sampling module 65 timestamp: Thu Apr 30 13:36:22 CEST 2026
+sampling module 66 timestamp: Thu Apr 30 13:36:24 CEST 2026
+sampling module 67 timestamp: Thu Apr 30 13:36:26 CEST 2026
+sampling module 68 timestamp: Thu Apr 30 13:36:27 CEST 2026
+sampling module 69 timestamp: Thu Apr 30 13:36:29 CEST 2026
+sampling module 70 timestamp: Thu Apr 30 13:36:30 CEST 2026
+sampling module 71 timestamp: Thu Apr 30 13:36:31 CEST 2026
+sampling module 72 timestamp: Thu Apr 30 13:36:34 CEST 2026
+sampling module 73 timestamp: Thu Apr 30 13:36:35 CEST 2026
+sampling module 74 timestamp: Thu Apr 30 13:36:37 CEST 2026
+sampling module 75 timestamp: Thu Apr 30 13:36:38 CEST 2026
+sampling module 76 timestamp: Thu Apr 30 13:36:39 CEST 2026
+sampling module 77 timestamp: Thu Apr 30 13:36:40 CEST 2026
+sampling module 78 timestamp: Thu Apr 30 13:36:41 CEST 2026
+sampling module 79 timestamp: Thu Apr 30 13:36:41 CEST 2026
+sampling module 80 timestamp: Thu Apr 30 13:36:42 CEST 2026
+sampling module 81 timestamp: Thu Apr 30 13:36:43 CEST 2026
+sampling module 82 timestamp: Thu Apr 30 13:36:43 CEST 2026
+sampling module 83 timestamp: Thu Apr 30 13:36:44 CEST 2026
+sampling module 84 timestamp: Thu Apr 30 13:36:45 CEST 2026
+sampling module 85 timestamp: Thu Apr 30 13:36:46 CEST 2026
+sampling module 86 timestamp: Thu Apr 30 13:36:47 CEST 2026
+sampling module 87 timestamp: Thu Apr 30 13:36:48 CEST 2026
+sampling module 88 timestamp: Thu Apr 30 13:36:48 CEST 2026
+sampling module 89 timestamp: Thu Apr 30 13:36:49 CEST 2026
+sampling module 90 timestamp: Thu Apr 30 13:36:49 CEST 2026
+sampling module 91 timestamp: Thu Apr 30 13:36:50 CEST 2026
+sampling module 92 timestamp: Thu Apr 30 13:36:50 CEST 2026
+sampling module 93 timestamp: Thu Apr 30 13:36:51 CEST 2026
+sampling module 94 timestamp: Thu Apr 30 13:36:53 CEST 2026
+sampling module 95 timestamp: Thu Apr 30 13:36:53 CEST 2026
+sampling module 96 timestamp: Thu Apr 30 13:36:54 CEST 2026
+sampling module 97 timestamp: Thu Apr 30 13:36:54 CEST 2026
+sampling module 98 timestamp: Thu Apr 30 13:36:55 CEST 2026
+sampling module 99 timestamp: Thu Apr 30 13:36:56 CEST 2026
+sampling module 100 timestamp: Thu Apr 30 13:36:56 CEST 2026
+sampling module 101 timestamp: Thu Apr 30 13:36:57 CEST 2026
+sampling module 102 timestamp: Thu Apr 30 13:37:13 CEST 2026
+sampling module 103 timestamp: Thu Apr 30 13:37:15 CEST 2026
+sampling module 104 timestamp: Thu Apr 30 13:37:16 CEST 2026
+sampling module 105 timestamp: Thu Apr 30 13:37:17 CEST 2026
+sampling module 106 timestamp: Thu Apr 30 13:37:18 CEST 2026
+sampling module 107 timestamp: Thu Apr 30 13:37:20 CEST 2026
+sampling module 108 timestamp: Thu Apr 30 13:37:21 CEST 2026
+sampling module 109 timestamp: Thu Apr 30 13:37:22 CEST 2026
+sampling module 110 timestamp: Thu Apr 30 13:37:23 CEST 2026
+sampling module 111 timestamp: Thu Apr 30 13:37:24 CEST 2026
+sampling module 112 timestamp: Thu Apr 30 13:37:24 CEST 2026
+sampling module 113 timestamp: Thu Apr 30 13:37:25 CEST 2026
+sampling module 114 timestamp: Thu Apr 30 13:37:26 CEST 2026
+sampling module 115 timestamp: Thu Apr 30 13:37:26 CEST 2026
+sampling module 116 timestamp: Thu Apr 30 13:37:26 CEST 2026
+sampling module 117 timestamp: Thu Apr 30 13:37:27 CEST 2026
+sampling module 118 timestamp: Thu Apr 30 13:37:28 CEST 2026
+sampling module 119 timestamp: Thu Apr 30 13:37:28 CEST 2026
+sampling module 120 timestamp: Thu Apr 30 13:37:29 CEST 2026
+sampling module 121 timestamp: Thu Apr 30 13:37:29 CEST 2026
+sampling module 122 timestamp: Thu Apr 30 13:37:30 CEST 2026
+done.
+Assigning regulators stochastically ...
+module: 0
+module: 1
+module: 2
+module: 3
+module: 4
+module: 5
+module: 6
+module: 7
+module: 8
+module: 9
+module: 10
+module: 11
+module: 12
+module: 13
+module: 14
+module: 15
+module: 16
+module: 17
+module: 18
+module: 19
+module: 20
+module: 21
+module: 22
+module: 23
+module: 24
+module: 25
+module: 26
+module: 27
+module: 28
+module: 29
+module: 30
+module: 31
+module: 32
+module: 33
+module: 34
+module: 35
+module: 36
+module: 37
+module: 38
+module: 39
+module: 40
+module: 41
+module: 42
+module: 43
+module: 44
+module: 45
+module: 46
+module: 47
+module: 48
+module: 49
+module: 50
+module: 51
+module: 52
+module: 53
+module: 54
+module: 55
+module: 56
+module: 57
+module: 58
+module: 59
+module: 60
+module: 61
+module: 62
+module: 63
+module: 64
+module: 65
+module: 66
+module: 67
+module: 68
+module: 69
+module: 70
+module: 71
+module: 72
+module: 73
+module: 74
+module: 75
+module: 76
+module: 77
+module: 78
+module: 79
+module: 80
+module: 81
+module: 82
+module: 83
+module: 84
+module: 85
+module: 86
+module: 87
+module: 88
+module: 89
+module: 90
+module: 91
+module: 92
+module: 93
+module: 94
+module: 95
+module: 96
+module: 97
+module: 98
+module: 99
+module: 100
+module: 101
+module: 102
+module: 103
+module: 104
+module: 105
+module: 106
+module: 107
+module: 108
+module: 109
+module: 110
+module: 111
+module: 112
+module: 113
+module: 114
+module: 115
+module: 116
+module: 117
+module: 118
+module: 119
+module: 120
+module: 121
+module: 122
+[ok]
+Printing regulator file Lemon_out/TFs.allreg.txt [ok]
+Printing regulator file Lemon_out/TFs.topreg.txt [ok]
+Printing random regulator file Lemon_out/TFs.randomreg.txt [ok]
+Writing xml file Lemon_out/TFs.xml.gz [ok]
+✅ Successfully generated TFs regulators (from ./Preprocessing/tfs.txt)
+
+Processing Metabolites regulators...
+  Regulator list: ./Preprocessing/metabolites.txt
+  Data type: c (c=continuous, d=discrete)
+  Output prefix: Lemon_out/Metabolites
+
+LemonTree - Version 3.1.1
+-------------------------
+
+Parameters
+----------
+task:               regulators
+data_file:          Preprocessing/LemonPreprocessed_complete.txt
+reg_file:           ./Preprocessing/metabolites.txt
+cluster_file:       Lemon_out/tight_clusters.txt
+output_file:        Lemon_out/Metabolites
+lambda:             0.1
+mu:                 0.0
+alpha:              0.1
+beta:               0.1
+num_runs:           1
+num_steps:          1100
+burn_in:            100
+sample_steps:       100
+score_gain:         0.0
+num_reg:            10
+Reading expression data... [ok]
+Number of genes in the data matrix: 3362
+Number of conditions in the data matrix: 75
+Number of missing values in the data matrix: 25192
+Total number of expression values: 252150
+Reading cluster file Lemon_out/tight_clusters.txt
+ [ok]
+Assigned genes: 6055
+Not assigned genes: 0
+Number of clusters: 123
+Reading candidate regulators... [ok]
+Found 134 regulators belonging to the geneset.
+0 of them are discrete
+0 regulators do not belong to the gene set
+dataMean: -1.900026152898926E-17
+dataSigma: 0.9932202608115017
+dataMin: -6.5847528461407
+dataMax: 6.03242842417542
+Gibbs sampling hierarchical trees...
+sampling module 0 timestamp: Thu Apr 30 13:56:22 CEST 2026
+sampling module 1 timestamp: Thu Apr 30 13:56:31 CEST 2026
+sampling module 2 timestamp: Thu Apr 30 13:56:37 CEST 2026
+sampling module 3 timestamp: Thu Apr 30 13:56:58 CEST 2026
+sampling module 4 timestamp: Thu Apr 30 13:57:02 CEST 2026
+sampling module 5 timestamp: Thu Apr 30 13:57:07 CEST 2026
+sampling module 6 timestamp: Thu Apr 30 13:57:10 CEST 2026
+sampling module 7 timestamp: Thu Apr 30 13:57:13 CEST 2026
+sampling module 8 timestamp: Thu Apr 30 13:57:15 CEST 2026
+sampling module 9 timestamp: Thu Apr 30 13:57:19 CEST 2026
+sampling module 10 timestamp: Thu Apr 30 13:57:23 CEST 2026
+sampling module 11 timestamp: Thu Apr 30 13:57:25 CEST 2026
+sampling module 12 timestamp: Thu Apr 30 13:57:29 CEST 2026
+sampling module 13 timestamp: Thu Apr 30 13:57:44 CEST 2026
+sampling module 14 timestamp: Thu Apr 30 13:57:50 CEST 2026
+sampling module 15 timestamp: Thu Apr 30 13:57:52 CEST 2026
+sampling module 16 timestamp: Thu Apr 30 13:57:54 CEST 2026
+sampling module 17 timestamp: Thu Apr 30 13:57:55 CEST 2026
+sampling module 18 timestamp: Thu Apr 30 13:57:57 CEST 2026
+sampling module 19 timestamp: Thu Apr 30 13:57:58 CEST 2026
+sampling module 20 timestamp: Thu Apr 30 13:58:01 CEST 2026
+sampling module 21 timestamp: Thu Apr 30 13:58:02 CEST 2026
+sampling module 22 timestamp: Thu Apr 30 13:58:03 CEST 2026
+sampling module 23 timestamp: Thu Apr 30 13:58:09 CEST 2026
+sampling module 24 timestamp: Thu Apr 30 13:58:11 CEST 2026
+sampling module 25 timestamp: Thu Apr 30 13:58:11 CEST 2026
+sampling module 26 timestamp: Thu Apr 30 13:58:12 CEST 2026
+sampling module 27 timestamp: Thu Apr 30 13:58:17 CEST 2026
+sampling module 28 timestamp: Thu Apr 30 13:58:18 CEST 2026
+sampling module 29 timestamp: Thu Apr 30 13:58:23 CEST 2026
+sampling module 30 timestamp: Thu Apr 30 13:58:27 CEST 2026
+sampling module 31 timestamp: Thu Apr 30 13:58:28 CEST 2026
+sampling module 32 timestamp: Thu Apr 30 13:58:29 CEST 2026
+sampling module 33 timestamp: Thu Apr 30 13:58:30 CEST 2026
+sampling module 34 timestamp: Thu Apr 30 13:58:32 CEST 2026
+sampling module 35 timestamp: Thu Apr 30 13:58:33 CEST 2026
+sampling module 36 timestamp: Thu Apr 30 13:58:34 CEST 2026
+sampling module 37 timestamp: Thu Apr 30 13:58:37 CEST 2026
+sampling module 38 timestamp: Thu Apr 30 13:58:48 CEST 2026
+sampling module 39 timestamp: Thu Apr 30 13:58:51 CEST 2026
+sampling module 40 timestamp: Thu Apr 30 13:59:45 CEST 2026
+sampling module 41 timestamp: Thu Apr 30 13:59:47 CEST 2026
+sampling module 42 timestamp: Thu Apr 30 13:59:49 CEST 2026
+sampling module 43 timestamp: Thu Apr 30 13:59:49 CEST 2026
+sampling module 44 timestamp: Thu Apr 30 13:59:50 CEST 2026
+sampling module 45 timestamp: Thu Apr 30 13:59:50 CEST 2026
+sampling module 46 timestamp: Thu Apr 30 13:59:51 CEST 2026
+sampling module 47 timestamp: Thu Apr 30 13:59:52 CEST 2026
+sampling module 48 timestamp: Thu Apr 30 13:59:52 CEST 2026
+sampling module 49 timestamp: Thu Apr 30 13:59:53 CEST 2026
+sampling module 50 timestamp: Thu Apr 30 13:59:54 CEST 2026
+sampling module 51 timestamp: Thu Apr 30 13:59:54 CEST 2026
+sampling module 52 timestamp: Thu Apr 30 13:59:58 CEST 2026
+sampling module 53 timestamp: Thu Apr 30 13:59:59 CEST 2026
+sampling module 54 timestamp: Thu Apr 30 14:00:02 CEST 2026
+sampling module 55 timestamp: Thu Apr 30 14:00:03 CEST 2026
+sampling module 56 timestamp: Thu Apr 30 14:00:04 CEST 2026
+sampling module 57 timestamp: Thu Apr 30 14:00:05 CEST 2026
+sampling module 58 timestamp: Thu Apr 30 14:00:11 CEST 2026
+sampling module 59 timestamp: Thu Apr 30 14:00:11 CEST 2026
+sampling module 60 timestamp: Thu Apr 30 14:00:13 CEST 2026
+sampling module 61 timestamp: Thu Apr 30 14:00:34 CEST 2026
+sampling module 62 timestamp: Thu Apr 30 14:00:35 CEST 2026
+sampling module 63 timestamp: Thu Apr 30 14:00:37 CEST 2026
+sampling module 64 timestamp: Thu Apr 30 14:00:55 CEST 2026
+sampling module 65 timestamp: Thu Apr 30 14:00:56 CEST 2026
+sampling module 66 timestamp: Thu Apr 30 14:00:56 CEST 2026
+sampling module 67 timestamp: Thu Apr 30 14:00:57 CEST 2026
+sampling module 68 timestamp: Thu Apr 30 14:00:57 CEST 2026
+sampling module 69 timestamp: Thu Apr 30 14:00:59 CEST 2026
+sampling module 70 timestamp: Thu Apr 30 14:00:59 CEST 2026
+sampling module 71 timestamp: Thu Apr 30 14:01:00 CEST 2026
+sampling module 72 timestamp: Thu Apr 30 14:01:01 CEST 2026
+sampling module 73 timestamp: Thu Apr 30 14:01:02 CEST 2026
+sampling module 74 timestamp: Thu Apr 30 14:01:04 CEST 2026
+sampling module 75 timestamp: Thu Apr 30 14:01:06 CEST 2026
+sampling module 76 timestamp: Thu Apr 30 14:01:08 CEST 2026
+sampling module 77 timestamp: Thu Apr 30 14:01:08 CEST 2026
+sampling module 78 timestamp: Thu Apr 30 14:01:10 CEST 2026
+sampling module 79 timestamp: Thu Apr 30 14:01:11 CEST 2026
+sampling module 80 timestamp: Thu Apr 30 14:01:12 CEST 2026
+sampling module 81 timestamp: Thu Apr 30 14:01:12 CEST 2026
+sampling module 82 timestamp: Thu Apr 30 14:01:13 CEST 2026
+sampling module 83 timestamp: Thu Apr 30 14:01:13 CEST 2026
+sampling module 84 timestamp: Thu Apr 30 14:01:14 CEST 2026
+sampling module 85 timestamp: Thu Apr 30 14:01:16 CEST 2026
+sampling module 86 timestamp: Thu Apr 30 14:01:17 CEST 2026
+sampling module 87 timestamp: Thu Apr 30 14:01:17 CEST 2026
+sampling module 88 timestamp: Thu Apr 30 14:01:18 CEST 2026
+sampling module 89 timestamp: Thu Apr 30 14:01:18 CEST 2026
+sampling module 90 timestamp: Thu Apr 30 14:01:19 CEST 2026
+sampling module 91 timestamp: Thu Apr 30 14:01:19 CEST 2026
+sampling module 92 timestamp: Thu Apr 30 14:01:20 CEST 2026
+sampling module 93 timestamp: Thu Apr 30 14:01:21 CEST 2026
+sampling module 94 timestamp: Thu Apr 30 14:01:23 CEST 2026
+sampling module 95 timestamp: Thu Apr 30 14:01:23 CEST 2026
+sampling module 96 timestamp: Thu Apr 30 14:01:24 CEST 2026
+sampling module 97 timestamp: Thu Apr 30 14:01:24 CEST 2026
+sampling module 98 timestamp: Thu Apr 30 14:01:25 CEST 2026
+sampling module 99 timestamp: Thu Apr 30 14:01:25 CEST 2026
+sampling module 100 timestamp: Thu Apr 30 14:01:26 CEST 2026
+sampling module 101 timestamp: Thu Apr 30 14:01:26 CEST 2026
+sampling module 102 timestamp: Thu Apr 30 14:01:40 CEST 2026
+sampling module 103 timestamp: Thu Apr 30 14:01:40 CEST 2026
+sampling module 104 timestamp: Thu Apr 30 14:01:41 CEST 2026
+sampling module 105 timestamp: Thu Apr 30 14:01:41 CEST 2026
+sampling module 106 timestamp: Thu Apr 30 14:01:42 CEST 2026
+sampling module 107 timestamp: Thu Apr 30 14:01:43 CEST 2026
+sampling module 108 timestamp: Thu Apr 30 14:01:44 CEST 2026
+sampling module 109 timestamp: Thu Apr 30 14:01:44 CEST 2026
+sampling module 110 timestamp: Thu Apr 30 14:01:45 CEST 2026
+sampling module 111 timestamp: Thu Apr 30 14:01:46 CEST 2026
+sampling module 112 timestamp: Thu Apr 30 14:01:47 CEST 2026
+sampling module 113 timestamp: Thu Apr 30 14:01:48 CEST 2026
+sampling module 114 timestamp: Thu Apr 30 14:01:49 CEST 2026
+sampling module 115 timestamp: Thu Apr 30 14:01:50 CEST 2026
+sampling module 116 timestamp: Thu Apr 30 14:01:51 CEST 2026
+sampling module 117 timestamp: Thu Apr 30 14:01:52 CEST 2026
+sampling module 118 timestamp: Thu Apr 30 14:01:53 CEST 2026
+sampling module 119 timestamp: Thu Apr 30 14:01:54 CEST 2026
+sampling module 120 timestamp: Thu Apr 30 14:01:55 CEST 2026
+sampling module 121 timestamp: Thu Apr 30 14:01:56 CEST 2026
+sampling module 122 timestamp: Thu Apr 30 14:01:57 CEST 2026
+done.
+Assigning regulators stochastically ...
+module: 0
+module: 1
+module: 2
+module: 3
+module: 4
+module: 5
+module: 6
+module: 7
+module: 8
+module: 9
+module: 10
+module: 11
+module: 12
+module: 13
+module: 14
+module: 15
+module: 16
+module: 17
+module: 18
+module: 19
+module: 20
+module: 21
+module: 22
+module: 23
+module: 24
+module: 25
+module: 26
+module: 27
+module: 28
+module: 29
+module: 30
+module: 31
+module: 32
+module: 33
+module: 34
+module: 35
+module: 36
+module: 37
+module: 38
+module: 39
+module: 40
+module: 41
+module: 42
+module: 43
+module: 44
+module: 45
+module: 46
+module: 47
+module: 48
+module: 49
+module: 50
+module: 51
+module: 52
+module: 53
+module: 54
+module: 55
+module: 56
+module: 57
+module: 58
+module: 59
+module: 60
+module: 61
+module: 62
+module: 63
+module: 64
+module: 65
+module: 66
+module: 67
+module: 68
+module: 69
+module: 70
+module: 71
+module: 72
+module: 73
+module: 74
+module: 75
+module: 76
+module: 77
+module: 78
+module: 79
+module: 80
+module: 81
+module: 82
+module: 83
+module: 84
+module: 85
+module: 86
+module: 87
+module: 88
+module: 89
+module: 90
+module: 91
+module: 92
+module: 93
+module: 94
+module: 95
+module: 96
+module: 97
+module: 98
+module: 99
+module: 100
+module: 101
+module: 102
+module: 103
+module: 104
+module: 105
+module: 106
+module: 107
+module: 108
+module: 109
+module: 110
+module: 111
+module: 112
+module: 113
+module: 114
+module: 115
+module: 116
+module: 117
+module: 118
+module: 119
+module: 120
+module: 121
+module: 122
+[ok]
+Printing regulator file Lemon_out/Metabolites.allreg.txt [ok]
+Printing regulator file Lemon_out/Metabolites.topreg.txt [ok]
+Printing random regulator file Lemon_out/Metabolites.randomreg.txt [ok]
+Writing xml file Lemon_out/Metabolites.xml.gz [ok]
+✅ Successfully generated Metabolites regulators (from ./Preprocessing/metabolites.txt)
+
+LemonTree post-clustering analysis completed successfully
+=== Files generated by post-clustering ===
+Lemon_out/tight_clusters.txt
+Lemon_out/TFs.allreg.txt
+Lemon_out/TFs.topreg.txt
+Lemon_out/TFs.randomreg.txt
+Lemon_out/Metabolites.allreg.txt
+Lemon_out/Metabolites.topreg.txt
+Lemon_out/Metabolites.randomreg.txt
+==========================================

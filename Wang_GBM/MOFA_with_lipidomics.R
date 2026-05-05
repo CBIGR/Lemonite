@@ -193,6 +193,10 @@ dev.off()
 # Write to file
 write.table(lipidomics, paste0(base_dir, 'results/MOFA_with_lipidomics/LemonPreprocessed_lipidomics.txt'), sep = '\t', quote=FALSE, row.names=FALSE)
 
+# Load name mapping for restoring original names in visualizations
+name_mapping <- fread(paste0(base_dir, 'data/name_mapping.tsv'), data.table = FALSE)
+name_lookup <- setNames(name_mapping$original, name_mapping$cleaned)
+
 
 ###########################################################################################
 #### Run MOFA
@@ -275,6 +279,15 @@ MOFAobject <- prepare_mofa(
 # load model
 MOFA.trained <- load_model('./MOFA1.hdf5')
 # change MOFA view names in pretrained object to match current view names
+
+# Rename metabolite/lipid features in MOFA model to original names for display
+for (view in c('Metabolomics', 'Lipidomics')) {
+  if (view %in% views_names(MOFA.trained)) {
+    feat_names <- features_names(MOFA.trained)[[view]]
+    original <- ifelse(feat_names %in% names(name_lookup), name_lookup[feat_names], feat_names)
+    features_names(MOFA.trained)[[view]] <- original
+  }
+}
 
 
 ###########################################################################################
@@ -423,8 +436,8 @@ for (view in views) {
   
   all_features <- unique(unlist(top_features_per_factor))
   
-  # Truncate feature names to max 20 characters
-  truncated_features <- substr(all_features, 1, 20)
+  # Truncate feature names to max 30 characters (using original names)
+  truncated_features <- substr(all_features, 1, 30)
   feature_names_truncated <- c(feature_names_truncated, truncated_features)
   
   data_matrix <- get_data(model, views = view)[[view]][[1]]
@@ -656,10 +669,14 @@ if (nrow(agg_go) > 0) {
 ###########################################################################################
 #### Save feature weights for all factors (per-factor files AND one combined file)
 ###########################################################################################
-
+# Get the number of factors
+n_factors <- model@dimensions$K
 # Create weights directory
 weights_dir <- paste0(base_dir, 'results/MOFA_with_lipidomics/feature_weights_all_factors')
 dir.create(weights_dir, showWarnings = FALSE, recursive = TRUE)
+
+# Re-fetch weights as named list (per view) for per-factor file writing
+weights <- get_weights(model, views = "all", factors = "all")
 
 # Write per-factor files and plots (keep existing behaviour)
 for (fact in 1:n_factors) {
@@ -859,7 +876,7 @@ cosmos_barplot <- ggplot(cosmos_summary_long, aes(x = Factor, y = count, fill = 
     title = "Metabolites above |weight| > 0.2 per factor",
     subtitle = "Colored portion indicates overlap with COSMOS meta-network",
     x = "Factor",
-    y = "Metabolites with |weight| > 0.2"
+    y = "Number of metabolites with |weight| > 0.2"
   ) +
   theme_minimal(base_size = 12) +
   theme(

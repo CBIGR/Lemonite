@@ -1,0 +1,8 @@
+Node1	Node2	Source	Type	Category
+galactitol	ACP5	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+galactitol	RPL36A	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+galactitol	ACE	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+ACP5	SPI1	STRING	PPI	PPI
+MAFB	RPL36A	BioGRID_genes	PPI	PPI
+MAFB	SPI1	STRING	PPI	PPI
+VDR	ACE	STRING	PPI	PPI

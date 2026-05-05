@@ -1,0 +1,13 @@
+Node	Label	Type
+sucrose	sucrose	metabolite
+ZNF787	ZNF787	TF
+PNLIP	PNLIP	bridge_node
+GMEB2	GMEB2	TF
+SDC1	SDC1	bridge_node
+IRF3	IRF3	TF
+FASN	FASN	bridge_node
+ZNF408	ZNF408	TF
+ABHD12	ABHD12	bridge_node
+KLF16	KLF16	TF
+ZNF581	ZNF581	TF
+NT5C	NT5C	bridge_node

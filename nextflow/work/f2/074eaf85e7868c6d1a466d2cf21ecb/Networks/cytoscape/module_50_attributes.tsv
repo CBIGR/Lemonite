@@ -1,0 +1,7 @@
+Node	Label	Type
+fructose	fructose	metabolite
+myo_inositol	myo_inositol	metabolite
+ZBTB8B	ZBTB8B	TF
+CPA2	CPA2	bridge_node
+PGBD1	PGBD1	TF
+DAGLA	DAGLA	bridge_node

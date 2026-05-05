@@ -1,0 +1,156 @@
+=== Files staged by Nextflow ===
+total 40
+drwxr-xr-x 3 borisvdm users  4096 May  5 14:48 .
+drwxr-xr-x 6 borisvdm users   158 May  5 14:48 ..
+lrwxrwxrwx 1 borisvdm users   100 May  5 14:48 cluster_1 -> /home/borisvdm/repo/LemonIte/nextflow/work/65/97998737c29c41bab0cde19914235a/Lemon_results/cluster_1
+lrwxrwxrwx 1 borisvdm users   100 May  5 14:48 cluster_2 -> /home/borisvdm/repo/LemonIte/nextflow/work/25/86a28790d583725a4d6a44f3379cb9/Lemon_results/cluster_2
+lrwxrwxrwx 1 borisvdm users   100 May  5 14:48 cluster_3 -> /home/borisvdm/repo/LemonIte/nextflow/work/76/ff997e59f7389fba97fb6bb2b523c4/Lemon_results/cluster_3
+lrwxrwxrwx 1 borisvdm users   100 May  5 14:48 cluster_4 -> /home/borisvdm/repo/LemonIte/nextflow/work/3f/58ea2d1d6044f7fa1bddadce0149bc/Lemon_results/cluster_4
+lrwxrwxrwx 1 borisvdm users   100 May  5 14:48 cluster_5 -> /home/borisvdm/repo/LemonIte/nextflow/work/b1/37dd07fa6c620581fd5cdc8b84807d/Lemon_results/cluster_5
+lrwxrwxrwx 1 borisvdm users   113 May  5 14:48 clusters_list.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/clusters_list.txt
+-rw-r--r-- 1 borisvdm users     0 May  5 14:48 .command.begin
+-rw-r--r-- 1 borisvdm users     0 May  5 14:48 .command.err
+-rw-r--r-- 1 borisvdm users    33 May  5 14:48 .command.log
+-rw-r--r-- 1 borisvdm users    33 May  5 14:48 .command.out
+-rw-r--r-- 1 borisvdm users 18157 May  5 14:48 .command.run
+-rw-r--r-- 1 borisvdm users  5588 May  5 14:48 .command.sh
+-rw-r--r-- 1 borisvdm users     0 May  5 14:48 .command.trace
+lrwxrwxrwx 1 borisvdm users   130 May  5 14:48 Cytoscape_attributes_75_modules_filtered.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/44/ada7a617fd70cfabe613f4ca6078dc/Networks/Cytoscape_attributes_75_modules_filtered.txt
+lrwxrwxrwx 1 borisvdm users   137 May  5 14:48 Cytoscape_network_75_modules_top2.0pct_filtered.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/44/ada7a617fd70cfabe613f4ca6078dc/Networks/Cytoscape_network_75_modules_top2.0pct_filtered.txt
+lrwxrwxrwx 1 borisvdm users   117 May  5 14:48 DESeq_groups.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/64/cd8ef6393edfdaeec42e9096fa8394/LemonTree/Preprocessing/DESeq_groups.txt
+lrwxrwxrwx 1 borisvdm users    87 May  5 14:48 Enrichment -> /home/borisvdm/repo/LemonIte/nextflow/work/b1/06a7af1c0926df3e61d625580765dd/Enrichment
+lrwxrwxrwx 1 borisvdm users   118 May  5 14:48 evaluation_summary.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/evaluation_summary.txt
+lrwxrwxrwx 1 borisvdm users   134 May  5 14:48 expression_variance_histogram.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/64/cd8ef6393edfdaeec42e9096fa8394/LemonTree/Preprocessing/expression_variance_histogram.pdf
+lrwxrwxrwx 1 borisvdm users   124 May  5 14:48 interactive_module_network.html -> /home/borisvdm/repo/LemonIte/nextflow/work/60/93a6230be859987f8a5b10b13a3558/Module_Overview/interactive_module_network.html
+lrwxrwxrwx 1 borisvdm users   132 May  5 14:48 interactive_module_network_movable.html -> /home/borisvdm/repo/LemonIte/nextflow/work/60/93a6230be859987f8a5b10b13a3558/Module_Overview/interactive_module_network_movable.html
+lrwxrwxrwx 1 borisvdm users   131 May  5 14:48 LemonPreprocessed_complete.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/64/cd8ef6393edfdaeec42e9096fa8394/LemonTree/Preprocessing/LemonPreprocessed_complete.txt
+lrwxrwxrwx 1 borisvdm users   133 May  5 14:48 LemonPreprocessed_expression.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/64/cd8ef6393edfdaeec42e9096fa8394/LemonTree/Preprocessing/LemonPreprocessed_expression.txt
+lrwxrwxrwx 1 borisvdm users   135 May  5 14:48 LemonPreprocessed_metabolomics.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/64/cd8ef6393edfdaeec42e9096fa8394/LemonTree/Preprocessing/LemonPreprocessed_metabolomics.txt
+drwxr-xr-x 7 borisvdm users   109 May  5 14:48 LemonTree
+lrwxrwxrwx 1 borisvdm users   134 May  5 14:48 Metabolite_Gene_enrichment_results.csv -> /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/Metabolite_Gene_enrichment_results.csv
+lrwxrwxrwx 1 borisvdm users   134 May  5 14:48 metabolite_LemoniteKG_interactions.mvf -> /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/metabolite_LemoniteKG_interactions.mvf
+lrwxrwxrwx 1 borisvdm users   130 May  5 14:48 Metabolites.selected_regs_list.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/Metabolites.selected_regs_list.txt
+lrwxrwxrwx 1 borisvdm users   138 May  5 14:48 Metabolites.selected_regulators_scores.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/Metabolites.selected_regulators_scores.txt
+lrwxrwxrwx 1 borisvdm users   116 May  5 14:48 metabolites.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/64/cd8ef6393edfdaeec42e9096fa8394/LemonTree/Preprocessing/metabolites.txt
+lrwxrwxrwx 1 borisvdm users   113 May  5 14:48 Module_coherence_scores.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/44/ada7a617fd70cfabe613f4ca6078dc/Networks/Module_coherence_scores.txt
+lrwxrwxrwx 1 borisvdm users   123 May  5 14:48 module_expression_analysis.csv -> /home/borisvdm/repo/LemonIte/nextflow/work/60/93a6230be859987f8a5b10b13a3558/Module_Overview/module_expression_analysis.csv
+lrwxrwxrwx 1 borisvdm users   117 May  5 14:48 module_network_edges.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/60/93a6230be859987f8a5b10b13a3558/Module_Overview/module_network_edges.txt
+lrwxrwxrwx 1 borisvdm users   127 May  5 14:48 module_network_node_attributes.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/60/93a6230be859987f8a5b10b13a3558/Module_Overview/module_network_node_attributes.txt
+lrwxrwxrwx 1 borisvdm users   127 May  5 14:48 Module_Overview_Comprehensive.html -> /home/borisvdm/repo/LemonIte/nextflow/work/60/93a6230be859987f8a5b10b13a3558/Module_Overview/Module_Overview_Comprehensive.html
+lrwxrwxrwx 1 borisvdm users   112 May  5 14:48 Module_Overview.csv -> /home/borisvdm/repo/LemonIte/nextflow/work/60/93a6230be859987f8a5b10b13a3558/Module_Overview/Module_Overview.csv
+lrwxrwxrwx 1 borisvdm users   113 May  5 14:48 name_map.csv -> /home/borisvdm/repo/LemonIte/nextflow/work/64/cd8ef6393edfdaeec42e9096fa8394/LemonTree/Preprocessing/name_map.csv
+lrwxrwxrwx 1 borisvdm users   117 May  5 14:48 name_mapping.tsv -> /home/borisvdm/repo/LemonIte/nextflow/work/64/cd8ef6393edfdaeec42e9096fa8394/LemonTree/Preprocessing/name_mapping.tsv
+lrwxrwxrwx 1 borisvdm users   127 May  5 14:48 Normalized_metabolites.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/64/cd8ef6393edfdaeec42e9096fa8394/LemonTree/Preprocessing/Normalized_metabolites.pdf
+lrwxrwxrwx 1 borisvdm users   120 May  5 14:48 PCA_metabolites.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/64/cd8ef6393edfdaeec42e9096fa8394/LemonTree/Preprocessing/PCA_metabolites.pdf
+lrwxrwxrwx 1 borisvdm users   124 May  5 14:48 PCA_transcriptomics.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/64/cd8ef6393edfdaeec42e9096fa8394/LemonTree/Preprocessing/PCA_transcriptomics.pdf
+lrwxrwxrwx 1 borisvdm users   104 May  5 14:48 pipeline_parameters_log.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/76/174d067205f77b10ad2e5a53a2db6e/pipeline_parameters_log.txt
+lrwxrwxrwx 1 borisvdm users   122 May  5 14:48 PPI_enrichment_results.csv -> /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/PPI_enrichment_results.csv
+lrwxrwxrwx 1 borisvdm users   116 May  5 14:48 PPI_interactions.mvf -> /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/PPI_interactions.mvf
+lrwxrwxrwx 1 borisvdm users   116 May  5 14:48 regulator_rankings.html -> /home/borisvdm/repo/LemonIte/nextflow/work/60/93a6230be859987f8a5b10b13a3558/Module_Overview/regulator_rankings.html
+lrwxrwxrwx 1 borisvdm users   114 May  5 14:48 sample_mapping.mvf -> /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/sample_mapping.mvf
+lrwxrwxrwx 1 borisvdm users   106 May  5 14:48 specific_modules.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/44/ada7a617fd70cfabe613f4ca6078dc/Networks/specific_modules.txt
+lrwxrwxrwx 1 borisvdm users   122 May  5 14:48 TFs.selected_regs_list.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/TFs.selected_regs_list.txt
+lrwxrwxrwx 1 borisvdm users   130 May  5 14:48 TFs.selected_regulators_scores.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/d2/4055ca978dc74eb066b284d587ad3c/ModuleViewer_files/TFs.selected_regulators_scores.txt
+lrwxrwxrwx 1 borisvdm users   108 May  5 14:48 tfs.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/64/cd8ef6393edfdaeec42e9096fa8394/LemonTree/Preprocessing/tfs.txt
+lrwxrwxrwx 1 borisvdm users    99 May  5 14:48 top_30 -> /home/borisvdm/repo/LemonIte/nextflow/work/60/93a6230be859987f8a5b10b13a3558/Module_Overview/top_30
+=================================
+=== LemonTree directory structure ===
+LemonTree/Networks/Cytoscape_attributes_75_modules_filtered.txt
+LemonTree/Networks/Cytoscape_network_75_modules_top2.0pct_filtered.txt
+LemonTree/Networks/specific_modules.txt
+LemonTree/Networks/Module_coherence_scores.txt
+LemonTree/ModuleViewer_files/Metabolite_Gene_enrichment_results.csv
+LemonTree/ModuleViewer_files/Metabolites.selected_regs_list.txt
+LemonTree/ModuleViewer_files/Metabolites.selected_regulators_scores.txt
+LemonTree/ModuleViewer_files/PPI_enrichment_results.csv
+LemonTree/ModuleViewer_files/PPI_interactions.mvf
+LemonTree/ModuleViewer_files/TFs.selected_regs_list.txt
+LemonTree/ModuleViewer_files/TFs.selected_regulators_scores.txt
+LemonTree/ModuleViewer_files/clusters_list.txt
+LemonTree/ModuleViewer_files/evaluation_summary.txt
+LemonTree/ModuleViewer_files/metabolite_LemoniteKG_interactions.mvf
+LemonTree/ModuleViewer_files/sample_mapping.mvf
+LemonTree/Preprocessing/DESeq_groups.txt
+LemonTree/Preprocessing/LemonPreprocessed_complete.txt
+LemonTree/Preprocessing/LemonPreprocessed_expression.txt
+LemonTree/Preprocessing/LemonPreprocessed_metabolomics.txt
+LemonTree/Preprocessing/Normalized_metabolites.pdf
+LemonTree/Preprocessing/PCA_metabolites.pdf
+LemonTree/Preprocessing/PCA_transcriptomics.pdf
+LemonTree/Preprocessing/expression_variance_histogram.pdf
+LemonTree/Preprocessing/metabolites.txt
+LemonTree/Preprocessing/name_map.csv
+LemonTree/Preprocessing/name_mapping.tsv
+LemonTree/Preprocessing/tfs.txt
+LemonTree/Lemon_out/cluster_3
+LemonTree/Lemon_out/cluster_2
+LemonTree/Lemon_out/cluster_1
+LemonTree/Lemon_out/cluster_4
+LemonTree/Lemon_out/cluster_5
+LemonTree/Module_Overview/Module_Overview.csv
+LemonTree/Module_Overview/Module_Overview_Comprehensive.html
+LemonTree/Module_Overview/interactive_module_network.html
+LemonTree/Module_Overview/interactive_module_network_movable.html
+LemonTree/Module_Overview/module_expression_analysis.csv
+LemonTree/Module_Overview/module_network_edges.txt
+LemonTree/Module_Overview/module_network_node_attributes.txt
+LemonTree/Module_Overview/regulator_rankings.html
+LemonTree/Module_Overview/bp_terms_top_30.csv
+LemonTree/Module_Overview/cluster_assignments_top_30.csv
+LemonTree/Module_Overview/megaGO_files/101_BP_terms.txt
+LemonTree/Module_Overview/megaGO_files/103_BP_terms.txt
+LemonTree/Module_Overview/megaGO_files/11_BP_terms.txt
+LemonTree/Module_Overview/megaGO_files/12_BP_terms.txt
+LemonTree/Module_Overview/megaGO_files/13_BP_terms.txt
+LemonTree/Module_Overview/megaGO_files/14_BP_terms.txt
+LemonTree/Module_Overview/megaGO_files/15_BP_terms.txt
+LemonTree/Module_Overview/megaGO_files/16_BP_terms.txt
+find: ‘standard output’: Broken pipe
+find: write error
+======================================
+[DEBUG] Input dir: /home/borisvdm/repo/LemonIte/nextflow/test_dataset
+[DEBUG] Output dir: .
+[DEBUG] Search dirs: ['./LemonTree/Preprocessing', './LemonTree/Preprocessing', '/home/borisvdm/repo/LemonIte/nextflow/test_dataset/data', '/home/borisvdm/repo/LemonIte/nextflow/test_dataset', '/home/borisvdm/repo/LemonIte/nextflow/test_dataset/../data']
+[DEBUG] Searching for raw pattern: *counts*.tsv
+[DEBUG]   Searching in: /home/borisvdm/repo/LemonIte/nextflow/test_dataset/data
+[DEBUG]   Found 0 matches
+[DEBUG]   Searching in: /home/borisvdm/repo/LemonIte/nextflow/test_dataset
+[DEBUG]   Found 0 matches
+[DEBUG]   Dir doesn't exist: /home/borisvdm/repo/LemonIte/nextflow/test_dataset/../data
+[DEBUG] Searching for raw pattern: *Counts*.tsv
+[DEBUG]   Searching in: /home/borisvdm/repo/LemonIte/nextflow/test_dataset/data
+[DEBUG]   Found 1 matches
+[DEBUG]   Selected: /home/borisvdm/repo/LemonIte/nextflow/test_dataset/data/Counts.tsv
+[DEBUG] Expression file found: /home/borisvdm/repo/LemonIte/nextflow/test_dataset/data/Counts.tsv
+[DEBUG] DataFrame shape: (10000, 75), Columns: 75, Samples: 74
+[DEBUG MAIN] Input stats collected: samples=74, data_types=['Transcriptomics', 'Metabolites']
+============================================================
+LEMONITE SUMMARY REPORT GENERATOR
+============================================================
+Input directory: /home/borisvdm/repo/LemonIte/nextflow/test_dataset
+Output directory: .
+Run ID: .
+============================================================
+Loaded 0 name mappings for original name restoration
+Collecting input statistics...
+Collecting preprocessing statistics...
+Collecting clustering statistics...
+Collecting network statistics...
+Collecting PKN evaluation statistics...
+Collecting enrichment statistics...
+Collecting module rankings...
+Collecting regulator rankings...
+Filtering regulator rankings to 75 coherence-filtered modules
+  Metabolites: 164 regulator-module pairs, 63 unique regulators
+  TFs: 592 regulator-module pairs, 384 unique regulators
+Parsing parameters...
+Generating HTML report...
+Summary report generated: ././Lemonite_Summary_Report.html
+Exporting data tables...
+Exported 18 data table files to ././report_tables
+
+============================================================
+REPORT GENERATION COMPLETE
+============================================================
+Report saved to: ././Lemonite_Summary_Report.html
+Summary report generation completed

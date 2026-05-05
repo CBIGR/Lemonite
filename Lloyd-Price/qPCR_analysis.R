@@ -157,25 +157,33 @@ for (tab in tabs[2:28]) {
   # Reverse the order of Group levels for all plots
   dat$Group <- factor(dat$Group, levels = rev(unique(dat$Group)))
   
+  # Determine treatment type BEFORE modifying group labels
+  original_group_first <- as.character(unique(dat$Group)[1])
+  
   # set reference genes: HPRT and HMBS if group is 'aGPC', GAPDH and HMBS if group contains 'Car' or 'Trig'
-  if (grepl('aGPC', dat$Group[1])) {
+  if (grepl('aGPC', original_group_first)) {
     treatment_type <- 'aGPC'
     print(treatment_type)
     # set reference gene columns
     ref1 <- 'HPRT'; ref2 <- 'HMBS'
-  } else if (grepl('Car', dat$Group[1])) {
+  } else if (grepl('Car', original_group_first)) {
     #print('Car or Trig')
     treatment_type <- 'Car'
     print(treatment_type)
     # set reference gene columns
     ref1 <- 'GAPDH'; ref2 <- 'HMBS'
-  } else if (grepl('Trig', dat$Group[1])) {
+  } else if (grepl('Trig', original_group_first)) {
     #print('Car or Trig')
     treatment_type <- 'Trig'
     print(treatment_type)
     # set reference gene columns
     ref1 <- 'GAPDH'; ref2 <- 'HMBS'
-  } 
+  } else {
+    stop("Unable to determine treatment type from group labels: ", original_group_first)
+  }
+  
+  # Extract only the concentration part from Group labels (remove "name" prefix)
+  dat$Group <- factor(gsub("^[^\\s]+\\s+", "", dat$Group), levels = rev(unique(gsub("^[^\\s]+\\s+", "", dat$Group)))) 
   
   
   # in column geom_mean, calculate the geometric mean of the reference genes
@@ -196,7 +204,7 @@ for (tab in tabs[2:28]) {
   dat <- dat[-c(24, 1),]
   # calculate delta_Ct
   dat$delta_Ct <- abs(dat$Geom_mean - dat$Average_Ct)
-  delta_Ct_control_avg <- mean(dat$delta_Ct[dat$Group == paste0(treatment_type, ' 0')])
+  delta_Ct_control_avg <- mean(dat$delta_Ct[dat$Group == '0'])
   dat$delta_delta_Ct <- dat$delta_Ct - delta_Ct_control_avg
   dat$Fold_gene_expression <- 2^(-dat$delta_delta_Ct)
   
@@ -204,7 +212,8 @@ for (tab in tabs[2:28]) {
   # Test if the data is normally distributed
   # Shapiro-Wilk normality test
   # Perform t-tests comparing each condition to baseline (0 dose group)
-  baseline_group <- paste0(treatment_type, ' 0')
+  # Note: Group labels have been stripped of the treatment prefix, so baseline is just '0'
+  baseline_group <- '0'
   print(paste('Performing t-tests comparing each condition to baseline:', baseline_group))
   
   # Get baseline data
@@ -355,10 +364,9 @@ for (tab in tabs[2:28]) {
   }
 
   boxplot <- boxplot +
-    labs(subtitle = test_summary,
-         title = paste0("Gene Expression: ", tab),
-         x = "Treatment Group",
-         y = "Relative expression") +
+    labs(title = sub("^[^_]+_", "", tab),
+         x = "",
+         y = "Concentration") +
     scale_y_continuous(labels = function(x) format(x, scientific = FALSE),
                       limits = c(NA, max_bar_y)) +  # Expand upper limit for significance bars
     publication_theme() +
@@ -431,9 +439,8 @@ for (tab in tabs[2:28]) {
   }
 
   dotplot <- dotplot +
-    labs(subtitle = test_summary,
-         title = paste0("Gene Expression: ", tab),
-         x = "Treatment Group",
+    labs(title = sub("^[^_]+_", "", tab),
+         x = "",
          y = "Relative expression") +
     scale_y_continuous(labels = function(x) format(x, scientific = FALSE),
                       limits = c(NA, max_bar_y)) +  # Expand upper limit for significance bars
@@ -640,12 +647,7 @@ for (tab in tabs[2:28]) {
         ) +
         scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
         labs(
-          title = paste0("Dose-Response Curve: ", tab),
-          subtitle = paste0("Treatment: ", treatment_type, " | ", 
-                           if(!is.na(slope_pval)) paste0("p = ", sprintf("%.3f", slope_pval), 
-                           if(slope_pval < 0.001) " ***" else if(slope_pval < 0.01) " **" else if(slope_pval < 0.05) " *" else " (ns)") else "",
-                           if(!is.na(r_squared)) paste0(" | R² = ", sprintf("%.3f", r_squared)) else "",
-                           if(!is.na(ec50)) paste0(" | EC50 = ", sprintf("%.1f", if(ec50/1000 < 1) ec50 else ec50/1000), if(ec50/1000 < 1) " nM" else " µM") else ""),
+          title = sub("^[^_]+_", "", tab),
           x = "Concentration",
           y = "Relative expression"
         ) +
@@ -806,10 +808,7 @@ for (tab in tabs[2:28]) {
           limits = c(0.01, 100)
         ) +
         labs(
-          title = paste0("Linear Model: ", tab),
-          subtitle = paste0("log(Expression) ~ log(Dose) | R² = ", sprintf("%.3f", r_squared), 
-                           " | p = ", sprintf("%.4f", slope_pval),
-                           if(slope_pval < 0.001) " (***)" else if(slope_pval < 0.01) " (**)" else if(slope_pval < 0.05) " (*)" else " (ns)"),
+          title = sub("^[^_]+_", "", tab),
           x = paste0(treatment_type, " Concentration"),
           y = "Relative Gene Expression"
         ) +

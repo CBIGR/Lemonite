@@ -1,0 +1,12 @@
+Node	Label	Type
+scyllo_inositol	scyllo_inositol	metabolite
+L_methionine	L_methionine	metabolite
+CREB1	CREB1	TF
+NOS1	NOS1	bridge_node
+ELK4	ELK4	TF
+CDIPT	CDIPT	bridge_node
+ZNF131	ZNF131	TF
+KMT2A	KMT2A	bridge_node
+RBPJ	RBPJ	TF
+SP3	SP3	TF
+MAT2A	MAT2A	bridge_node

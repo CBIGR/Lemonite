@@ -1,0 +1,6 @@
+Node1	Node2	Source	Type	Category
+capricacid	FABP2	Human1_GEM_dist1	metabolite-gene	Metabolic_pathway
+capricacid	LIPC	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+D_gluconic_acid	LIPC	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+HHEX	FABP2	STRING	PPI	PPI
+PBX4	LIPC	STRING	PPI	PPI

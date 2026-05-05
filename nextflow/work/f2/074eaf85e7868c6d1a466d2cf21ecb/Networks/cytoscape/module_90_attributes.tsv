@@ -1,0 +1,8 @@
+Node	Label	Type
+fructose	fructose	metabolite
+RBAK	RBAK	module_gene
+ZKSCAN5	ZKSCAN5	TF
+SLC4A5	SLC4A5	bridge_node
+GTF2I	GTF2I	TF
+ACE2	ACE2	bridge_node
+ZSCAN21	ZSCAN21	TF

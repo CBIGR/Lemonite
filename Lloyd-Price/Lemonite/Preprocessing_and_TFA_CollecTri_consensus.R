@@ -3,6 +3,19 @@
 setwd('/home/borisvdm/Documents/PhD/Lemonite/Lloyd-Price_IBD/results/LemonTree/')
 base_dir <- '/home/borisvdm/Documents/PhD/Lemonite/Lloyd-Price_IBD/'
 
+# Load name mapping for display (if already created from a previous run)
+if (!exists('name_lookup')) {
+  name_mapping_file <- paste0(base_dir, 'data/name_mapping.tsv')
+  if (file.exists(name_mapping_file)) {
+    name_mapping_df <- read.table(name_mapping_file, sep='\t', header=TRUE, stringsAsFactors=FALSE)
+    name_lookup <- setNames(name_mapping_df$original, name_mapping_df$cleaned)
+    message(paste("Loaded name mapping:", length(name_lookup), "entries"))
+  } else {
+    name_lookup <- NULL
+    warning("name_mapping.tsv not found \u2014 will be created during this run")
+  }
+}
+
 # You will need the following (sub)directory structure:
 # ./
 # -- data
@@ -61,17 +74,18 @@ RNAseq <- fread(expression, header=TRUE, data.table=TRUE)
 #                     filters='hgnc_symbol', values=RNAseq$count, mart=ensembl)
 
 # Use the Ensembl BioMart
-ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl", host = 'https://jan2024.archive.ensembl.org')
-# Retrieve all Ensembl Gene IDs, HGNC Symbols, and Gene Biotypes for all possible genes
-all_genes <- getBM(attributes = c('hgnc_symbol', 'ensembl_gene_id', 'gene_biotype'),
-                   mart = ensembl)
+# ensembl <- useMart("ensembl", dataset = "hsapiens_gene_ensembl", host = 'https://jan2024.archive.ensembl.org')
+# # Retrieve all Ensembl Gene IDs, HGNC Symbols, and Gene Biotypes for all possible genes
+# all_genes <- getBM(attributes = c('hgnc_symbol', 'ensembl_gene_id', 'gene_biotype'),
+#                    mart = ensembl)
+# 
+# write.table(all_genes, file = '/home/borisvdm/Documents/PhD/Lemonite/ensembl_mapping_jan2024.txt', quote=FALSE, sep = '\t', row.names = FALSE)
 
-write.table(all_genes, file = '/home/borisvdm/Documents/PhD/Lemonite/ensembl_mapping_jan2024.txt', quote=FALSE, sep = '\t', row.names = FALSE)
-
-id_ensembl <- all_genes[all_genes$hgnc_symbol %in% RNAseq$count, ]
+#id_ensembl <- all_genes[all_genes$hgnc_symbol %in% RNAseq$count, ]
 
 # write.table(id_ensembl[,c(2,1)], file = '/home/boris/Documents/PhD/gut_brain/IBD/Lloyd-Price2019/results/LemonTree_CollecTri_consensus/Preprocessing/ensemble_mapping.txt', quote=FALSE, sep = '\t', row.names = FALSE)
-#id_ensembl <- fread('/home/boris/Documents/PhD/gut_brain/IBD/Lloyd-Price2019/results/LemonTree_CollecTri_consensus/Preprocessing/ensemble_mapping.txt', header=TRUE, data.table=TRUE)
+id_ensembl <- fread('/home/borisvdm/Documents/PhD/Lemonite/ensembl_mapping_jan2024.txt', header=TRUE, data.table=TRUE)
+
 
 RNAseq <- merge(RNAseq, id_ensembl, by.x = 'count', by.y='hgnc_symbol')
 RNAseq_coding <- as.data.frame(RNAseq[!duplicated(RNAseq$count), ]) # 5 non-unique gene symbols
@@ -296,12 +310,22 @@ abundancies <- fread(metabolomics, data.table = FALSE, header = TRUE)
 rownames(abundancies) <- abundancies$V1; abundancies$V1 <- NULL
 #abundancies <- abundancies %>% mutate_all(na_if, "") # Change empty entries to NA
 
+# Save original metabolite names before cleaning
+original_metabolite_names <- rownames(abundancies)
+
 rownames(abundancies) <- str_replace_all(rownames(abundancies), ' ', '_')
 rownames(abundancies) <- str_replace_all(rownames(abundancies), '-', '_')
 rownames(abundancies) <- str_replace_all(rownames(abundancies), ':', '_')
 rownames(abundancies) <- str_replace_all(rownames(abundancies), '\\+', '_')
 # Remove trailing '_' from rownames
 rownames(abundancies) <- str_replace_all(rownames(abundancies), '_$', '')
+
+# Save name mapping for downstream scripts
+name_mapping_df <- data.frame(cleaned = rownames(abundancies), original = original_metabolite_names, stringsAsFactors = FALSE)
+name_mapping_file <- paste0(base_dir, 'data/name_mapping.tsv')
+write.table(name_mapping_df, name_mapping_file, sep='\t', row.names=FALSE, quote=FALSE)
+message(paste("Saved name mapping:", nrow(name_mapping_df), "entries to", name_mapping_file))
+name_lookup <- setNames(name_mapping_df$original, name_mapping_df$cleaned)
 
 abundancies[is.na(abundancies)] <- 0
 abundancies <- log(abundancies + 1)

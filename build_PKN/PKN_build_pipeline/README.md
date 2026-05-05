@@ -22,7 +22,6 @@ This directory contains a modularized Python implementation of the 3-step PKN (P
 - [ ] `step1_metabolites/intact.py` - IntAct retriever
 - [ ] `step1_metabolites/chembl.py` - chEMBL retriever
 - [ ] `step1_metabolites/lincs.py` - LINCS retriever
-- [ ] `step1_metabolites/l1000.py` - L1000 gene expression retriever
 - [ ] `step1_metabolites/gem.py` - Human-GEM pathway retriever
 - [ ] `step1_metabolites/metalinks.py` - MetalinksDB retriever
 - [ ] `step1_metabolites/preprocessing.py` - Metabolite preprocessing
@@ -75,7 +74,7 @@ python main.py --step 3
 python main.py --step 1 --databases biogrid,stitch,lincs
 ```
 
-### Resume from checkpoint (for L1000)
+### Resume from checkpoint
 ```bash
 python main.py --step 1 --resume
 ```
@@ -100,7 +99,6 @@ step1_metabolites/
   ├── intact.py             # IntAct API
   ├── chembl.py             # chEMBL API
   ├── lincs.py              # LINCS biochemical data
-  ├── l1000.py              # L1000 gene expression (2.1GB GMT)
   ├── gem.py                # Human-GEM pathway distances
   ├── metalinks.py          # MetalinksDB
   ├── preprocessing.py      # ChEMBL ID mapping, SMILES canonicalization
@@ -146,7 +144,7 @@ All API retrievers use exponential backoff with configurable:
 ### Caching
 - Local file retrievers cache parsed results
 - API retrievers cache raw responses
-- Resume capability for long-running operations (L1000)
+- Resume capability for long-running operations
 
 ### Base Classes
 All retrievers inherit from:
@@ -168,7 +166,6 @@ PKN/
   ├── HMDB_metabolites_IntAct_processed.csv
   ├── HMDB_metabolites_chEMBL_processed.csv
   ├── HMDB_metabolites_LINCS_processed.csv
-  ├── HMDB_metabolites_L1000_processed.csv
   ├── HMDB_metabolites_Human1_GEM_dist1_processed.csv
   ├── HMDB_metabolites_Human1_GEM_dist2_processed.csv
   ├── HMDB_metabolites_MetalinksDB_processed.csv
@@ -214,7 +211,6 @@ python step1_metabolites/biogrid.py
 
 ## Notes
 
-- **L1000**: 2.1GB GMT file, single-threaded to avoid RAM issues
 - **STITCH**: Requires MyGene.info for Ensembl→gene symbol mapping
 - **GEM**: NetworkX graph with pathway distance calculations
 - **APIs**: UniProt, IntAct, chEMBL, STRING - all have retry logic

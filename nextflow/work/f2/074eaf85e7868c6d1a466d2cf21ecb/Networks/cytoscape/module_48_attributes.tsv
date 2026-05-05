@@ -1,0 +1,7 @@
+Node	Label	Type
+creatinine	creatinine	metabolite
+ENTPD3	ENTPD3	module_gene
+MYT1L	MYT1L	TF
+PXDN	PXDN	bridge_node
+ZNF532	ZNF532	TF
+EEF2	EEF2	bridge_node

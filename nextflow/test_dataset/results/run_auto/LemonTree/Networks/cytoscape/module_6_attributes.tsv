@@ -1,0 +1,6 @@
+Node	Label	Type
+capricacid	capricacid	metabolite
+STAT6	STAT6	TF
+PPARD	PPARD	bridge_node
+STAT3	STAT3	TF
+TSHR	TSHR	bridge_node

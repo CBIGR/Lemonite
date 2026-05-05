@@ -1,0 +1,13 @@
+Node	Label	Type
+2_hydroxyglutaric_acid	2_hydroxyglutaric_acid	metabolite
+myo_inositol	myo_inositol	metabolite
+AEBP1	AEBP1	TF
+CPA6	CPA6	bridge_node
+NFATC4	NFATC4	TF
+LPIN1	LPIN1	bridge_node
+HES1	HES1	TF
+GAA	GAA	bridge_node
+ZFAT	ZFAT	TF
+FASN	FASN	bridge_node
+TBR1	TBR1	TF
+GAD1	GAD1	bridge_node

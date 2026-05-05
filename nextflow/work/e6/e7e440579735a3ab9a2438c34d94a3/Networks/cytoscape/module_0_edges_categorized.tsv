@@ -1,0 +1,5 @@
+Node1	Node2	Source	Type	Category
+creatinine	PXDN	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+creatinine	FASN	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+MYT1L	PXDN	STRING	PPI	PPI
+ELK1	FASN	BioGRID_genes	PPI	PPI

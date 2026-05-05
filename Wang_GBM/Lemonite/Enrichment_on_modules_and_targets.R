@@ -37,7 +37,13 @@ if (file.exists(plot_utils_path)) {
 ############################################################################################################################################
 
 # CHOOSE ANALYSIS METHOD: "GSEA", "EnrichR", or "both"
-ANALYSIS_METHOD <- "EnrichR"  # Change this to choose your analysis method
+ANALYSIS_METHOD <- "GSEA"  # Change this to choose your analysis method
+
+# GSEA ranking scope: choose which genes to rank against module eigengene
+# Options: "all_genes" (all genes in expression matrix),
+#          "module_members" (genes that are members of any module),
+#          "specific_module_genes" (genes in the specific module being analyzed)
+GSEA_SCOPE <- "all_genes"
 
 # Base directory - UPDATE THIS PATH for IBD Lloyd-Price data
 base_dir <- '/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum/'
@@ -129,9 +135,12 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
   #plan(multisession, workers = 1)
   register(MulticoreParam(workers = n_threads))
     
-  # Output directory
-  output_dir <- paste0(base_dir, 'Enrichment/Modules_gsea')
+  # Output directory (includes scope subfolder)
+  output_base_dir <- paste0(base_dir, 'Enrichment/Modules_gsea')
+  output_dir <- paste0(output_base_dir, '/', GSEA_SCOPE)
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+  cat("GSEA scope:", GSEA_SCOPE, "\n")
+  cat("Results will be saved to:", output_dir, "\n")
 
   # ######################################################################################################################################
   # #### GSEA analysis per module: rank genes based on coexpression with module eigengene - parallel
@@ -175,7 +184,8 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
     list(up, down)
   }
 
-  run_all_gsea <- function(cluster, dbs, organism, module_eigengenes, expression, output_dir) {
+  run_all_gsea <- function(cluster, dbs, organism, module_eigengenes, expression, output_dir,
+                           clusters_to_genes = NULL, gsea_scope = "all_genes") {
 
     #cluster <- '20'
 
@@ -184,7 +194,22 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
     dir.create(dir_name, showWarnings = FALSE)
 
     eigengene <- module_eigengenes[, paste0("ME", cluster)]
-    correlations <- cor(t(expression), eigengene, use = "pairwise.complete.obs")
+
+    # Select genes for correlation based on gsea_scope
+    expr_for_cor <- if (gsea_scope == "specific_module_genes" && !is.null(clusters_to_genes)) {
+      # Only genes in this specific module
+      module_genes <- intersect(clusters_to_genes[[cluster]], rownames(expression))
+      expression[module_genes, , drop = FALSE]
+    } else if (gsea_scope == "module_members" && !is.null(clusters_to_genes)) {
+      # All genes that are members of any module
+      all_module_genes <- intersect(unlist(clusters_to_genes), rownames(expression))
+      expression[all_module_genes, , drop = FALSE]
+    } else {
+      # gsea_scope == "all_genes": use all genes in expression matrix
+      expression
+    }
+
+    correlations <- cor(t(expr_for_cor), eigengene, use = "pairwise.complete.obs")
 
     ranked_genes <- correlations[, 1]
     names(ranked_genes) <- rownames(correlations)
@@ -269,7 +294,9 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
     organism = organism,
     module_eigengenes = module_eigengenes,
     expression = expression,
-    output_dir = output_dir
+    output_dir = output_dir,
+    clusters_to_genes = clusters_to_genes,
+    gsea_scope = GSEA_SCOPE
   )
 
   # Split up/down results

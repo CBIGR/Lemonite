@@ -24,6 +24,7 @@ import warnings
 import re
 import subprocess
 import glob
+import shutil
 from scipy.stats import mannwhitneyu, kruskal, rankdata
 from scipy.spatial.distance import pdist, squareform
 from scipy.cluster.hierarchy import linkage, fcluster
@@ -68,6 +69,254 @@ except ImportError:
     print("To enable megago clustering, install with: pip install megago")
 
 warnings.filterwarnings('ignore')
+
+CANONICAL_CLUSTER_COLUMN = 'top_30'
+CANONICAL_ONTOLOGY = 'BP'
+CANONICAL_TOP_N = 30
+RRVGO_THRESHOLD = 0.7
+RRVGO_METHOD = 'Rel'
+ENRICHMENT_SOURCE_PRIORITY = ('EnrichR', 'GSEA')
+
+
+def module_sort_key(module_id):
+    text = str(module_id)
+    try:
+        return (0, float(text), text)
+    except ValueError:
+        return (1, text, text)
+
+
+def empty_enrichment_frame():
+    return pd.DataFrame(columns=['Module', 'Database', 'Term', 'p.adjust', '__direction__', '__source__'])
+
+
+def standardize_enrichment_df(df, direction=None, source=None):
+    if df is None or df.empty:
+        return empty_enrichment_frame()
+
+    standardized = df.copy()
+
+    mod_col = next((c for c in standardized.columns if c.lower() in ('module', 'cluster', 'moduleid', 'mod')), None)
+    if mod_col and mod_col != 'Module':
+        standardized = standardized.rename(columns={mod_col: 'Module'})
+
+    term_col = next((c for c in standardized.columns if c.lower() in ('term', 'description', 'pathway', 'name')), None)
+    if term_col and term_col != 'Term':
+        standardized = standardized.rename(columns={term_col: 'Term'})
+
+    padj_col = next((c for c in standardized.columns if c.lower() in ('padj', 'p.adjust', 'fdr', 'qvalue', 'p_adj', 'adjusted.p.value', 'p.value')), None)
+    if padj_col and padj_col != 'p.adjust':
+        standardized = standardized.rename(columns={padj_col: 'p.adjust'})
+
+    db_col = next((c for c in standardized.columns if c.lower() in ('database', 'db', 'source')), None)
+    if db_col and db_col != 'Database':
+        standardized = standardized.rename(columns={db_col: 'Database'})
+
+    if 'Module' not in standardized.columns or 'Term' not in standardized.columns:
+        return empty_enrichment_frame()
+
+    if 'Database' not in standardized.columns:
+        standardized['Database'] = ''
+    if 'p.adjust' not in standardized.columns:
+        standardized['p.adjust'] = np.nan
+
+    standardized['Module'] = standardized['Module'].astype(str).str.strip()
+    standardized['Database'] = standardized['Database'].astype(str).str.strip()
+    standardized['Term'] = standardized['Term'].astype(str).str.strip()
+    standardized['p.adjust'] = pd.to_numeric(standardized['p.adjust'], errors='coerce')
+    standardized['__direction__'] = direction if direction is not None else standardized.get('__direction__', 'Up')
+    standardized['__source__'] = source if source is not None else standardized.get('__source__', '')
+
+    standardized = standardized[['Module', 'Database', 'Term', 'p.adjust', '__direction__', '__source__']]
+    standardized = standardized.dropna(subset=['Module', 'Term', 'p.adjust'])
+    if standardized.empty:
+        return empty_enrichment_frame()
+
+    return standardized.sort_values(['Module', 'p.adjust', 'Term', '__direction__']).reset_index(drop=True)
+
+
+def infer_direction_from_filename(filename):
+    lowered = filename.lower()
+    if re.search(r'(^|_)down(_|\.)', lowered):
+        return 'Down'
+    return 'Up'
+
+
+def normalize_enrichment_method(method):
+    lowered = str(method).strip().lower()
+    if lowered == 'enrichr':
+        return 'EnrichR'
+    if lowered == 'gsea':
+        return 'GSEA'
+    return 'auto'
+
+
+def bucket_enrichment_files(csv_files):
+    buckets = {
+        source: {
+            'all_up': [],
+            'all_down': [],
+            'top_10_up': [],
+            'top_10_down': []
+        }
+        for source in ENRICHMENT_SOURCE_PRIORITY
+    }
+
+    for path in sorted(dict.fromkeys(csv_files)):
+        filename = os.path.basename(path).lower()
+        if 'enrichr' in filename:
+            source = 'EnrichR'
+        elif 'gsea' in filename:
+            source = 'GSEA'
+        else:
+            continue
+
+        if 'all_enriched_pathways' in filename:
+            granularity = 'all'
+        elif 'top_10_enriched_pathways' in filename:
+            granularity = 'top_10'
+        else:
+            continue
+
+        direction = infer_direction_from_filename(filename).lower()
+        buckets[source][f'{granularity}_{direction}'].append(path)
+
+    return buckets
+
+
+def choose_enrichment_source(file_buckets, requested_method):
+    requested = normalize_enrichment_method(requested_method)
+    available_sources = [
+        source for source in ENRICHMENT_SOURCE_PRIORITY
+        if any(file_buckets[source][key] for key in file_buckets[source])
+    ]
+
+    if not available_sources:
+        return None
+
+    if requested in ('EnrichR', 'GSEA'):
+        if requested in available_sources:
+            return requested
+        print(f"Requested enrichment source {requested} not found. Falling back to {available_sources[0]}.")
+        return available_sources[0]
+
+    if len(available_sources) > 1:
+        print(f"Both EnrichR and GSEA outputs are available; preferring {available_sources[0]} for overview labeling.")
+    else:
+        print(f"Auto-detected enrichment source: {available_sources[0]}")
+
+    return available_sources[0]
+
+
+def database_key(database_value):
+    value = str(database_value).strip().lower()
+    if value in ('bp', 'go_bp') or 'biological_process' in value or 'biological process' in value:
+        return 'bp'
+    if value in ('mf', 'go_mf') or 'molecular_function' in value or 'molecular function' in value:
+        return 'mf'
+    if value in ('cc', 'go_cc') or 'cellular_component' in value or 'cellular component' in value:
+        return 'cc'
+    if 'kegg' in value:
+        return 'kegg'
+    if 'react' in value:
+        return 'reactome'
+    return 'other'
+
+
+def extract_go_id(term):
+    match = re.search(r'GO:\d+', str(term))
+    return match.group(0) if match else None
+
+
+def prepare_top30_bp_terms(enrichment_data, output_dir, selected_source, top_n=CANONICAL_TOP_N):
+    top30_dir = os.path.join(output_dir, CANONICAL_CLUSTER_COLUMN)
+    os.makedirs(top30_dir, exist_ok=True)
+
+    bp_terms_path = os.path.join(top30_dir, f'bp_terms_{CANONICAL_CLUSTER_COLUMN}.csv')
+    bp_df = enrichment_data.get('bp', empty_enrichment_frame()).copy()
+
+    if bp_df.empty:
+        empty_terms = empty_enrichment_frame().assign(GO_ID=pd.Series(dtype='object'))
+        empty_terms.to_csv(bp_terms_path, index=False)
+        print(f"No BP enrichment terms available. Wrote empty top_30 file to: {bp_terms_path}")
+        return empty_terms, bp_terms_path, top30_dir
+
+    bp_df = standardize_enrichment_df(bp_df, source=selected_source)
+    bp_df['GO_ID'] = bp_df['Term'].map(extract_go_id)
+    bp_df['__term_key__'] = bp_df['GO_ID'].fillna(bp_df['Term'])
+    bp_df = bp_df.drop_duplicates(subset=['Module', '__term_key__'], keep='first')
+    bp_df = bp_df.sort_values(['Module', 'p.adjust', 'Term', '__direction__'])
+    top_terms = bp_df.groupby('Module', sort=True).head(top_n).copy()
+    top_terms = top_terms.drop(columns=['__term_key__'])
+    top_terms.to_csv(bp_terms_path, index=False)
+
+    print(f"Prepared canonical BP top_30 terms for {top_terms['Module'].nunique()} modules")
+    print(f"Top_30 BP term file: {bp_terms_path}")
+    return top_terms, bp_terms_path, top30_dir
+
+
+def write_cluster_assignments(module_clusters, output_dir, cluster_column=CANONICAL_CLUSTER_COLUMN):
+    cluster_path = os.path.join(output_dir, f'cluster_assignments_{cluster_column}.csv')
+    cluster_df = pd.DataFrame([
+        {'Module': str(module_id), cluster_column: cluster_name}
+        for module_id, cluster_name in sorted(module_clusters.items(), key=lambda item: module_sort_key(item[0]))
+    ])
+    cluster_df.to_csv(cluster_path, index=False)
+    print(f"Cluster assignments saved to: {cluster_path}")
+    return cluster_df, cluster_path
+
+
+def load_optional_csv(csv_path, columns):
+    if os.path.exists(csv_path):
+        return pd.read_csv(csv_path)
+    return pd.DataFrame(columns=columns)
+
+
+def run_rrvgo_labeler(bp_terms_path, cluster_path, output_dir, organism, cluster_column=CANONICAL_CLUSTER_COLUMN):
+    helper_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rrvgo_cluster_labels.R')
+    empty_outputs = {
+        'cluster_labels': pd.DataFrame(columns=['MegaGO_cluster', 'MegaGO_label']),
+        'module_labels': pd.DataFrame(columns=['Module', 'MegaGO_cluster', 'MegaGO_label', 'representative_go_id', 'label_source']),
+        'reduced_terms': pd.DataFrame(columns=['MegaGO_cluster', 'representative_label'])
+    }
+
+    if not os.path.exists(helper_path):
+        print(f"Warning: rrvgo helper not found at {helper_path}; skipping label generation.")
+        return empty_outputs
+
+    command = [
+        'Rscript',
+        helper_path,
+        f'--enrichment={bp_terms_path}',
+        f'--clusters={cluster_path}',
+        f'--out-dir={output_dir}',
+        f'--cluster-column={cluster_column}',
+        f'--organism={organism}',
+        f'--ontology={CANONICAL_ONTOLOGY}',
+        f'--top-n={CANONICAL_TOP_N}',
+        f'--threshold={RRVGO_THRESHOLD}',
+        f'--method={RRVGO_METHOD}'
+    ]
+
+    print("Running rrvgo cluster labeling helper...")
+    result = subprocess.run(command, capture_output=True, text=True)
+    if result.stdout:
+        print(result.stdout.strip())
+    if result.returncode != 0:
+        if result.stderr:
+            print(result.stderr.strip())
+        print("Warning: rrvgo helper failed; continuing without cluster labels.")
+        return empty_outputs
+
+    cluster_labels_path = os.path.join(output_dir, f'rrvgo_cluster_labels_{cluster_column}.csv')
+    module_labels_path = os.path.join(output_dir, f'rrvgo_module_labels_{cluster_column}.csv')
+    reduced_terms_path = os.path.join(output_dir, f'rrvgo_reduced_terms_{cluster_column}.csv')
+
+    return {
+        'cluster_labels': load_optional_csv(cluster_labels_path, ['MegaGO_cluster', 'MegaGO_label']),
+        'module_labels': load_optional_csv(module_labels_path, ['Module', 'MegaGO_cluster', 'MegaGO_label', 'representative_go_id', 'label_source']),
+        'reduced_terms': load_optional_csv(reduced_terms_path, ['MegaGO_cluster', 'representative_label'])
+    }
 
 def get_regulators(regfile):
     """
@@ -126,7 +375,7 @@ def load_regulator_scores(score_file):
         return pd.DataFrame(columns=['Regulator', 'Module', 'Score', 'Overall_rank'])
  
 
-def generate_regulator_tables_html(regulator_scores_dict, output_dir):
+def generate_regulator_tables_html(regulator_scores_dict, output_dir, name_lookup=None):
     """
     Generate an HTML file with regulator ranking tables.
     
@@ -220,9 +469,10 @@ def generate_regulator_tables_html(regulator_scores_dict, output_dir):
             score = row['Score']
             score_class = 'positive' if score > 0 else 'negative'
             overall_rank = row.get('Overall_rank', 'NA')
+            display_reg = name_lookup.get(row['Regulator'], row['Regulator']) if name_lookup else row['Regulator']
             html_parts.append(
                 f'<tr><td>{rank}</td>'
-                f'<td>{row["Regulator"]}</td>'
+                f'<td>{display_reg}</td>'
                 f'<td>{row["Module"]}</td>'
                 f'<td class="{score_class}">{score:.4f}</td>'
                 f'<td>{overall_rank}</td></tr>'
@@ -261,9 +511,10 @@ def generate_regulator_tables_html(regulator_scores_dict, output_dir):
 
         for rank, (_, row) in enumerate(summary_df.iterrows(), 1):
             score_class = 'positive' if row['Total_Score'] > 0 else 'negative'
+            display_reg = name_lookup.get(row['Regulator'], row['Regulator']) if name_lookup else row['Regulator']
             html_parts.append(
                 f'<tr><td>{rank}</td>'
-                f'<td>{row["Regulator"]}</td>'
+                f'<td>{display_reg}</td>'
                 f'<td class="{score_class}">{row["Total_Score"]:.4f}</td>'
                 f'<td>{row["N_Modules"]}</td>'
                 f'<td class="module-list">{row["Target_Modules"]}</td></tr>'
@@ -472,7 +723,7 @@ def create_comprehensive_html_report(regulator_tables_html_path, network_html_pa
     return output_file
 
 
-def load_enrichment_data(enrichment_dir, method='EnrichR'):
+def load_enrichment_data(enrichment_dir, method='auto'):
     """
     Load pathway enrichment results from either EnrichR or GSEA methods
     
@@ -481,368 +732,95 @@ def load_enrichment_data(enrichment_dir, method='EnrichR'):
     method (str): 'EnrichR' or 'GSEA'
     
     Returns:
-    dict: Dictionary with pathway type as keys and DataFrames as values
+    tuple: (enrichment_data dict, metadata dict)
     """
-    enrichment_data = {}
+    enrichment_data = {
+        'bp': empty_enrichment_frame(),
+        'mf': empty_enrichment_frame(),
+        'cc': empty_enrichment_frame(),
+        'kegg': empty_enrichment_frame(),
+        'reactome': empty_enrichment_frame()
+    }
+    metadata = {
+        'selected_source': None,
+        'selected_granularity': None,
+        'selected_files': []
+    }
 
     try:
-        # quick exit if enrichment dir doesn't exist
         if not os.path.isdir(enrichment_dir):
-            return enrichment_data
+            return enrichment_data, metadata
 
-        # collect CSV files under enrichment_dir
         csv_files = []
         for root, dirs, files in os.walk(enrichment_dir):
             for f in files:
                 if f.lower().endswith('.csv'):
                     csv_files.append(os.path.join(root, f))
 
-        # Debug: list discovered enrichment csv files
         if csv_files:
             print(f"Found enrichment CSV files ({len(csv_files)}):")
             for p in csv_files:
                 print(f"  - {p}")
         else:
             print(f"No enrichment CSV files found under: {enrichment_dir}")
-
         if not csv_files:
-            # no enrichment files found
-            return enrichment_data
+            return enrichment_data, metadata
 
-        filenames_lower = [os.path.basename(p).lower() for p in csv_files]
+        file_buckets = bucket_enrichment_files(csv_files)
+        selected_source = choose_enrichment_source(file_buckets, method)
+        if selected_source is None:
+            print("No canonical EnrichR or GSEA enrichment files were found.")
+            return enrichment_data, metadata
 
-        # detect method if possible
-        enrichr_candidates = [p for p,fn in zip(csv_files, filenames_lower) if 'enrichr' in fn or 'top_10_enriched_pathways' in fn]
-        gsea_candidates = [p for p,fn in zip(csv_files, filenames_lower) if 'gsea' in fn or fn.startswith('gsea_')]
+        source_bucket = file_buckets[selected_source]
+        selected_granularity = 'all' if (source_bucket['all_up'] or source_bucket['all_down']) else 'top_10'
+        selected_files = list(dict.fromkeys(
+            source_bucket[f'{selected_granularity}_up'] + source_bucket[f'{selected_granularity}_down']
+        ))
 
-        if enrichr_candidates and not gsea_candidates:
-            method = 'EnrichR'
-            print('Auto-detected EnrichR method')
-        elif gsea_candidates and not enrichr_candidates:
-            method = 'GSEA'
-            print('Auto-detected GSEA method')
-        else:
-            print(f'Both or ambiguous enrichment outputs found; using requested method: {method}')
+        metadata = {
+            'selected_source': selected_source,
+            'selected_granularity': selected_granularity,
+            'selected_files': selected_files
+        }
 
-        def _standardize_df(df):
-            df = df.copy()
-            # Module column
-            mod_col = next((c for c in df.columns if c.lower() in ('module','cluster','moduleid','mod')), None)
-            if mod_col and mod_col != 'Module':
-                df = df.rename(columns={mod_col: 'Module'})
-            # Term column
-            term_col = next((c for c in df.columns if c.lower() in ('term','description','pathway','name')), None)
-            if term_col and term_col != 'Term':
-                df = df.rename(columns={term_col: 'Term'})
-            # p.adjust alternatives
-            padj_col = next((c for c in df.columns if c.lower() in ('padj','p.adjust','fdr','qvalue','p_adj','p.value')), None)
-            if padj_col and padj_col != 'p.adjust':
-                df = df.rename(columns={padj_col: 'p.adjust'})
-            if 'Module' in df.columns:
-                df['Module'] = df['Module'].astype(str).str.strip()
-            return df
+        print(f"Using {selected_source} enrichment files ({selected_granularity}) for module overview integration")
 
-        # Look for enrichment combined files (both EnrichR and GSEA patterns)
-        up_candidates = [p for p in csv_files
-                        if ('enrichr' in os.path.basename(p).lower() or 'gsea' in os.path.basename(p).lower())
-                        and 'up' in os.path.basename(p).lower()
-                        and 'per_module' in os.path.basename(p).lower()]
-        down_candidates = [p for p in csv_files
-                          if ('enrichr' in os.path.basename(p).lower() or 'gsea' in os.path.basename(p).lower())
-                          and 'down' in os.path.basename(p).lower()
-                          and 'per_module' in os.path.basename(p).lower()]
+        if not selected_files:
+            return enrichment_data, metadata
 
-        # Also check exact filename fallbacks (both EnrichR and GSEA)
-        for pattern in ['enrichr_top_10_enriched_pathways_up_per_module.csv',
-                        'gsea_top_10_enriched_pathways_up_per_module.csv']:
-            fallback = next((p for p in csv_files if os.path.basename(p).lower() == pattern), None)
-            if fallback and fallback not in up_candidates:
-                up_candidates.append(fallback)
-        for pattern in ['enrichr_top_10_enriched_pathways_down_per_module.csv',
-                        'gsea_top_10_enriched_pathways_down_per_module.csv']:
-            fallback = next((p for p in csv_files if os.path.basename(p).lower() == pattern), None)
-            if fallback and fallback not in down_candidates:
-                down_candidates.append(fallback)
-
-        # When multiple candidates exist per method+direction (e.g. from different runs),
-        # try to select the best match per method using module count
-        def _select_best_per_method(candidates, module_count=None):
-            """Group candidates by method and select best file per method."""
-            by_method = {}
-            for c in candidates:
-                bn = os.path.basename(c).lower()
-                m = 'enrichr' if 'enrichr' in bn else ('gsea' if 'gsea' in bn else 'other')
-                by_method.setdefault(m, []).append(c)
-
-            selected = []
-            for m, method_cands in by_method.items():
-                if len(method_cands) == 1:
-                    selected.append(method_cands[0])
-                elif module_count:
-                    matched = [c for c in method_cands if str(module_count) in os.path.basename(c)]
-                    selected.append(matched[0] if matched else method_cands[0])
-                else:
-                    selected.append(method_cands[0])
-            return selected
-
-        # Determine module count for disambiguation if needed (>1 file per method)
-        current_module_count = None
-        needs_disambiguation = any(
-            sum(1 for c in cands if kw in os.path.basename(c).lower()) > 1
-            for cands in [up_candidates, down_candidates]
-            for kw in ['enrichr', 'gsea']
-        )
-        if needs_disambiguation:
-            for root, dirs, files in os.walk(os.path.dirname(enrichment_dir)):
-                for f in files:
-                    if 'module' in f.lower() and f.endswith('.txt'):
-                        try:
-                            with open(os.path.join(root, f), 'r') as file:
-                                lines = file.readlines()
-                                if lines:
-                                    modules = set()
-                                    for line in lines[1:]:
-                                        parts_line = line.strip().split('\t')
-                                        if len(parts_line) >= 2:
-                                            modules.add(parts_line[1])
-                                    if modules:
-                                        current_module_count = len(modules)
-                                        print(f"Detected {current_module_count} modules from {f}")
-                                        break
-                        except:
-                            continue
-
-            up_candidates = _select_best_per_method(up_candidates, current_module_count)
-            down_candidates = _select_best_per_method(down_candidates, current_module_count)
-
-        # Deduplicate and load all enrichment files (EnrichR + GSEA, up + down)
-        all_enrichment_paths = list(dict.fromkeys(up_candidates + down_candidates))
-
-        if all_enrichment_paths:
-            parts = []
-            for pth in all_enrichment_paths:
-                try:
-                    df = pd.read_csv(pth)
-                    # Set direction based on filename
-                    filename = os.path.basename(pth).lower()
-                    if 'up' in filename:
-                        df['__direction__'] = 'Up'
-                    elif 'down' in filename:
-                        df['__direction__'] = 'Down'
-                    else:
-                        df['__direction__'] = 'Up'  # Default to up if unclear
-                    parts.append(df)
-                    print(f"Loaded enrichment file: {os.path.basename(pth)} ({len(df)} rows)")
-                except Exception as e:
-                    print(f"Warning: could not read enrichment file {pth}: {e}")
-
-            if parts:
-                combined = pd.concat(parts, ignore_index=True)
-                combined = _standardize_df(combined)
-
-                # If Database column present, split by database
-                db_col = next((c for c in combined.columns if c.lower() in ('database','db','source')), None)
-                if db_col:
-                    for db_val, sub in combined.groupby(db_col):
-                        v = str(db_val).lower()
-                        if 'bp' in v or 'go' in v or 'biol' in v:
-                            key = 'bp'
-                        elif 'mf' in v:
-                            key = 'mf'
-                        elif 'cc' in v:
-                            key = 'cc'
-                        elif 'kegg' in v:
-                            key = 'kegg'
-                        elif 'react' in v:
-                            key = 'reactome'
-                        else:
-                            key = 'other'
-
-                        enrichment_data.setdefault(key, pd.DataFrame())
-                        enrichment_data[key] = pd.concat([enrichment_data[key], _standardize_df(sub)], ignore_index=True)
-                else:
-                    # fallback: put into 'bp' to ensure downstream has something
-                    enrichment_data['bp'] = combined
-
-                # ensure keys exist
-                for k in ('bp','mf','cc','kegg','reactome'):
-                    enrichment_data.setdefault(k, pd.DataFrame(columns=['Module','Term','p.adjust']))
-
-                return enrichment_data
-
-        # General fallback: try to load any EnrichR/GSEA-like files and bucket by filename
-        for pth in csv_files:
-            fn = os.path.basename(pth).lower()
+        loaded_frames = []
+        for path in selected_files:
             try:
-                df = pd.read_csv(pth)
-            except Exception:
+                direction = infer_direction_from_filename(os.path.basename(path))
+                frame = pd.read_csv(path)
+                standardized = standardize_enrichment_df(frame, direction=direction, source=selected_source)
+                if not standardized.empty:
+                    loaded_frames.append(standardized)
+                    print(f"Loaded enrichment file: {os.path.basename(path)} ({len(standardized)} rows)")
+            except Exception as exc:
+                print(f"Warning: could not read enrichment file {path}: {exc}")
+
+        if not loaded_frames:
+            return enrichment_data, metadata
+
+        combined = pd.concat(loaded_frames, ignore_index=True)
+        for db_value, subframe in combined.groupby('Database', dropna=False):
+            key = database_key(db_value)
+            if key == 'other':
                 continue
+            enrichment_data[key] = pd.concat([
+                enrichment_data[key],
+                standardize_enrichment_df(subframe)
+            ], ignore_index=True)
 
-            std = _standardize_df(df)
-            key = 'other'
-            if 'gsea' in fn:
-                # For GSEA files, check if they contain biological process terms
-                # GSEA files have BP terms under 'BP' or 'ALL' database category
-                if 'Database' in std.columns:
-                    # Check if this file contains biological process terms
-                    db_values = std['Database'].str.lower().unique()
-                    if any('bp' in db_val or 'all' in db_val or 'go:' in db_val for db_val in db_values if isinstance(db_val, str)):
-                        # Extract BP terms from GSEA file - prefer 'BP' over 'ALL'
-                        bp_terms = pd.DataFrame()
-                        if 'bp' in [str(x).lower() for x in db_values]:
-                            bp_terms = std[std['Database'].str.lower() == 'bp'].copy()
-                        elif 'all' in [str(x).lower() for x in db_values]:
-                            bp_terms = std[std['Database'].str.lower() == 'all'].copy()
-
-                        if not bp_terms.empty:
-                            enrichment_data.setdefault('bp', pd.DataFrame())
-                            enrichment_data['bp'] = pd.concat([enrichment_data['bp'], bp_terms], ignore_index=True)
-
-                        # Extract other database categories
-                        for db_val in db_values:
-                            if isinstance(db_val, str):
-                                db_lower = db_val.lower()
-                                if db_lower == 'cc':
-                                    key = 'cc'
-                                elif db_lower == 'mf':
-                                    key = 'mf'
-                                elif 'kegg' in db_lower:
-                                    key = 'kegg'
-                                elif 'react' in db_lower:
-                                    key = 'reactome'
-                                else:
-                                    continue
-
-                                db_terms = std[std['Database'].str.lower() == db_lower]
-                                if not db_terms.empty:
-                                    enrichment_data.setdefault(key, pd.DataFrame())
-                                    enrichment_data[key] = pd.concat([enrichment_data[key], db_terms], ignore_index=True)
-                        continue  # Skip the general key assignment below
-
-                # Fallback for GSEA files without Database column or other patterns
-                if 'bp' in fn or 'biol' in fn:
-                    key = 'bp'
-                elif 'mf' in fn:
-                    key = 'mf'
-                elif 'cc' in fn:
-                    key = 'cc'
-                elif 'kegg' in fn:
-                    key = 'kegg'
-                elif 'react' in fn:
-                    key = 'reactome'
-            elif 'enrichr' in fn or 'top_10_enriched_pathways' in fn:
-                # heuristic
-                if 'bp' in fn or 'biol' in fn:
-                    key = 'bp'
-                elif 'mf' in fn:
-                    key = 'mf'
-                elif 'cc' in fn:
-                    key = 'cc'
-                elif 'kegg' in fn:
-                    key = 'kegg'
-                elif 'react' in fn:
-                    key = 'reactome'
-
-            enrichment_data.setdefault(key, pd.DataFrame())
-            enrichment_data[key] = pd.concat([enrichment_data[key], std], ignore_index=True)
-
-        # ensure expected keys exist
-        for k in ('bp','mf','cc','kegg','reactome'):
-            enrichment_data.setdefault(k, pd.DataFrame(columns=['Module','Term','p.adjust']))
+        for key in enrichment_data:
+            enrichment_data[key] = standardize_enrichment_df(enrichment_data[key])
 
     except Exception as e:
         print(f"Error loading enrichment data: {e}")
 
-    return enrichment_data
-
-def categorize_modules_by_keywords(enrichment_data):
-    """
-    Naive heuristic to assign each module to a broad GO category based on keyword
-    matching in its enriched Biological Process terms.
-    
-    Parameters:
-    enrichment_data (dict): Enrichment data dictionary (key 'bp' has BP DataFrame)
-    
-    Returns:
-    dict: Mapping module id (string) -> broad GO category string
-    """
-    go_categories = {
-        'Immune': ['immune', 'inflammatory', 'cytokine', 'interferon', 'lymphocyte',
-                   'leukocyte', 'antigen', 'defense', 'innate immunity', 'adaptive immunity',
-                   'inflammation'],
-        'Metabolic': ['metabolic', 'metabolism', 'biosynthetic', 'catabolic',
-                      'glycolysis', 'oxidation', 'fatty acid', 'lipid metabolism',
-                      'glucose', 'ATP'],
-        'Cell Cycle': ['cell cycle', 'mitotic', 'division', 'proliferation',
-                       'DNA replication', 'chromosome', 'cytokinesis', 'G1/S', 'G2/M'],
-        'Signaling': ['signal transduction', 'signaling', 'receptor', 'kinase',
-                      'phosphorylation', 'MAPK', 'cascade', 'pathway', 'GTPase'],
-        'Development': ['development', 'differentiation', 'morphogenesis',
-                        'embryonic', 'organogenesis', 'pattern specification'],
-        'Apoptosis': ['apoptosis', 'cell death', 'programmed cell death',
-                      'caspase'],
-        'Adhesion_Migration': ['cell adhesion', 'migration', 'motility',
-                               'locomotion', 'extracellular matrix', 'integrin'],
-        'Transcription': ['transcription', 'RNA processing', 'gene expression',
-                          'chromatin', 'histone', 'epigenetic'],
-        'Transport': ['transport', 'localization', 'secretion', 'export',
-                      'import', 'vesicle'],
-        'Stress_Response': ['stress', 'response to stimulus', 'oxidative stress',
-                            'DNA damage', 'hypoxia', 'heat shock']
-    }
-
-    module_categories = {}
-
-    if 'bp' not in enrichment_data or enrichment_data['bp'].empty:
-        print("No BP enrichment data available for keyword clustering")
-        return module_categories
-
-    bp_df = enrichment_data['bp']
-    term_col = 'Term' if 'Term' in bp_df.columns else None
-    mod_col = 'Module' if 'Module' in bp_df.columns else None
-    if term_col is None or mod_col is None:
-        return module_categories
-
-    for module in bp_df[mod_col].unique():
-        mod_df = bp_df[bp_df[mod_col] == module]
-        bp_terms = mod_df[term_col].tolist()
-        if not bp_terms:
-            module_categories[str(module)] = 'Other'
-            continue
-
-        scores = {cat: 0 for cat in go_categories}
-        for term in bp_terms:
-            if not isinstance(term, str):
-                continue
-            tl = term.lower()
-            for cat, kws in go_categories.items():
-                for kw in kws:
-                    if kw in tl:
-                        scores[cat] += 1
-
-        if max(scores.values()) > 0:
-            module_categories[str(module)] = max(scores, key=scores.get)
-        else:
-            module_categories[str(module)] = 'Other'
-
-    print(f"Keyword clustering assigned {len(module_categories)} modules to {len(set(module_categories.values()))} categories")
-    return module_categories
-
-
-def rand_index_from_labels(lbl1, lbl2):
-    """Compute the Rand Index between two label vectors."""
-    n = len(lbl1)
-    assert n == len(lbl2)
-    agreements = 0
-    total = 0
-    for i in range(n):
-        for j in range(i + 1, n):
-            same1 = lbl1[i] == lbl1[j]
-            same2 = lbl2[i] == lbl2[j]
-            if same1 == same2:
-                agreements += 1
-            total += 1
-    return agreements / total if total else 0.0
+    return enrichment_data, metadata
 
 
 def load_pkn_data(pkn_file, metabolite_mapping_file=None):
@@ -943,7 +921,7 @@ def annotate_edges_with_category(edges, pkn_lookup, name_to_hmdb, module_genes_m
     return edges
 
 
-def build_enriched_hover_text(module_id, module_overview_df, enrichment_all_df, edges):
+def build_enriched_hover_text(module_id, module_overview_df, enrichment_all_df, edges, name_lookup=None):
     """
     Build rich hover text for a module node including expression info,
     regulators (up to 10), and top 3 pathways per database with p-values.
@@ -983,7 +961,20 @@ def build_enriched_hover_text(module_id, module_overview_df, enrichment_all_df, 
         genes_val = row.get('Module_genes', 'NA')
         if genes_val != 'NA' and pd.notna(genes_val):
             gene_count = len(str(genes_val).split('|'))
-            hover_text += f"<b>Genes:</b> {gene_count} genes<br><br>"
+            hover_text += f"<b>Genes:</b> {gene_count} genes<br>"
+
+        megago_cluster = row.get('MegaGO_Cluster', row.get('Functional_Cluster', 'NA'))
+        if megago_cluster != 'NA' and pd.notna(megago_cluster):
+            hover_text += f"<b>MegaGO Cluster:</b> {megago_cluster}<br>"
+
+        megago_label = row.get('MegaGO_Label', 'NA')
+        if megago_label != 'NA' and pd.notna(megago_label) and str(megago_label).strip() != '':
+            hover_text += f"<b>MegaGO Label:</b> {megago_label}<br>"
+            representative_go_id = row.get('MegaGO_Representative_GO_ID', 'NA')
+            if representative_go_id != 'NA' and pd.notna(representative_go_id) and str(representative_go_id).strip() != '':
+                hover_text += f"<b>Representative GO:</b> {representative_go_id}<br>"
+
+        hover_text += '<br>'
 
     # Regulators per type from edges
     module_target = f"Module_{module_id}"
@@ -996,8 +987,9 @@ def build_enriched_hover_text(module_id, module_overview_df, enrichment_all_df, 
     for reg_type in sorted(reg_type_labels.keys()):
         regs = sorted(reg_type_labels[reg_type])
         if regs:
+            display_regs = [name_lookup.get(r, r) for r in regs] if name_lookup else regs
             hover_text += f"<b>{reg_type.capitalize()} ({len(regs)}):</b> "
-            hover_text += ', '.join(regs[:10])
+            hover_text += ', '.join(display_regs[:10])
             if len(regs) > 10:
                 hover_text += f", ... (+{len(regs) - 10} more)"
             hover_text += '<br>'
@@ -1067,7 +1059,7 @@ def adjust_positions_to_avoid_overlap(pos, min_dist=60):
     return pos
 
 
-def export_cytoscape_files(nodes, edges, module_clusters, module_overview_df, naive_categories, output_dir):
+def export_cytoscape_files(nodes, edges, module_clusters, module_overview_df, output_dir):
     """
     Export Cytoscape-compatible edge list and node attribute TSV files.
     
@@ -1076,7 +1068,6 @@ def export_cytoscape_files(nodes, edges, module_clusters, module_overview_df, na
     edges (list): Edge dicts with 'source', 'target', 'category'
     module_clusters (dict): module_id -> 'Cluster_N' string
     module_overview_df (pd.DataFrame): Module overview for attribute lookup
-    naive_categories (dict or None): module_id -> naive keyword category
     output_dir (str): Output directory
     """
     print("\nExporting Cytoscape-compatible files...")
@@ -1099,7 +1090,7 @@ def export_cytoscape_files(nodes, edges, module_clusters, module_overview_df, na
     # Node attributes file
     node_file = os.path.join(output_dir, 'module_network_node_attributes.txt')
     with open(node_file, 'w') as f:
-        header = "Node\tMegaGO_Cluster\tNaive_Category\tNode_Type\tExpression_significant\tPPI_significant\tModule_genes_count\n"
+        header = "Node\tMegaGO_Cluster\tMegaGO_Label\tMegaGO_Representative_GO_ID\tMegaGO_Label_Source\tNode_Type\tExpression_significant\tPPI_significant\tModule_genes_count\n"
         f.write(header)
         for node in nodes:
             node_id = node['id']
@@ -1107,7 +1098,9 @@ def export_cytoscape_files(nodes, edges, module_clusters, module_overview_df, na
             if node_type == 'module':
                 module_num = node_id.replace('Module_', '')
                 cluster = module_clusters.get(module_num, 'Unassigned')
-                naive_cat = naive_categories.get(module_num, '') if naive_categories else ''
+                megago_label = ''
+                representative_go_id = ''
+                label_source = ''
 
                 expr_flag = ''
                 ppi_flag = ''
@@ -1128,15 +1121,20 @@ def export_cytoscape_files(nodes, edges, module_clusters, module_overview_df, na
                         except Exception:
                             pass
                         try:
+                            megago_label = mod_row.iloc[0].get('MegaGO_Label', '')
+                            representative_go_id = mod_row.iloc[0].get('MegaGO_Representative_GO_ID', '')
+                            label_source = mod_row.iloc[0].get('MegaGO_Label_Source', '')
+                        except Exception:
+                            pass
+                        try:
                             genes = mod_row.iloc[0].get('Module_genes', '')
                             if genes != 'NA' and pd.notna(genes):
                                 gene_count = str(len(str(genes).split('|')))
                         except Exception:
                             pass
-                f.write(f"{node_id}\t{cluster}\t{naive_cat}\t{node_type}\t{expr_flag}\t{ppi_flag}\t{gene_count}\n")
+                f.write(f"{node_id}\t{cluster}\t{megago_label}\t{representative_go_id}\t{label_source}\t{node_type}\t{expr_flag}\t{ppi_flag}\t{gene_count}\n")
             else:
-                naive_cat = ''
-                f.write(f"{node_id}\t\t{naive_cat}\t{node_type}\t\t\t\n")
+                f.write(f"{node_id}\t\t\t\t\t{node_type}\t\t\t\n")
     print(f"  Saved node attributes: {node_file}")
 
 
@@ -1176,12 +1174,12 @@ def calculate_pathway_similarity_matrix(module_pathways):
     
     return pd.DataFrame(similarity_matrix, index=modules, columns=modules)
 
-def create_megago_files(enrichment_data, output_dir):
+def create_megago_files(bp_terms_df, output_dir):
     """
-    Create MegaGO files with GO BP terms for each module
+    Create MegaGO files with canonical BP top_30 terms for each module.
     
     Parameters:
-    enrichment_data (dict): Dictionary with pathway type as keys and DataFrames as values
+    bp_terms_df (pd.DataFrame): Canonical BP top_30 terms per module
     output_dir (str): Output directory for megaGO files
     
     Returns:
@@ -1191,47 +1189,36 @@ def create_megago_files(enrichment_data, output_dir):
     os.makedirs(megago_dir, exist_ok=True)
     
     files_created = 0
-    
-    # Use biological process enrichment data for megaGO
-    if 'bp' in enrichment_data and not enrichment_data['bp'].empty:
-        print("Creating MegaGO files with GO BP terms for each module...")
-        
-        bp_data = enrichment_data['bp']
-        
-        for module in bp_data['Module'].unique():
-            module_data = bp_data[bp_data['Module'] == module]
-            bp_terms = module_data['Term'].tolist()
-            
-            if bp_terms:  # Only create file if module has BP terms
-                # Clean GO terms by extracting GO IDs robustly or falling back to a cleaned term label
-                import re
-                cleaned_terms = []
-                for term in bp_terms:
-                    if not isinstance(term, str):
-                        continue
-                    # Try to find a GO ID anywhere in the string (e.g. "(...GO:0006954)" or "GO:0006954 - term")
-                    m = re.search(r'GO:(\d+)', term)
-                    if m:
-                        go_id = m.group(1).zfill(7)
-                        cleaned_terms.append(f"GO:{go_id}")
-                        continue
+    if bp_terms_df is None or bp_terms_df.empty:
+        print("Warning: No canonical BP top_30 terms available - cannot create MegaGO files")
+        return None
 
-                    # Fallback: take text before common separators like ' - ' or '(' or ';' or ','
-                    fallback = re.split(r' - |\(|;|,', term)[0].strip()
-                    if fallback:
-                        cleaned_terms.append(fallback)
-                
-                if cleaned_terms:
-                    filepath = os.path.join(megago_dir, f"{module}_BP_terms.txt")
-                    with open(filepath, "w") as f:
-                        f.write('GO_TERM\n')
-                        f.write("\n".join(cleaned_terms))
-                    
-                    files_created += 1
-        
-        print(f"Created {files_created} GO BP term files for MegaGO clustering")
-    else:
-        print("Warning: No biological process enrichment data available - cannot create MegaGO files")
+    print("Creating MegaGO files with canonical BP top_30 terms for each module...")
+
+    for module, module_data in bp_terms_df.groupby('Module', sort=True):
+        cleaned_terms = []
+        for term in module_data['Term'].tolist():
+            if not isinstance(term, str):
+                continue
+
+            go_id = extract_go_id(term)
+            if go_id:
+                cleaned_terms.append(go_id)
+                continue
+
+            fallback = re.split(r' - |\(|;|,', term)[0].strip()
+            if fallback:
+                cleaned_terms.append(fallback)
+
+        cleaned_terms = list(dict.fromkeys(cleaned_terms))
+        if cleaned_terms:
+            filepath = os.path.join(megago_dir, f"{module}_BP_terms.txt")
+            with open(filepath, 'w') as handle:
+                handle.write('GO_TERM\n')
+                handle.write("\n".join(cleaned_terms))
+            files_created += 1
+
+    print(f"Created {files_created} GO BP term files for MegaGO clustering")
     
     return megago_dir if files_created > 0 else None
 
@@ -1444,17 +1431,17 @@ def parse_megago_output(output_text, bp_files):
     
     return similarity_matrix, module_ids
 
-def megago_cluster_modules(module_pathways, n_clusters=5, use_megago=True, enrichment_data=None, output_dir='.'):
+def megago_cluster_modules(module_pathways, bp_terms_df, n_clusters=5, output_dir='.'):
     """
-    Cluster modules using megaGO command-line tool if available, otherwise use pathway similarity.
+    Cluster modules using megaGO on canonical BP top_30 terms when available,
+    otherwise fall back to pathway similarity.
 
     Returns cluster labels as 'Cluster_N' strings for consistency with downstream code.
 
     Parameters:
     module_pathways (dict): Dictionary mapping module IDs to lists of pathway terms
     n_clusters (int): Number of clusters to create
-    use_megago (bool): Whether to use megago for clustering
-    enrichment_data (dict): Enrichment data for creating megaGO files
+    bp_terms_df (pd.DataFrame): Canonical BP top_30 terms used for MegaGO and rrvgo
     output_dir (str): Output directory for temporary files
 
     Returns:
@@ -1476,64 +1463,51 @@ def megago_cluster_modules(module_pathways, n_clusters=5, use_megago=True, enric
         print("Functional clustering disabled - assigning all modules to single cluster")
         return {mod: 'Cluster_1' for mod in modules}, None
 
-    if not use_megago:
-        print("MegaGO clustering disabled by user - using pathway similarity")
-    else:
-        print("\nAttempting MegaGO clustering...")
+    print("\nAttempting canonical MegaGO clustering...")
+    megago_binary = shutil.which('megago')
+    if megago_binary and bp_terms_df is not None and not bp_terms_df.empty:
+        print(f"   Found canonical BP top_30 terms with {len(bp_terms_df)} rows")
+        megago_dir = create_megago_files(bp_terms_df, output_dir)
 
-        # Try to use actual megaGO command-line tool
-        if enrichment_data and 'bp' in enrichment_data:
-            print(f"   Found biological process enrichment data with {len(enrichment_data['bp'])} entries")
-            # Create megaGO files
-            megago_dir = create_megago_files(enrichment_data, output_dir)
+        if megago_dir:
+            print(f"   Created MegaGO files in: {megago_dir}")
+            similarity_matrix, megago_module_ids = run_megago_clustering(megago_dir)
 
-            if megago_dir:
-                print(f"   Created megaGO files in: {megago_dir}")
-                # Run megaGO clustering
-                similarity_matrix, megago_module_ids = run_megago_clustering(megago_dir)
+            if similarity_matrix is not None:
+                print("Successfully obtained MegaGO similarity matrix")
 
-                if similarity_matrix is not None:
-                    print("Successfully obtained MegaGO similarity matrix")
+                distance_matrix = 1 - similarity_matrix
+                if len(megago_module_ids) >= 2:
+                    condensed_dist = squareform(distance_matrix, checks=False)
+                    linkage_matrix = linkage(condensed_dist, method='ward')
 
-                    # Convert similarity to distance
-                    distance_matrix = 1 - similarity_matrix
+                    if n_clusters == 'auto':
+                        n_clusters = min(5, max(2, len(megago_module_ids) // 3))
 
-                    # Perform hierarchical clustering
-                    if len(megago_module_ids) >= 2:
-                        condensed_dist = squareform(distance_matrix, checks=False)
-                        linkage_matrix = linkage(condensed_dist, method='ward')
+                    cluster_labels = fcluster(linkage_matrix, n_clusters, criterion='maxclust')
 
-                        if n_clusters == 'auto':
-                            n_clusters = min(5, max(2, len(megago_module_ids) // 3))
+                    raw = {}
+                    for i, module_id in enumerate(megago_module_ids):
+                        raw[module_id] = cluster_labels[i]
+                    for module in modules:
+                        if module not in raw:
+                            raw[module] = 0
 
-                        cluster_labels = fcluster(linkage_matrix, n_clusters, criterion='maxclust')
+                    module_clusters = _to_cluster_str(raw)
+                    print(f"Created {n_clusters} module clusters using MegaGO semantic similarity")
 
-                        raw = {}
-                        for i, module_id in enumerate(megago_module_ids):
-                            raw[module_id] = cluster_labels[i]
-                        for module in modules:
-                            if module not in raw:
-                                raw[module] = 0
+                    cluster_counts = Counter(module_clusters.values())
+                    for cid, count in sorted(cluster_counts.items()):
+                        print(f"  {cid}: {count} modules")
+                    return module_clusters, similarity_matrix
 
-                        module_clusters = _to_cluster_str(raw)
-                        print(f"Created {n_clusters} module clusters using MegaGO semantic similarity")
-
-                        cluster_counts = Counter(module_clusters.values())
-                        for cid, count in sorted(cluster_counts.items()):
-                            print(f"  {cid}: {count} modules")
-                        return module_clusters, similarity_matrix
-
-                else:
-                    print("MegaGO clustering failed - falling back to pathway similarity")
-            else:
-                print("Could not create MegaGO files - falling back to pathway similarity")
+            print("MegaGO clustering failed - falling back to pathway similarity")
         else:
-            if not enrichment_data:
-                print("No enrichment data available - falling back to pathway similarity")
-            elif 'bp' not in enrichment_data:
-                print(f"No biological process enrichment data (available keys: {list(enrichment_data.keys())}) - falling back to pathway similarity")
-            else:
-                print("No biological process enrichment data for MegaGO - falling back to pathway similarity")
+            print("Could not create MegaGO files - falling back to pathway similarity")
+    elif bp_terms_df is None or bp_terms_df.empty:
+        print("No canonical BP top_30 terms available - falling back to pathway similarity")
+    else:
+        print("MegaGO command-line tool not available - falling back to pathway similarity")
 
     # Fall back to enhanced pathway similarity clustering
     print("Using pathway similarity for clustering...")
@@ -1576,11 +1550,12 @@ def megago_cluster_modules(module_pathways, n_clusters=5, use_megago=True, enric
 def create_interactive_network_visualization(module_data, module_clusters, output_dir,
                                               enrichment_data=None, go_similarity_matrix=None,
                                               module_overview_df=None, enrichment_all_df=None,
-                                              naive_categories=None, pkn_lookup=None,
-                                              name_to_hmdb=None, module_genes_map=None):
+                                              cluster_label_lookup=None, pkn_lookup=None,
+                                              name_to_hmdb=None, module_genes_map=None,
+                                              name_lookup=None):
     """
     Create interactive network visualization using Plotly with MegaGO cluster coloring,
-    PKN-based edge categorization, and optional naive keyword category borders.
+    cluster labels, and PKN-based edge categorization.
 
     Generates two HTML files:
     - interactive_module_network.html (standard)
@@ -1594,7 +1569,7 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
     go_similarity_matrix: similarity matrix for layout
     module_overview_df (pd.DataFrame): Module overview for hover text
     enrichment_all_df (pd.DataFrame): Combined enrichment data with Database column
-    naive_categories (dict or None): module_id -> naive keyword category
+    cluster_label_lookup (dict or None): MegaGO cluster -> representative label
     pkn_lookup (dict or None): PKN edge lookup dict
     name_to_hmdb (dict or None): metabolite name -> HMDB mapping
     module_genes_map (dict or None): module_id -> gene list
@@ -1640,11 +1615,12 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
     for reg_type, regulators in regulator_modules.items():
         for regulator, target_modules in regulators.items():
             modules_str = ', '.join(sorted(target_modules))
+            display_name = name_lookup.get(regulator, regulator) if name_lookup else regulator
             regulator_node = {
                 'id': regulator,
-                'label': regulator[:15] if len(regulator) > 15 else regulator,
+                'label': display_name[:15] if len(display_name) > 15 else display_name,
                 'type': reg_type,
-                'hover_info': f"<b>{regulator}</b><br>Type: {reg_type}<br>Targets ({len(target_modules)}): M{', M'.join(target_modules)}"
+                'hover_info': f"<b>{display_name}</b><br>Type: {reg_type}<br>Targets ({len(target_modules)}): M{', M'.join(target_modules)}"
             }
             nodes.append(regulator_node)
             
@@ -1668,13 +1644,8 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
         if node['type'] == 'module':
             module_id = node['id'].replace('Module_', '')
             node['hover_info'] = build_enriched_hover_text(
-                module_id, module_overview_df, enrichment_all_df, edges
+                module_id, module_overview_df, enrichment_all_df, edges, name_lookup=name_lookup
             )
-            cluster = module_clusters.get(module_id, 'Unassigned')
-            node['hover_info'] += f"<br><b>MegaGO Cluster:</b> {cluster}"
-            if naive_categories:
-                naive_cat = naive_categories.get(module_id, 'Other')
-                node['hover_info'] += f"<br><b>Keyword Category:</b> {naive_cat}"
     
     # -- Create layout positions --
     pos, cluster_positions = _create_cluster_layout(nodes, edges, module_clusters)
@@ -1689,15 +1660,6 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
     cluster_color_map = {cl: cluster_palette[i % len(cluster_palette)]
                          for i, cl in enumerate(all_clusters)}
     cluster_color_map['Unassigned'] = '#BBBBBB'
-
-    naive_color_map = {}
-    if naive_categories is not None:
-        naives = sorted(set(naive_categories.values()))
-        naive_palette = ['#FFD700', '#ADFF2F', '#00FA9A', '#FF69B4',
-                         '#BA55D3', '#FFA500', '#87CEFA', '#40E0D0']
-        naive_color_map = {cl: naive_palette[i % len(naive_palette)]
-                           for i, cl in enumerate(naives)}
-        naive_color_map['Other'] = '#DDDDDD'
 
     regulator_color = '#FF8C00'
 
@@ -1771,8 +1733,6 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
                     color = cluster_color_map.get(module_clusters.get(m_id, 'Unassigned'), '#BBBBBB')
                     size = 50
                     border = '#FFFFFF'
-                    if naive_categories is not None:
-                        border = naive_color_map.get(naive_categories.get(m_id, 'Other'), '#FFFFFF')
                     text_size = 12
                 else:
                     color = regulator_color
@@ -1803,14 +1763,10 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
                 hover_texts = [n.get('hover_info', n['label']) for n in cat_nodes]
                 labels = [n['id'].replace('Module_', '') for n in cat_nodes]
 
-                # Compute border colors per module
-                line_colours = []
-                for n in cat_nodes:
-                    m_id = n['id'].replace('Module_', '')
-                    if naive_categories is not None:
-                        line_colours.append(naive_color_map.get(naive_categories.get(m_id, 'Other'), 'white'))
-                    else:
-                        line_colours.append('white')
+                line_colours = ['white'] * len(cat_nodes)
+
+                cluster_label = (cluster_label_lookup or {}).get(cluster, '')
+                trace_name = f"{cluster}: {cluster_label} ({len(cat_nodes)})" if cluster_label else f"{cluster} ({len(cat_nodes)})"
 
                 trace = go.Scatter(
                     x=x_vals, y=y_vals, mode='markers+text',
@@ -1819,7 +1775,7 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
                     text=labels, textposition='middle center',
                     textfont=dict(size=12, color='black', family='Arial Black'),
                     hovertext=hover_texts, hoverinfo='text',
-                    name=f"{cluster} ({len(cat_nodes)})", legendgroup=cluster
+                    name=trace_name, legendgroup=cluster
                 )
                 fig.add_trace(trace)
 
@@ -1865,25 +1821,21 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
         # -- Cluster label annotations --
         annotations = []
         for cl, (cx, cy) in cluster_positions.items():
+            cluster_label = (cluster_label_lookup or {}).get(cl, '')
+            display_label = cluster_label if len(cluster_label) <= 50 else cluster_label[:47] + '...'
+            annotation_text = f'<b>{cl}</b>'
+            if display_label:
+                annotation_text += f'<br><span style="font-size:10px">{display_label}</span>'
             annotations.append(dict(
                 x=cx * 1.3, y=cy * 1.3,
-                text=f'<b>{cl}</b>', showarrow=False,
+                text=annotation_text, showarrow=False,
                 font=dict(size=14, color=cluster_color_map.get(cl, '#000000')),
                 bgcolor='rgba(255,255,255,0.8)', borderpad=4
             ))
 
-        # Add naive legend entries
-        if naive_categories is not None and not movable:
-            for cat, col in naive_color_map.items():
-                fig.add_trace(go.Scatter(
-                    x=[None], y=[None], mode='markers',
-                    marker=dict(size=20, color='white', line=dict(width=3, color=col)),
-                    name=f'Keyword: {cat}', showlegend=True
-                ))
-
         fig.update_layout(
             title=dict(
-                text='Module-Regulator Network<br><sub>Modules colored by MegaGO cluster</sub>',
+                text='Module-Regulator Network<br><sub>Modules colored by canonical MegaGO clusters</sub>',
                 x=0.5, font=dict(size=20)),
             showlegend=True, hovermode='closest',
             width=1400, height=1000,
@@ -2701,22 +2653,18 @@ def main():
     parser.add_argument('--regulator_score_files', type=str, required=False, default='',
                        help='Comma-separated list of regulator score files (format: Type:Path,Type:Path)')
     parser.add_argument('--enrichment_method', type=str, default='auto',
-                       choices=['EnrichR', 'GSEA', 'auto'],
+                       choices=['EnrichR', 'GSEA', 'both', 'auto'],
                        help='Enrichment analysis method to use')
     parser.add_argument('--n_clusters', type=int, default=5,
                        help='Number of functional clusters to create')
-    parser.add_argument('--clustering_method', type=str, default='megago',
-                       choices=['megago', 'keyword', 'both'],
-                       help='Clustering method: megago (default), keyword (naive GO keywords), or both')
-    # Keep --use_megago/--no_megago for backward compatibility
-    parser.add_argument('--use_megago', action='store_true', default=None,
-                       help='(Deprecated) Use megago clustering. Prefer --clustering_method.')
-    parser.add_argument('--no_megago', dest='use_megago', action='store_false',
-                       help='(Deprecated) Disable megago clustering. Prefer --clustering_method keyword.')
+    parser.add_argument('--organism', type=str, default='human',
+                       help='Organism for canonical rrvgo labeling (human/mouse)')
     parser.add_argument('--pkn_file', type=str, default=None,
                        help='Path to PKN file (Lemonite_PKN.tsv) for edge categorization')
     parser.add_argument('--metabolite_mapping', type=str, default=None,
                        help='Path to metabolite name mapping file (name_map.csv) for HMDB resolution')
+    parser.add_argument('--name_mapping', type=str, default=None,
+                       help='Path to name_mapping.tsv (cleaned->original name mapping for restoring original feature names)')
     parser.add_argument('--prioritize_by_expression', action='store_true', default=True,
                        help='Enable expression-based module prioritization (default: enabled)')
     parser.add_argument('--no_prioritize_by_expression', dest='prioritize_by_expression', action='store_false',
@@ -2732,14 +2680,6 @@ def main():
     
     args = parser.parse_args()
     
-    # -- Backward compatibility: map deprecated --use_megago/--no_megago to --clustering_method --
-    if args.use_megago is not None:
-        if args.use_megago:
-            args.clustering_method = 'megago'
-        else:
-            args.clustering_method = 'keyword'
-        print(f"Note: --use_megago/--no_megago is deprecated. Mapped to --clustering_method {args.clustering_method}")
-    
     # Create output directory
     output_dir = os.path.join(args.output_dir, 'Module_Overview')
     os.makedirs(output_dir, exist_ok=True)
@@ -2752,18 +2692,32 @@ def main():
     print(f"Regulator files: {args.regulator_files}")
     print(f"Enrichment method: {args.enrichment_method}")
     print(f"Number of clusters: {args.n_clusters}")
+    print(f"Organism: {args.organism}")
     print(f"Coherence threshold: {args.coherence_threshold}")
     print(f"Expression prioritization: {args.prioritize_by_expression}")
-    print(f"Clustering method: {args.clustering_method}")
+    print(f"Clustering workflow: canonical MegaGO {CANONICAL_CLUSTER_COLUMN} + rrvgo")
     if args.pkn_file:
         print(f"PKN file: {args.pkn_file}")
     if args.metabolite_mapping:
         print(f"Metabolite mapping: {args.metabolite_mapping}")
+    if args.name_mapping:
+        print(f"Name mapping: {args.name_mapping}")
     if args.prioritize_by_expression:
         print(f"Grouping column: {args.group_column}")
     
     # Load module data
     print("\nLoading module data...")
+    
+    # Load name mapping for restoring original feature names
+    name_lookup = {}
+    if args.name_mapping and os.path.exists(args.name_mapping):
+        try:
+            nm_df = pd.read_csv(args.name_mapping, sep='\t')
+            if 'cleaned' in nm_df.columns and 'original' in nm_df.columns:
+                name_lookup = dict(zip(nm_df['cleaned'], nm_df['original']))
+                print(f"Loaded {len(name_lookup)} name mappings for original name restoration")
+        except Exception as e:
+            print(f"Warning: Could not load name mapping: {e}")
     
     # Parse and load regulator files dynamically
     regulator_configs = {}
@@ -2821,8 +2775,8 @@ def main():
                 enrichment_dir = os.path.join(root, [d for d in dirs if 'Enrichment' in d or 'enrichment' in d][0])
                 break
     
-    enrichment_data = load_enrichment_data(enrichment_dir, args.enrichment_method)
-    
+    enrichment_data, enrichment_metadata = load_enrichment_data(enrichment_dir, args.enrichment_method)
+
     # Add direction column to enrichment data for hover information
     for key in enrichment_data:
         if not enrichment_data[key].empty and '__direction__' not in enrichment_data[key].columns:
@@ -3112,32 +3066,45 @@ def main():
                 if f.endswith(('.txt', '.csv')):
                     print(f"  - {f}")
     
-    # -- Determine clustering method and run clustering --
-    print(f"\nPerforming functional clustering (method={args.clustering_method})...")
-    
-    use_megago_flag = args.clustering_method in ('megago', 'both')
-    module_clusters, go_similarity_matrix = megago_cluster_modules(
-        module_pathways, args.n_clusters, use_megago_flag, enrichment_data, output_dir
+    print(f"\nPerforming functional clustering with canonical MegaGO {CANONICAL_CLUSTER_COLUMN} workflow...")
+    bp_terms_top30_df, bp_terms_top30_path, top30_dir = prepare_top30_bp_terms(
+        enrichment_data,
+        output_dir,
+        enrichment_metadata.get('selected_source')
     )
-    
-    # Naive keyword clustering (always run when method is 'keyword' or 'both')
-    naive_categories = None
-    if args.clustering_method in ('keyword', 'both'):
-        print("Running naive keyword clustering on GO terms...")
-        naive_categories = categorize_modules_by_keywords(enrichment_data)
-        if args.clustering_method == 'keyword':
-            # When keyword-only, use naive categories as the primary module_clusters
-            module_clusters = {mid: cat for mid, cat in naive_categories.items()}
-    
-    # If 'both', compute Rand Index for comparison
-    if args.clustering_method == 'both' and naive_categories:
-        shared = sorted(set(module_clusters.keys()) & set(naive_categories.keys()))
-        if len(shared) > 1:
-            ri = rand_index_from_labels(
-                [module_clusters[m] for m in shared],
-                [naive_categories[m] for m in shared]
-            )
-            print(f"Rand Index (megaGO vs keyword): {ri:.3f}")
+    module_clusters, go_similarity_matrix = megago_cluster_modules(
+        module_pathways,
+        bp_terms_top30_df,
+        args.n_clusters,
+        output_dir=top30_dir
+    )
+    cluster_assignments_df, cluster_assignments_path = write_cluster_assignments(
+        module_clusters,
+        top30_dir,
+        cluster_column=CANONICAL_CLUSTER_COLUMN
+    )
+    rrvgo_results = run_rrvgo_labeler(
+        bp_terms_top30_path,
+        cluster_assignments_path,
+        top30_dir,
+        args.organism,
+        cluster_column=CANONICAL_CLUSTER_COLUMN
+    )
+
+    cluster_label_lookup = {}
+    if not rrvgo_results['cluster_labels'].empty:
+        cluster_labels_df = rrvgo_results['cluster_labels'].copy()
+        cluster_label_lookup = {
+            str(row['MegaGO_cluster']): str(row['MegaGO_label'])
+            for _, row in cluster_labels_df.iterrows()
+            if pd.notna(row.get('MegaGO_label')) and str(row.get('MegaGO_label')).strip()
+        }
+
+    module_label_lookup = {}
+    if not rrvgo_results['module_labels'].empty:
+        module_labels_df = rrvgo_results['module_labels'].copy()
+        module_labels_df['Module'] = module_labels_df['Module'].astype(str)
+        module_label_lookup = module_labels_df.set_index('Module').to_dict(orient='index')
     
     # -- Load PKN data for edge categorization --
     pkn_lookup = None
@@ -3151,68 +3118,29 @@ def main():
     for mid, genes in module_genes.items():
         module_genes_map[mid] = genes
     
-    # Build module overview DataFrame for enriched hover text
-    module_overview_df = pd.DataFrame(module_data)
-    
-    # Build combined enrichment DataFrame with Database column
-    enrichment_all_frames = []
-    db_name_map = {
-        'bp': 'GO_BP', 'mf': 'GO_MF', 'cc': 'GO_CC',
-        'reactome': 'Reactome', 'kegg': 'KEGG'
-    }
-    for key, df in enrichment_data.items():
-        if df is not None and not df.empty:
-            df_copy = df.copy()
-            df_copy['Database'] = db_name_map.get(key, key)
-            enrichment_all_frames.append(df_copy)
-    enrichment_all_df = pd.concat(enrichment_all_frames, ignore_index=True) if enrichment_all_frames else pd.DataFrame()
-    
-    # -- Create interactive visualizations --
-    print(f"\nCreating interactive visualizations...")
-    
-    network_fig = create_interactive_network_visualization(
-        module_data, module_clusters, output_dir,
-        enrichment_data=enrichment_data,
-        go_similarity_matrix=go_similarity_matrix,
-        module_overview_df=module_overview_df,
-        enrichment_all_df=enrichment_all_df,
-        naive_categories=naive_categories,
-        pkn_lookup=pkn_lookup,
-        name_to_hmdb=name_to_hmdb,
-        module_genes_map=module_genes_map
-    )
-    
-    # Export Cytoscape-compatible TSV files
-    nodes_for_cytoscape = []
-    edges_for_cytoscape = []
-    # Re-build minimal nodes/edges for export (same logic as in visualization)
-    for module_info in module_data:
-        mid = str(module_info['Module'])
-        nodes_for_cytoscape.append({'id': f"Module_{mid}", 'type': 'module'})
-        for col in module_info:
-            if col.endswith('_regulators') and module_info.get(col, 'NA') != 'NA':
-                rtype = col.replace('_regulators', '')
-                for reg in module_info[col].split('|'):
-                    reg = reg.strip()
-                    if reg:
-                        nodes_for_cytoscape.append({'id': reg, 'type': rtype})
-                        edges_for_cytoscape.append({'source': reg, 'target': f"Module_{mid}", 'type': f"{rtype}_regulation"})
-    # Annotate edges for export
-    if pkn_lookup and module_genes_map:
-        edges_for_cytoscape = annotate_edges_with_category(edges_for_cytoscape, pkn_lookup, name_to_hmdb or {}, module_genes_map)
-    else:
-        for e in edges_for_cytoscape:
-            e['category'] = 'Other'
-    
-    export_cytoscape_files(nodes_for_cytoscape, edges_for_cytoscape, module_clusters,
-                           module_overview_df, naive_categories, output_dir)
-    
-    cluster_stats = pd.DataFrame()  # Empty DataFrame to avoid errors
-    
     # Add cluster information to module data
     for module_entry in module_data:
         module_id = str(module_entry['Module'])
-        module_entry['Functional_Cluster'] = module_clusters.get(module_id, 'Cluster_0')
+        megago_cluster = module_clusters.get(module_id, 'Unassigned')
+        label_info = module_label_lookup.get(module_id, {})
+
+        megago_label = label_info.get('MegaGO_label', cluster_label_lookup.get(megago_cluster, 'NA'))
+        if pd.isna(megago_label) or str(megago_label).strip() == '':
+            megago_label = 'NA'
+
+        representative_go_id = label_info.get('representative_go_id', 'NA')
+        if pd.isna(representative_go_id) or str(representative_go_id).strip() == '':
+            representative_go_id = 'NA'
+
+        label_source = label_info.get('label_source', 'NA')
+        if pd.isna(label_source) or str(label_source).strip() == '':
+            label_source = 'NA'
+
+        module_entry['Functional_Cluster'] = megago_cluster
+        module_entry['MegaGO_Cluster'] = megago_cluster
+        module_entry['MegaGO_Label'] = megago_label
+        module_entry['MegaGO_Representative_GO_ID'] = representative_go_id
+        module_entry['MegaGO_Label_Source'] = label_source
         
         # Add expression rank if available
         if expression_priority and module_id in expression_priority:
@@ -3229,6 +3157,63 @@ def main():
                 module_entry['Expression_adjusted_pval'] = 'NA'
         else:
             module_entry['Expression_adjusted_pval'] = 'NA'
+
+    # Build module overview DataFrame for enriched hover text
+    module_overview_df = pd.DataFrame(module_data)
+
+    # Build combined enrichment DataFrame with Database column
+    enrichment_all_frames = []
+    db_name_map = {
+        'bp': 'GO_BP', 'mf': 'GO_MF', 'cc': 'GO_CC',
+        'reactome': 'Reactome', 'kegg': 'KEGG'
+    }
+    for key, df in enrichment_data.items():
+        if df is not None and not df.empty:
+            df_copy = df.copy()
+            df_copy['Database'] = db_name_map.get(key, key)
+            enrichment_all_frames.append(df_copy)
+    enrichment_all_df = pd.concat(enrichment_all_frames, ignore_index=True) if enrichment_all_frames else pd.DataFrame()
+
+    # -- Create interactive visualizations --
+    print(f"\nCreating interactive visualizations...")
+
+    network_fig = create_interactive_network_visualization(
+        module_data, module_clusters, output_dir,
+        enrichment_data=enrichment_data,
+        go_similarity_matrix=go_similarity_matrix,
+        module_overview_df=module_overview_df,
+        enrichment_all_df=enrichment_all_df,
+        cluster_label_lookup=cluster_label_lookup,
+        pkn_lookup=pkn_lookup,
+        name_to_hmdb=name_to_hmdb,
+        module_genes_map=module_genes_map,
+        name_lookup=name_lookup
+    )
+
+    # Export Cytoscape-compatible TSV files
+    nodes_for_cytoscape = []
+    edges_for_cytoscape = []
+    for module_info in module_data:
+        mid = str(module_info['Module'])
+        nodes_for_cytoscape.append({'id': f"Module_{mid}", 'type': 'module'})
+        for col in module_info:
+            if col.endswith('_regulators') and module_info.get(col, 'NA') != 'NA':
+                rtype = col.replace('_regulators', '')
+                for reg in module_info[col].split('|'):
+                    reg = reg.strip()
+                    if reg:
+                        nodes_for_cytoscape.append({'id': reg, 'type': rtype})
+                        edges_for_cytoscape.append({'source': reg, 'target': f"Module_{mid}", 'type': f"{rtype}_regulation"})
+    if pkn_lookup and module_genes_map:
+        edges_for_cytoscape = annotate_edges_with_category(edges_for_cytoscape, pkn_lookup, name_to_hmdb or {}, module_genes_map)
+    else:
+        for e in edges_for_cytoscape:
+            e['category'] = 'Other'
+
+    export_cytoscape_files(nodes_for_cytoscape, edges_for_cytoscape, module_clusters,
+                           module_overview_df, output_dir)
+
+    cluster_stats = pd.DataFrame()  # Empty DataFrame to avoid errors
     
     # Convert to DataFrame and sort appropriately
     module_df = pd.DataFrame(module_data)
@@ -3254,7 +3239,7 @@ def main():
     # Generate regulator ranking tables HTML
     regulator_tables_html = None
     if regulator_scores_dict:
-        regulator_tables_path = generate_regulator_tables_html(regulator_scores_dict, output_dir)
+        regulator_tables_path = generate_regulator_tables_html(regulator_scores_dict, output_dir, name_lookup=name_lookup)
         # Read the generated HTML for embedding in comprehensive report
         try:
             with open(regulator_tables_path, 'r') as f:

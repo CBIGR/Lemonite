@@ -1,0 +1,16 @@
+Node1	Node2	Source	Type	Category
+myo_inositol	MGAM	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	TK1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	SLC27A3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	PRDX6	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	ST6GALNAC3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+MGAM	fructose	Human1_GEM_dist1	metabolite-gene	Metabolic_pathway
+fructose	TK1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+fructose	SLC27A3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+fructose	PRDX6	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+D_malic_acid	SLC25A30	UniProtKB	metabolite-gene	Ambiguous
+ZNF431	TK1	BioGRID_genes	PPI	PPI
+ZNF226	SLC27A3	STRING	PPI	PPI
+ZNF567	PRDX6	STRING	PPI	PPI
+ZNF836	SLC25A30	STRING	PPI	PPI
+ZNF583	ST6GALNAC3	STRING	PPI	PPI

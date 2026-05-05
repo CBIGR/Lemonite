@@ -38,6 +38,16 @@ metabolomics <- fread(paste0(base_dir, 'Preprocessing/LemonPreprocessed_metabolo
 lipidomics <- fread(paste0(base_dir, 'Preprocessing/LemonPreprocessed_lipidomics.txt'), data.table = FALSE)
 gene_expression <- fread(paste0(base_dir, 'Preprocessing/LemonPreprocessed_expression.txt'), data.table = FALSE)
 
+# Load name mapping for restoring original names in outputs
+name_mapping_file <- paste0(base_dir, 'Preprocessing/name_mapping.tsv')
+if (file.exists(name_mapping_file)) {
+  name_mapping <- fread(name_mapping_file, data.table = FALSE)
+  name_lookup <- setNames(name_mapping$original, name_mapping$cleaned)
+} else {
+  warning('name_mapping.tsv not found, original names will not be available')
+  name_lookup <- character(0)
+}
+
 # Clean lipid names BEFORE setting as rownames: replace special characters with underscores
 # This handles characters like (), /, :, -, spaces, etc.
 cat("Cleaning lipid names...\n")
@@ -326,6 +336,22 @@ cat(paste0("  Results in: ", lipidomics_dir, "\n"))
 cat("\nCorrelation tables saved:\n")
 cat(paste0("- ", metabolomics_dir, "/PCC_metabolites_transcripts.csv\n"))
 cat(paste0("- ", lipidomics_dir, "/PCC_lipids_transcripts.csv\n"))
+
+# Write name mapping for output directories (cleaned -> original names)
+if (length(name_lookup) > 0) {
+  dir_mapping <- data.frame(
+    directory = c(colnames(dat_metabolomics), colnames(dat_lipidomics)),
+    original_name = ifelse(
+      c(colnames(dat_metabolomics), colnames(dat_lipidomics)) %in% names(name_lookup),
+      name_lookup[c(colnames(dat_metabolomics), colnames(dat_lipidomics))],
+      c(colnames(dat_metabolomics), colnames(dat_lipidomics))
+    ),
+    type = c(rep('metabolite', ncol(dat_metabolomics)), rep('lipid', ncol(dat_lipidomics)))
+  )
+  write.table(dir_mapping, file.path(paste0(base_dir, 'Enrichment/'), 'directory_name_mapping.tsv'),
+              sep = '\t', quote = FALSE, row.names = FALSE)
+  cat("Directory-to-original-name mapping saved to Enrichment/directory_name_mapping.tsv\n")
+}
 
 
 

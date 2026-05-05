@@ -1,0 +1,10 @@
+Node	Label	Type
+2_hydroxyglutaric_acid	2_hydroxyglutaric_acid	metabolite
+RREB1	RREB1	TF
+SLC22A11	SLC22A11	bridge_node
+IRF3	IRF3	TF
+PHGDH	PHGDH	bridge_node
+SATB2	SATB2	TF
+GAD1	GAD1	bridge_node
+KCNIP3	KCNIP3	TF
+ASPH	ASPH	bridge_node

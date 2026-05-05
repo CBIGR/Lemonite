@@ -1,0 +1,11 @@
+Node1	Node2	Source	Type	Category
+fructose	GGT7	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+fructose	EPX	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+fructose	P4HA3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+fructose	FASN	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+fructose	ALDOA	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+ZHX3	GGT7	STRING	PPI	PPI
+MYB	EPX	STRING	PPI	PPI
+ZNF592	P4HA3	BioGRID_genes	PPI	PPI
+SALL1	FASN	BioGRID_genes	PPI	PPI
+MSX2	ALDOA	BioGRID_genes	PPI	PPI

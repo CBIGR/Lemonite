@@ -1,0 +1,571 @@
+=== Files staged by Nextflow ===
+total 32
+drwxr-xr-x 4 borisvdm users  4096 Apr 30 14:03 .
+drwxr-xr-x 4 borisvdm users    82 Apr 30 14:03 ..
+lrwxrwxrwx 1 borisvdm users    98 Apr 30 14:03 clusterfile -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Lemon_out/clusterfile
+-rw-r--r-- 1 borisvdm users     0 Apr 30 14:03 .command.begin
+-rw-r--r-- 1 borisvdm users     0 Apr 30 14:03 .command.err
+-rw-r--r-- 1 borisvdm users    33 Apr 30 14:03 .command.log
+-rw-r--r-- 1 borisvdm users    33 Apr 30 14:03 .command.out
+-rw-r--r-- 1 borisvdm users 14392 Apr 30 14:03 .command.run
+-rw-r--r-- 1 borisvdm users  3017 Apr 30 14:03 .command.sh
+-rw-r--r-- 1 borisvdm users     0 Apr 30 14:03 .command.trace
+lrwxrwxrwx 1 borisvdm users   107 Apr 30 14:03 DESeq_groups.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/DESeq_groups.txt
+lrwxrwxrwx 1 borisvdm users   124 Apr 30 14:03 expression_variance_histogram.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/expression_variance_histogram.pdf
+drwxr-xr-x 2 borisvdm users     6 Apr 30 14:03 Lemon_out
+lrwxrwxrwx 1 borisvdm users   121 Apr 30 14:03 LemonPreprocessed_complete.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/LemonPreprocessed_complete.txt
+lrwxrwxrwx 1 borisvdm users   123 Apr 30 14:03 LemonPreprocessed_expression.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/LemonPreprocessed_expression.txt
+lrwxrwxrwx 1 borisvdm users   125 Apr 30 14:03 LemonPreprocessed_metabolomics.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/LemonPreprocessed_metabolomics.txt
+lrwxrwxrwx 1 borisvdm users   100 Apr 30 14:03 Lemon_results -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Lemon_out/Lemon_results
+lrwxrwxrwx 1 borisvdm users   109 Apr 30 14:03 Metabolites.allreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Lemon_out/Metabolites.allreg.txt
+lrwxrwxrwx 1 borisvdm users   112 Apr 30 14:03 Metabolites.randomreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Lemon_out/Metabolites.randomreg.txt
+lrwxrwxrwx 1 borisvdm users   109 Apr 30 14:03 Metabolites.topreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Lemon_out/Metabolites.topreg.txt
+lrwxrwxrwx 1 borisvdm users   106 Apr 30 14:03 metabolites.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/metabolites.txt
+lrwxrwxrwx 1 borisvdm users   105 Apr 30 14:03 Metabolites.xml.gz -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Lemon_out/Metabolites.xml.gz
+lrwxrwxrwx 1 borisvdm users   103 Apr 30 14:03 name_map.csv -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/name_map.csv
+lrwxrwxrwx 1 borisvdm users   107 Apr 30 14:03 name_mapping.tsv -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/name_mapping.tsv
+lrwxrwxrwx 1 borisvdm users   117 Apr 30 14:03 Normalized_metabolites.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/Normalized_metabolites.pdf
+lrwxrwxrwx 1 borisvdm users   110 Apr 30 14:03 PCA_metabolites.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/PCA_metabolites.pdf
+lrwxrwxrwx 1 borisvdm users   114 Apr 30 14:03 PCA_transcriptomics.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/PCA_transcriptomics.pdf
+drwxr-xr-x 2 borisvdm users     6 Apr 30 14:03 Preprocessing
+lrwxrwxrwx 1 borisvdm users   101 Apr 30 14:03 TFs.allreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Lemon_out/TFs.allreg.txt
+lrwxrwxrwx 1 borisvdm users   104 Apr 30 14:03 TFs.randomreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Lemon_out/TFs.randomreg.txt
+lrwxrwxrwx 1 borisvdm users   101 Apr 30 14:03 TFs.topreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Lemon_out/TFs.topreg.txt
+lrwxrwxrwx 1 borisvdm users    98 Apr 30 14:03 tfs.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Preprocessing/tfs.txt
+lrwxrwxrwx 1 borisvdm users    97 Apr 30 14:03 TFs.xml.gz -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Lemon_out/TFs.xml.gz
+lrwxrwxrwx 1 borisvdm users   105 Apr 30 14:03 tight_clusters.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/dc/1032c9204fc07b2fcd81a5e3dbaf13/Lemon_out/tight_clusters.txt
+=================================
+=== Available files before network generation ===
+=== Lemon_out contents ===
+total 14156
+drwxr-xr-x 3 borisvdm users    4096 Apr 30 14:03 .
+drwxr-xr-x 4 borisvdm users    4096 Apr 30 14:03 ..
+-rw-r--r-- 1 borisvdm users     240 Apr 30 14:03 clusterfile
+drwxr-xr-x 2 borisvdm users      91 Apr 30 14:03 Lemon_results
+-rw-r--r-- 1 borisvdm users  381240 Apr 30 14:03 Metabolites.allreg.txt
+-rw-r--r-- 1 borisvdm users  409249 Apr 30 14:03 Metabolites.randomreg.txt
+-rw-r--r-- 1 borisvdm users    4069 Apr 30 14:03 Metabolites.topreg.txt
+-rw-r--r-- 1 borisvdm users 5458544 Apr 30 14:03 Metabolites.xml.gz
+-rw-r--r-- 1 borisvdm users  955509 Apr 30 14:03 TFs.allreg.txt
+-rw-r--r-- 1 borisvdm users 1408463 Apr 30 14:03 TFs.randomreg.txt
+-rw-r--r-- 1 borisvdm users    9533 Apr 30 14:03 TFs.topreg.txt
+-rw-r--r-- 1 borisvdm users 5787301 Apr 30 14:03 TFs.xml.gz
+-rw-r--r-- 1 borisvdm users   56211 Apr 30 14:03 tight_clusters.txt
+Lemon_out/Metabolites.allreg.txt
+Lemon_out/Metabolites.topreg.txt
+Lemon_out/TFs.allreg.txt
+Lemon_out/TFs.topreg.txt
+=== Preprocessing contents ===
+total 8424
+drwxr-xr-x 2 borisvdm users    4096 Apr 30 14:03 .
+drwxr-xr-x 4 borisvdm users    4096 Apr 30 14:03 ..
+-rw-r--r-- 1 borisvdm users    1156 Apr 30 14:03 DESeq_groups.txt
+-rw-r--r-- 1 borisvdm users   10178 Apr 30 14:03 expression_variance_histogram.pdf
+-rw-r--r-- 1 borisvdm users 4264576 Apr 30 14:03 LemonPreprocessed_complete.txt
+-rw-r--r-- 1 borisvdm users 4080745 Apr 30 14:03 LemonPreprocessed_expression.txt
+-rw-r--r-- 1 borisvdm users  184436 Apr 30 14:03 LemonPreprocessed_metabolomics.txt
+-rw-r--r-- 1 borisvdm users    1908 Apr 30 14:03 metabolites.txt
+-rwxr-xr-x 1 borisvdm users    8995 Apr 30 14:03 name_map.csv
+-rw-r--r-- 1 borisvdm users      17 Apr 30 14:03 name_mapping.tsv
+-rw-r--r-- 1 borisvdm users    3611 Apr 30 14:03 Normalized_metabolites.pdf
+-rw-r--r-- 1 borisvdm users   10159 Apr 30 14:03 PCA_metabolites.pdf
+-rw-r--r-- 1 borisvdm users   10328 Apr 30 14:03 PCA_transcriptomics.pdf
+-rw-r--r-- 1 borisvdm users    9088 Apr 30 14:03 tfs.txt
+=================================================
+Running network generation...
+
+================================================================================
+LEMONTREE TO NETWORK CONVERSION
+================================================================================
+Run ID: 2000HVG_coherence0.5_top2.0pct_clusters5
+Input directory: .
+Output directory: .
+Regulator selection method: percentage
+Method suffix: top2.0pct
+Threshold value: 2.0
+Coherence threshold: 0.5
+Skip coherence filtering: False
+
+================================================================================
+REGULATOR CONFIGURATION
+================================================================================
+Available regulator types: 2
+  [OK] TFs: TFs
+  [OK] Metabolites: Metabolites
+
+================================================================================
+STEP 1: Creating sample mapping file
+================================================================================
+74 samples included in the analysis.
+Found metadata column 'diagnosis' with 4 unique values: IDH mutant, nmf1, nmf2, nmf3
+Created sample mapping with 1 metadata types: diagnosis
+
+================================================================================
+STEP 2: REGULATOR SELECTION (PERCENTAGE)
+Selection performed on ORIGINAL LemonTree scores before normalization
+================================================================================
+
+Processing TFs regulators (TFs)...
+Max random score across all modules:
+2.598225
+3 remain for module 0 with a cutoff of 2.0 > random
+12 remain for module 1 with a cutoff of 2.0 > random
+2 remain for module 2 with a cutoff of 2.0 > random
+8 remain for module 3 with a cutoff of 2.0 > random
+6 remain for module 4 with a cutoff of 2.0 > random
+9 remain for module 5 with a cutoff of 2.0 > random
+8 remain for module 6 with a cutoff of 2.0 > random
+4 remain for module 7 with a cutoff of 2.0 > random
+20 remain for module 8 with a cutoff of 2.0 > random
+13 remain for module 9 with a cutoff of 2.0 > random
+8 remain for module 10 with a cutoff of 2.0 > random
+7 remain for module 11 with a cutoff of 2.0 > random
+7 remain for module 12 with a cutoff of 2.0 > random
+6 remain for module 13 with a cutoff of 2.0 > random
+5 remain for module 14 with a cutoff of 2.0 > random
+10 remain for module 15 with a cutoff of 2.0 > random
+1 remain for module 16 with a cutoff of 2.0 > random
+10 remain for module 17 with a cutoff of 2.0 > random
+7 remain for module 18 with a cutoff of 2.0 > random
+10 remain for module 19 with a cutoff of 2.0 > random
+5 remain for module 20 with a cutoff of 2.0 > random
+10 remain for module 21 with a cutoff of 2.0 > random
+7 remain for module 22 with a cutoff of 2.0 > random
+11 remain for module 23 with a cutoff of 2.0 > random
+8 remain for module 24 with a cutoff of 2.0 > random
+9 remain for module 25 with a cutoff of 2.0 > random
+10 remain for module 26 with a cutoff of 2.0 > random
+7 remain for module 27 with a cutoff of 2.0 > random
+10 remain for module 28 with a cutoff of 2.0 > random
+10 remain for module 29 with a cutoff of 2.0 > random
+7 remain for module 30 with a cutoff of 2.0 > random
+8 remain for module 31 with a cutoff of 2.0 > random
+5 remain for module 32 with a cutoff of 2.0 > random
+8 remain for module 33 with a cutoff of 2.0 > random
+7 remain for module 34 with a cutoff of 2.0 > random
+5 remain for module 35 with a cutoff of 2.0 > random
+13 remain for module 36 with a cutoff of 2.0 > random
+6 remain for module 37 with a cutoff of 2.0 > random
+11 remain for module 38 with a cutoff of 2.0 > random
+7 remain for module 39 with a cutoff of 2.0 > random
+10 remain for module 40 with a cutoff of 2.0 > random
+8 remain for module 41 with a cutoff of 2.0 > random
+6 remain for module 42 with a cutoff of 2.0 > random
+5 remain for module 43 with a cutoff of 2.0 > random
+2 remain for module 44 with a cutoff of 2.0 > random
+3 remain for module 45 with a cutoff of 2.0 > random
+8 remain for module 46 with a cutoff of 2.0 > random
+5 remain for module 47 with a cutoff of 2.0 > random
+5 remain for module 48 with a cutoff of 2.0 > random
+4 remain for module 49 with a cutoff of 2.0 > random
+8 remain for module 50 with a cutoff of 2.0 > random
+12 remain for module 51 with a cutoff of 2.0 > random
+12 remain for module 52 with a cutoff of 2.0 > random
+17 remain for module 53 with a cutoff of 2.0 > random
+9 remain for module 54 with a cutoff of 2.0 > random
+5 remain for module 55 with a cutoff of 2.0 > random
+8 remain for module 56 with a cutoff of 2.0 > random
+7 remain for module 57 with a cutoff of 2.0 > random
+13 remain for module 58 with a cutoff of 2.0 > random
+12 remain for module 59 with a cutoff of 2.0 > random
+13 remain for module 60 with a cutoff of 2.0 > random
+3 remain for module 61 with a cutoff of 2.0 > random
+6 remain for module 62 with a cutoff of 2.0 > random
+10 remain for module 63 with a cutoff of 2.0 > random
+7 remain for module 64 with a cutoff of 2.0 > random
+6 remain for module 65 with a cutoff of 2.0 > random
+7 remain for module 66 with a cutoff of 2.0 > random
+4 remain for module 67 with a cutoff of 2.0 > random
+10 remain for module 68 with a cutoff of 2.0 > random
+6 remain for module 69 with a cutoff of 2.0 > random
+2 remain for module 70 with a cutoff of 2.0 > random
+4 remain for module 71 with a cutoff of 2.0 > random
+9 remain for module 72 with a cutoff of 2.0 > random
+7 remain for module 73 with a cutoff of 2.0 > random
+1 remain for module 74 with a cutoff of 2.0 > random
+5 remain for module 75 with a cutoff of 2.0 > random
+8 remain for module 76 with a cutoff of 2.0 > random
+9 remain for module 77 with a cutoff of 2.0 > random
+10 remain for module 78 with a cutoff of 2.0 > random
+4 remain for module 79 with a cutoff of 2.0 > random
+11 remain for module 80 with a cutoff of 2.0 > random
+5 remain for module 81 with a cutoff of 2.0 > random
+10 remain for module 82 with a cutoff of 2.0 > random
+8 remain for module 83 with a cutoff of 2.0 > random
+11 remain for module 84 with a cutoff of 2.0 > random
+7 remain for module 85 with a cutoff of 2.0 > random
+8 remain for module 86 with a cutoff of 2.0 > random
+6 remain for module 87 with a cutoff of 2.0 > random
+10 remain for module 88 with a cutoff of 2.0 > random
+8 remain for module 89 with a cutoff of 2.0 > random
+7 remain for module 90 with a cutoff of 2.0 > random
+6 remain for module 91 with a cutoff of 2.0 > random
+7 remain for module 92 with a cutoff of 2.0 > random
+5 remain for module 93 with a cutoff of 2.0 > random
+14 remain for module 94 with a cutoff of 2.0 > random
+8 remain for module 95 with a cutoff of 2.0 > random
+7 remain for module 96 with a cutoff of 2.0 > random
+7 remain for module 97 with a cutoff of 2.0 > random
+7 remain for module 98 with a cutoff of 2.0 > random
+9 remain for module 99 with a cutoff of 2.0 > random
+6 remain for module 100 with a cutoff of 2.0 > random
+6 remain for module 101 with a cutoff of 2.0 > random
+9 remain for module 102 with a cutoff of 2.0 > random
+4 remain for module 103 with a cutoff of 2.0 > random
+4 remain for module 104 with a cutoff of 2.0 > random
+9 remain for module 105 with a cutoff of 2.0 > random
+9 remain for module 106 with a cutoff of 2.0 > random
+14 remain for module 107 with a cutoff of 2.0 > random
+6 remain for module 108 with a cutoff of 2.0 > random
+10 remain for module 109 with a cutoff of 2.0 > random
+6 remain for module 110 with a cutoff of 2.0 > random
+8 remain for module 111 with a cutoff of 2.0 > random
+5 remain for module 112 with a cutoff of 2.0 > random
+10 remain for module 113 with a cutoff of 2.0 > random
+11 remain for module 114 with a cutoff of 2.0 > random
+6 remain for module 115 with a cutoff of 2.0 > random
+8 remain for module 116 with a cutoff of 2.0 > random
+6 remain for module 117 with a cutoff of 2.0 > random
+8 remain for module 118 with a cutoff of 2.0 > random
+12 remain for module 119 with a cutoff of 2.0 > random
+6 remain for module 120 with a cutoff of 2.0 > random
+7 remain for module 121 with a cutoff of 2.0 > random
+5 remain for module 122 with a cutoff of 2.0 > random
+Processing ./Lemon_out/TFs.top2.0pct.txt: 4 columns
+Written 123 clusters to ./ModuleViewer_files/TFs.selected_regs_list.txt
+Warning: Could not create distribution plot for ./ModuleViewer_files/TFs.selected_regs_list.txt: [Errno 2] No such file or directory: './ModuleViewer_files/./ModuleViewer_files/TFs.selected_regs_list.txt'
+
+Processing Metabolites regulators (Metabolites)...
+Max random score across all modules:
+6.996035
+1 remain for module 0 with a cutoff of 2.0 > random
+1 remain for module 1 with a cutoff of 2.0 > random
+2 remain for module 2 with a cutoff of 2.0 > random
+4 remain for module 3 with a cutoff of 2.0 > random
+4 remain for module 4 with a cutoff of 2.0 > random
+1 remain for module 5 with a cutoff of 2.0 > random
+4 remain for module 6 with a cutoff of 2.0 > random
+5 remain for module 7 with a cutoff of 2.0 > random
+3 remain for module 8 with a cutoff of 2.0 > random
+2 remain for module 9 with a cutoff of 2.0 > random
+4 remain for module 10 with a cutoff of 2.0 > random
+2 remain for module 11 with a cutoff of 2.0 > random
+3 remain for module 12 with a cutoff of 2.0 > random
+2 remain for module 13 with a cutoff of 2.0 > random
+2 remain for module 14 with a cutoff of 2.0 > random
+3 remain for module 15 with a cutoff of 2.0 > random
+2 remain for module 16 with a cutoff of 2.0 > random
+2 remain for module 17 with a cutoff of 2.0 > random
+2 remain for module 18 with a cutoff of 2.0 > random
+2 remain for module 19 with a cutoff of 2.0 > random
+2 remain for module 20 with a cutoff of 2.0 > random
+2 remain for module 21 with a cutoff of 2.0 > random
+4 remain for module 22 with a cutoff of 2.0 > random
+5 remain for module 23 with a cutoff of 2.0 > random
+2 remain for module 24 with a cutoff of 2.0 > random
+5 remain for module 25 with a cutoff of 2.0 > random
+5 remain for module 26 with a cutoff of 2.0 > random
+1 remain for module 27 with a cutoff of 2.0 > random
+2 remain for module 28 with a cutoff of 2.0 > random
+3 remain for module 29 with a cutoff of 2.0 > random
+1 remain for module 30 with a cutoff of 2.0 > random
+5 remain for module 31 with a cutoff of 2.0 > random
+3 remain for module 32 with a cutoff of 2.0 > random
+1 remain for module 33 with a cutoff of 2.0 > random
+4 remain for module 34 with a cutoff of 2.0 > random
+3 remain for module 35 with a cutoff of 2.0 > random
+2 remain for module 36 with a cutoff of 2.0 > random
+5 remain for module 37 with a cutoff of 2.0 > random
+1 remain for module 38 with a cutoff of 2.0 > random
+2 remain for module 39 with a cutoff of 2.0 > random
+3 remain for module 40 with a cutoff of 2.0 > random
+3 remain for module 41 with a cutoff of 2.0 > random
+2 remain for module 42 with a cutoff of 2.0 > random
+1 remain for module 43 with a cutoff of 2.0 > random
+1 remain for module 44 with a cutoff of 2.0 > random
+1 remain for module 45 with a cutoff of 2.0 > random
+2 remain for module 46 with a cutoff of 2.0 > random
+1 remain for module 47 with a cutoff of 2.0 > random
+1 remain for module 48 with a cutoff of 2.0 > random
+1 remain for module 50 with a cutoff of 2.0 > random
+3 remain for module 51 with a cutoff of 2.0 > random
+1 remain for module 52 with a cutoff of 2.0 > random
+1 remain for module 53 with a cutoff of 2.0 > random
+1 remain for module 54 with a cutoff of 2.0 > random
+3 remain for module 56 with a cutoff of 2.0 > random
+4 remain for module 57 with a cutoff of 2.0 > random
+2 remain for module 58 with a cutoff of 2.0 > random
+2 remain for module 59 with a cutoff of 2.0 > random
+4 remain for module 60 with a cutoff of 2.0 > random
+3 remain for module 61 with a cutoff of 2.0 > random
+2 remain for module 62 with a cutoff of 2.0 > random
+2 remain for module 63 with a cutoff of 2.0 > random
+2 remain for module 64 with a cutoff of 2.0 > random
+3 remain for module 65 with a cutoff of 2.0 > random
+2 remain for module 66 with a cutoff of 2.0 > random
+1 remain for module 67 with a cutoff of 2.0 > random
+1 remain for module 68 with a cutoff of 2.0 > random
+1 remain for module 69 with a cutoff of 2.0 > random
+2 remain for module 70 with a cutoff of 2.0 > random
+3 remain for module 71 with a cutoff of 2.0 > random
+2 remain for module 72 with a cutoff of 2.0 > random
+2 remain for module 73 with a cutoff of 2.0 > random
+1 remain for module 74 with a cutoff of 2.0 > random
+4 remain for module 75 with a cutoff of 2.0 > random
+2 remain for module 76 with a cutoff of 2.0 > random
+1 remain for module 77 with a cutoff of 2.0 > random
+2 remain for module 78 with a cutoff of 2.0 > random
+2 remain for module 79 with a cutoff of 2.0 > random
+2 remain for module 80 with a cutoff of 2.0 > random
+1 remain for module 81 with a cutoff of 2.0 > random
+2 remain for module 82 with a cutoff of 2.0 > random
+1 remain for module 83 with a cutoff of 2.0 > random
+3 remain for module 84 with a cutoff of 2.0 > random
+2 remain for module 85 with a cutoff of 2.0 > random
+1 remain for module 86 with a cutoff of 2.0 > random
+2 remain for module 87 with a cutoff of 2.0 > random
+3 remain for module 88 with a cutoff of 2.0 > random
+3 remain for module 89 with a cutoff of 2.0 > random
+2 remain for module 90 with a cutoff of 2.0 > random
+1 remain for module 92 with a cutoff of 2.0 > random
+3 remain for module 93 with a cutoff of 2.0 > random
+2 remain for module 94 with a cutoff of 2.0 > random
+3 remain for module 95 with a cutoff of 2.0 > random
+2 remain for module 96 with a cutoff of 2.0 > random
+1 remain for module 97 with a cutoff of 2.0 > random
+2 remain for module 98 with a cutoff of 2.0 > random
+4 remain for module 99 with a cutoff of 2.0 > random
+4 remain for module 100 with a cutoff of 2.0 > random
+2 remain for module 101 with a cutoff of 2.0 > random
+2 remain for module 102 with a cutoff of 2.0 > random
+3 remain for module 103 with a cutoff of 2.0 > random
+2 remain for module 104 with a cutoff of 2.0 > random
+1 remain for module 105 with a cutoff of 2.0 > random
+4 remain for module 106 with a cutoff of 2.0 > random
+2 remain for module 107 with a cutoff of 2.0 > random
+2 remain for module 108 with a cutoff of 2.0 > random
+2 remain for module 110 with a cutoff of 2.0 > random
+2 remain for module 111 with a cutoff of 2.0 > random
+1 remain for module 112 with a cutoff of 2.0 > random
+2 remain for module 113 with a cutoff of 2.0 > random
+3 remain for module 114 with a cutoff of 2.0 > random
+2 remain for module 115 with a cutoff of 2.0 > random
+1 remain for module 116 with a cutoff of 2.0 > random
+1 remain for module 117 with a cutoff of 2.0 > random
+3 remain for module 118 with a cutoff of 2.0 > random
+3 remain for module 119 with a cutoff of 2.0 > random
+1 remain for module 120 with a cutoff of 2.0 > random
+2 remain for module 122 with a cutoff of 2.0 > random
+Processing ./Lemon_out/Metabolites.top2.0pct.txt: 4 columns
+Written 118 clusters to ./ModuleViewer_files/Metabolites.selected_regs_list.txt
+Warning: Could not create distribution plot for ./ModuleViewer_files/Metabolites.selected_regs_list.txt: [Errno 2] No such file or directory: './ModuleViewer_files/./ModuleViewer_files/Metabolites.selected_regs_list.txt'
+
+================================================================================
+STEP 3: NORMALIZING SELECTED REGULATOR SCORES (SUM NORMALIZATION)
+Global sum normalization divides scores by the TOTAL sum of selected regulator scores,
+then scales by 100 to make numbers more interpretable
+Normalized scores OVERWRITE original selection files for downstream use
+================================================================================
+
+Normalizing selected TFs regulators (TFs)...
+  Normalized 946 selected regulator-module pairs
+  Original range: [3.7686, 207.8791]
+  Original sum (all modules): 13767.8022
+  Normalized sum (all modules): 1000.0000 (scaled to sum=1000 across all modules)
+  Normalized range: [0.273724, 15.098928]
+  Note: Scores now sum to ~100 across all modules (global normalization and scaling)
+  Overwritten: ./Lemon_out/TFs.top2.0pct.txt
+
+Normalizing selected Metabolites regulators (Metabolites)...
+  Normalized 269 selected regulator-module pairs
+  Original range: [11.5733, 97.4939]
+  Original sum (all modules): 6149.2841
+  Normalized sum (all modules): 1000.0000 (scaled to sum=1000 across all modules)
+  Normalized range: [1.882049, 15.854508]
+  Note: Scores now sum to ~100 across all modules (global normalization and scaling)
+  Overwritten: ./Lemon_out/Metabolites.top2.0pct.txt
+
+================================================================================
+STEP 4: Creating list files and distribution plots
+================================================================================
+
+================================================================================
+STEP 5: Creating cluster list files
+================================================================================
+Processing ./Lemon_out/tight_clusters.txt: 2 columns
+Written 123 clusters to ./ModuleViewer_files/clusters_list.txt
+  Copied selected regulator scores: ./ModuleViewer_files/TFs.selected_regulators_scores.txt
+  Copied selected regulator scores: ./ModuleViewer_files/Metabolites.selected_regulators_scores.txt
+
+================================================================================
+STEP 6: Loading module-gene mappings
+================================================================================
+Found 123 modules
+
+================================================================================
+STEP 7: Calculating module coherence
+================================================================================
+Loaded expression data: (3227, 76)
+Calculating module coherence scores...
+Module 12: Low coherence (0.431 < 0.5), marking for removal
+Module 22: Low coherence (0.366 < 0.5), marking for removal
+Module 26: Low coherence (0.447 < 0.5), marking for removal
+Module 28: Low coherence (0.423 < 0.5), marking for removal
+Error processing module 33: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 37: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 39: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 40: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Module 55: Low coherence (0.301 < 0.5), marking for removal
+Error processing module 56: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 57: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 60: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 63: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 70: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 74: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 79: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 83: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 88: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Module 92: Low coherence (0.466 < 0.5), marking for removal
+Error processing module 93: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 95: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Module 97: Low coherence (0.391 < 0.5), marking for removal
+Error processing module 101: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 102: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 106: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 107: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 109: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 111: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 112: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 113: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 116: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 119: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 120: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Error processing module 121: Input X contains NaN.
+PCA does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+Original number of modules: 123
+Modules after coherence filtering: 89
+Saved coherence scores to: ./Networks/Module_coherence_scores.txt
+   Module  coherence_score
+0      75         0.914808
+1      14         0.897836
+2      45         0.895884
+3      16         0.893669
+4       0         0.845861
+..    ...              ...
+84     29         0.520719
+85    122         0.508705
+86     51         0.503892
+87     58         0.502541
+88     47         0.501517
+
+[89 rows x 2 columns]
+
+================================================================================
+STEP 9: Defining modules for network construction
+================================================================================
+89 modules in specific_modules
+================================================================================
+SUMMARY OF MODULE FILTERING AND PRIORITIZATION
+================================================================================
+Original number of modules: 123
+Modules removed due to low coherence (< 0.5): 34
+Modules remaining after coherence filtering: 89
+
+Prioritization method: Module coherence scores
+All coherence-filtered modules used for network construction: 89
+
+Final network will be built using 89 modules
+Coherence threshold used: 0.5
+Regulator selection method: percentage
+Method suffix: top2.0pct
+
+IMPORTANT: No modules are removed based on expression significance.
+Modules are only filtered by coherence, then ordered by coherence scores.
+================================================================================
+
+================================================================================
+STEP 11: Building regulatory network
+================================================================================
+Building network for 89 selected modules
+Modules to keep: ['75', '14', '45', '16', '0', '7', '52', '44', '64', '104']...
+Network saved to: ./Networks/LemonNetwork_top2.0pct_89modules.txt
+The network contains 2046 unique genes.
+The network contains 410 unique TFs regulators.
+The network contains 72 unique Metabolites regulators.
+
+================================================================================
+STEP 12: Creating regulator-target mappings
+================================================================================
+  TFs: 410 regulators
+  Metabolites: 72 regulators
+  TFs: 410 regulators -> ./Networks/TFs2targets_top2.0pct_89_modules.txt
+  Metabolites: 72 regulators -> ./Networks/Metabolites2targets_top2.0pct_89_modules.txt
+
+================================================================================
+STEP 13: Creating ranked regulator files
+================================================================================
+  Top TFs regulators:
+    Regulator      Score  ...                         Modules                                            Targets
+109     MYT1L  32.422981  ...  0|2|6|10|13|18|71|81|82|91|115  ATP8A2|HPCAL4|CAMK1G|SNAP25|SYNGR3|SNCB|PSD|DD...
+46      FOXJ1  20.292095  ...                            7|62  HYDIN|DCDC1|CFAP126|CFAP54|ZMYND10|SLC9C2|VWA3...
+106      MYRF  18.967010  ...                      6|14|18|71  CHADL|C10orf90|ANO4|S1PR5|GPD1|GRM3|FAM178B|HC...
+72      IKZF1  18.782888  ...                     20|35|64|69  CEBPA|POU2F2|CREBL2|FLI1|SP140|ACSM5|CD69|SIGL...
+74      IKZF3  17.275080  ...                           16|69  EPHA1|NKG7|IKZF3|CCL5|SLAMF7|CD2|CD6|CD8A|CD3E...
+
+[5 rows x 6 columns]
+  Saved: ./Networks/Network_top2.0pct_89_modules_TFs_ranked_regulators.txt
+  Top Metabolites regulators:
+                 Regulator  ...                                            Targets
+0   2_hydroxyglutaric_acid  ...  NETO1|CRTAC1|ZC3H12B|KCNQ5|MACROD2|CNTN1|NALCN...
+54              creatinine  ...  ATP8A2|HPCAL4|CAMK1G|SNAP25|SYNGR3|SNCB|PSD|DD...
+62            myo_inositol  ...  CFB|SOCS3|IER3|NFKB2|FCN1|C15orf48|CCL2|CXCL5|...
+60            homocysteine  ...  NCALD|ADD2|OLIG2|TNR|MMD2|FXYD6|DGKB|KCNQ2|OLI...
+36             Unknown_021  ...  CCL4|CSRNP1|KLF4|SRF|NR4A3|CREM|JUNB|EGR1|NR4A...
+
+[5 rows x 6 columns]
+  Saved: ./Networks/Network_top2.0pct_89_modules_Metabolites_ranked_regulators.txt
+
+================================================================================
+STEP 14: Creating Cytoscape network files
+================================================================================
+Creating Cytoscape files for 89 modules: [75, 14, 45, 16, 0, 7, 52, 44, 64, 104]...
+TFs regulators: 682 interactions for filtered modules
+Metabolites regulators: 194 interactions for filtered modules
+Created Cytoscape files for 482 regulators and 89 modules
+
+================================================================================
+STEP 15: Creating filtered distribution plots
+================================================================================
+Saved plot for 410 unique regulators
+Saved plot for 72 unique regulators
+
+================================================================================
+Network generation completed successfully for run: 2000HVG_coherence0.5_top2.0pct_clusters5
+================================================================================
+

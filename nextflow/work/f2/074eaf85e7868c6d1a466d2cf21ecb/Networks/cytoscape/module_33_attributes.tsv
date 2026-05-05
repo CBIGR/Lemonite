@@ -1,0 +1,11 @@
+Node	Label	Type
+creatinine	creatinine	metabolite
+EGR2	EGR2	TF
+ACP5	ACP5	bridge_node
+JUNB	JUNB	TF
+DNM2	DNM2	bridge_node
+FOS	FOS	TF
+ACE	ACE	bridge_node
+NR4A3	NR4A3	TF
+ALPP	ALPP	bridge_node
+EGR1	EGR1	TF

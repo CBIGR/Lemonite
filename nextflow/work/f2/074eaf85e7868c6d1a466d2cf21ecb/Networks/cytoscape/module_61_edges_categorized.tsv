@@ -1,0 +1,14 @@
+Node1	Node2	Source	Type	Category
+myo_inositol	GAD1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	GK	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	DPYSL2	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	EEF1A2	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	FASN	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+myo_inositol	SLC24A4	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
+POU3F2	GAD1	STRING	PPI	PPI
+FOXS1	GK	BioGRID_genes	PPI	PPI
+LEF1	DPYSL2	BioGRID_genes	PPI	PPI
+DPYSL2	FASN	BioGRID_genes	PPI	PPI
+ERG	EEF1A2	BioGRID_genes	PPI	PPI
+FOXL1	FASN	BioGRID_genes	PPI	PPI
+MEF2C	SLC24A4	STRING	PPI	PPI

@@ -1,0 +1,6 @@
+Node	Label	Type
+glycerol_3_phosphate	glycerol_3_phosphate	metabolite
+POU2F2	POU2F2	TF
+AQP3	AQP3	bridge_node
+PLAGL2	PLAGL2	TF
+EEF1A2	EEF1A2	bridge_node

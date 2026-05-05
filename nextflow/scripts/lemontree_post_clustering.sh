@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 # LemonTree post-clustering analysis script
 # Runs tight clustering and regulator analysis

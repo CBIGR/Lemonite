@@ -10,6 +10,12 @@ process CLUSTERING {
 
     script:
     """
+    # Validate input file
+    if [ ! -s "${preprocessed_data}" ]; then
+        echo "Error: Input file '${preprocessed_data}' is missing or empty"
+        exit 1
+    fi
+
     # Run LemonTree clustering using our script
     # Check host script first (allows updates without rebuilding container)
     if [ -f "${projectDir}/scripts/run_lemontree.sh" ]; then
@@ -24,7 +30,8 @@ process CLUSTERING {
         ${cluster_id} \
         ${preprocessed_data} \
         . \
-        ${params.lemontree_jar}
+        "${params.lemontree_jar}" \
+        ${params.random_seed}
     """
 
     stub:

@@ -77,12 +77,12 @@ process ENRICHMENT_ANALYSIS {
     Rscript \$SCRIPT_PATH \
         --input_dir . \
         --output_dir . \
-        --analysis_method ${analysis_method} \
-        --top_n_percent_regulators ${params.top_n_percent_regulators} \
-        --coherence_threshold ${params.coherence_threshold} \
+        --analysis_method "${analysis_method}" \
+        --top_n_percent_regulators "${params.top_n_percent_regulators}" \
+        --coherence_threshold "${params.coherence_threshold}" \
         --n_threads ${task.cpus} \
         --regulator_types "${params.regulator_types}" \
-        --organism ${params.organism}
+        --organism "${params.organism}"
     """
 
     stub:

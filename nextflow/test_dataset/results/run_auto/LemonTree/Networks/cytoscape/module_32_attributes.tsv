@@ -1,0 +1,12 @@
+Node	Label	Type
+fructose	fructose	metabolite
+ZHX3	ZHX3	TF
+GGT7	GGT7	bridge_node
+MYB	MYB	TF
+EPX	EPX	bridge_node
+ZNF592	ZNF592	TF
+P4HA3	P4HA3	bridge_node
+SALL1	SALL1	TF
+FASN	FASN	bridge_node
+MSX2	MSX2	TF
+ALDOA	ALDOA	bridge_node
