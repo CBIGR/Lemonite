@@ -21,8 +21,8 @@
 
 - **Multi-omics Integration**: Integrate transcriptomics, metabolomics, lipidomics, and other omics data types
 - **Flexible Regulator Assignment**: Support for TFs, metabolites, lipids, and or other omics (binary data currently not supported)
-- **Prior Knowledge Networks**: Lemonite knowledge graph for validation of metabolite-gene and protein-protein interactions
-- **Rich Visualizations**: Interactive network graphs, module heatmaps, in silico validation with knowledge graph, and enrichment results
+- **Prior Knowledge Networks**: Lemonite knowledge graph for validation of metabolite-gene/protein and protein-protein interactions
+- **Rich Visualizations**: Interactive network graphs, module heatmaps, in silico validation with knowledge graph, and functional annotation (ORA/GSEA) results
 
 ---
 
