@@ -15,12 +15,23 @@ import networkx as nx
 from multiprocessing import Pool
 from scipy.stats import hypergeom
 from statsmodels.stats.multitest import multipletests
+import matplotlib
+matplotlib.use('Agg')  # headless backend required in Singularity/HPC environments
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from matplotlib.patches import FancyArrowPatch, Patch
+from matplotlib.lines import Line2D
 import seaborn as sns
 import argparse
 import shutil
 import glob
+
+try:
+    import pygraphviz as pgv
+    PYGRAPHVIZ_AVAILABLE = True
+except ImportError:
+    PYGRAPHVIZ_AVAILABLE = False
+    print('Warning: pygraphviz not available; subnetwork plots will be skipped.')
 
 def get_regulators(regfile):
     """Function to create a dictionary with all regulators per module"""
@@ -63,248 +74,295 @@ def load_metabolite_mapping(mapping_file):
         print(f"Error loading metabolite mapping: {e}")
         return {}
 
-def draw_subnetwork(module, target_genes, regulators_dict, PKN, name_to_hmdb):
+# ---------------------------------------------------------------------------
+# Edge-styling helpers (match Wang_GBM/Lemonite/Investigate_shortest_paths.ipynb)
+# ---------------------------------------------------------------------------
+
+def get_edge_type_category(source, edge_type):
+    """Categorize a PKN edge into Causal / Metabolic_pathway / Ambiguous / PPI."""
+    if edge_type == 'metabolite-gene':
+        if source in ('LINCS', 'chEMBL'):
+            return 'Causal'
+        elif source in ('Human1_GEM_dist1', 'Human1_GEM_dist2'):
+            return 'Metabolic_pathway'
+        else:
+            return 'Ambiguous'
+    return 'PPI'
+
+
+def get_edge_style_mapping():
+    """Visual styles for each interaction category."""
+    return {
+        'Causal': {
+            'color': '#555555', 'style': 'solid', 'width': 3.0, 'alpha': 0.9,
+            'label': 'Causal (LINCS/chEMBL)',
+        },
+        'Metabolic_pathway': {
+            'color': '#555555', 'style': 'solid', 'width': 2.5, 'alpha': 0.85,
+            'label': 'Metabolic pathway (GEM)',
+        },
+        'Ambiguous': {
+            'color': '#555555', 'style': 'solid', 'width': 2.0, 'alpha': 0.7,
+            'label': 'Ambiguous (other)',
+        },
+        'PPI': {
+            'color': '#A9A9A9', 'style': 'solid', 'width': 1.5, 'alpha': 0.5,
+            'label': 'PPI',
+        },
+        'HumanNet': {
+            'color': 'orange', 'style': 'solid', 'width': 1.5, 'alpha': 0.6,
+            'label': 'HumanNet (functional)',
+        },
+    }
+
+
+def get_edge_source_and_type(PKN_df, node1, node2):
+    """Return (source, edge_type, category) for an edge, using PKN_df if available."""
+    if PKN_df is None or PKN_df.empty:
+        return 'unknown', 'unknown', 'Ambiguous'
+
+    # Detect column names: prefer Node1/Node2, fall back to first two columns
+    cols = list(PKN_df.columns)
+    if 'Node1' in cols and 'Node2' in cols:
+        c1, c2 = 'Node1', 'Node2'
+    else:
+        c1, c2 = cols[0], cols[1]
+
+    mask = (
+        ((PKN_df[c1] == node1) & (PKN_df[c2] == node2)) |
+        ((PKN_df[c1] == node2) & (PKN_df[c2] == node1))
+    )
+    match = PKN_df[mask]
+    if match.empty:
+        return 'unknown', 'unknown', 'Ambiguous'
+
+    source = match.iloc[0]['Source'] if 'Source' in cols else 'unknown'
+    edge_type = match.iloc[0]['Type'] if 'Type' in cols else 'unknown'
+    category = get_edge_type_category(source, edge_type)
+    return source, edge_type, category
+
+
+def create_edge_legend_by_category(edge_styles, edge_info):
+    """Return legend Line2D handles for edge categories present in the network."""
+    present = {info.get('category', 'PPI') for info in edge_info.values()}
+    handles = []
+    for category in sorted(edge_styles.keys()):
+        style = edge_styles[category]
+        if category == 'Metabolic_pathway':
+            handles.append(Line2D([0, 1], [0, 0],
+                marker='o', markersize=6, markerfacecolor=style['color'],
+                markeredgecolor='black', markeredgewidth=0.5,
+                color=style['color'], linewidth=style['width'],
+                linestyle=style['style'], alpha=style['alpha'],
+                label=style['label']))
+        elif category == 'Causal':
+            handles.append(Line2D([0, 1], [0, 0],
+                marker='>', markersize=8, markerfacecolor=style['color'],
+                markeredgecolor='black', markeredgewidth=0.5,
+                color=style['color'], linewidth=style['width'],
+                linestyle=style['style'], alpha=style['alpha'],
+                label=style['label']))
+        else:
+            handles.append(Line2D([0, 1], [0, 0],
+                color=style['color'], linewidth=style['width'],
+                linestyle=style['style'], alpha=style['alpha'],
+                label=style['label']))
+    return handles
+
+
+def create_node_legend(has_metabolites, has_tfs, has_targets, has_bridge, has_lipids=False):
+    """Return Patch legend handles for node types present in the network."""
+    handles = []
+    if has_metabolites:
+        handles.append(Patch(facecolor='red', edgecolor='black', label='Metabolites'))
+    if has_lipids:
+        handles.append(Patch(facecolor='purple', edgecolor='black', label='Lipids'))
+    if has_tfs:
+        handles.append(Patch(facecolor='lightgreen', edgecolor='black', label='TFs'))
+    if has_targets:
+        handles.append(Patch(facecolor='orange', edgecolor='black', label='Targets'))
+    if has_bridge:
+        handles.append(Patch(facecolor='lightgrey', edgecolor='black', label='Bridge'))
+    return handles
+
+
+def print_edge_statistics(edge_info):
+    """Print counts of edge categories, types, and sources."""
+    from collections import Counter
+    categories = [i.get('category', 'PPI') for i in edge_info.values()]
+    types      = [i.get('type', 'unknown') for i in edge_info.values()]
+    sources    = [i.get('source', 'unknown') for i in edge_info.values()]
+    print("\n=== Edge Statistics ===")
+    print("By Category:", dict(Counter(categories)))
+    print("By Type:",     dict(Counter(types)))
+    print("By Source:",   dict(Counter(sources)))
+
+
+# ---------------------------------------------------------------------------
+# Main subnetwork drawing function
+# ---------------------------------------------------------------------------
+
+def draw_subnetwork(module, target_genes, regulators_dict, PKN_graph, name_to_hmdb,
+                    PKN_df=None, humannet_set=None, layout_engine='neato'):
     """
-    Draw subnetwork visualization for a module showing connections in the PKN
-    
-    Parameters:
-    module (str): Module identifier
-    target_genes (list): List of target genes for this module
-    regulators_dict (dict): Dictionary mapping regulator types to lists of regulators
-    PKN (nx.Graph): NetworkX graph representing the PKN
-    name_to_hmdb (dict): Dictionary mapping metabolite names to HMDB IDs
+    Draw subnetwork visualization for a module using Graphviz/pygraphviz.
+    Visual style matches Wang_GBM/Lemonite/Investigate_shortest_paths.ipynb.
+
+    layout_engine options: 'neato' (force-directed), 'dot' (hierarchical), 'fdp', 'sfdp'
     """
-    # Create reverse mapping from HMDB ID to metabolite name for display
+    if not PYGRAPHVIZ_AVAILABLE:
+        print(f'Skipping subnetwork plot for module {module}: pygraphviz not available.')
+        return
+
     hmdb_to_name = {v: k for k, v in name_to_hmdb.items()}
 
-    # Extract regulator lists from the dictionary
-    TF_regulators = regulators_dict.get('TF', [])
+    TF_regulators         = regulators_dict.get('TF', [])
     metabolite_regulators = regulators_dict.get('Metabolite', [])
-    lipids_regulators = regulators_dict.get('Lipid', [])
+    lipid_regulators      = regulators_dict.get('Lipid', [])
 
-    # Get metabolite regulators, TF regulators, and target genes for this module
-    # These are already passed as parameters, no need to index dictionaries
-    print(f'Module {module} has {len(metabolite_regulators)} metabolite regulators, {len(TF_regulators)} TF regulators, {len(lipids_regulators)} lipid regulators and {len(target_genes)} target genes')
+    print(f'Module {module}: {len(metabolite_regulators)} metabolites, '
+          f'{len(TF_regulators)} TFs, {len(lipid_regulators)} lipids, '
+          f'{len(target_genes)} targets.')
 
-    # Initialize lists to store edges and nodes for visualization
-    direct_edges = []        # edges directly connecting metabolite -> target gene
-    only_PKN_edge = []       # other edges in PKN between nodes
-    reachable_targets = set() # target genes reachable directly
-    met_regs = []             # list of metabolite regulators (mapped to HMDB IDs)
+    to_draw   = nx.Graph()
+    edge_info = {}
+    met_regs  = []
 
-    # Initialize an empty graph for drawing
-    to_draw = nx.Graph()
-
-    # ---- STEP 1: Process metabolite regulators ----
+    # --- STEP 1: Metabolite regulators (direct edges to target genes) ---
     for reg in metabolite_regulators:
         if reg not in name_to_hmdb:
-            print(f'{reg} does not have a valid HMDB ID in the list you provided')
             continue
-        
-        regulator = name_to_hmdb[reg]  # map name to HMDB ID
+        regulator = name_to_hmdb[reg]
         met_regs.append(regulator)
-
-        if regulator in PKN.nodes():  # if the regulator exists in the PKN
-            to_draw.add_node(regulator)
-
-            # Check for direct connections from regulator to each target gene
-            for target in target_genes:
-                try:
-                    shortest_path = nx.shortest_path_length(PKN, source=regulator, target=target)
-                    if shortest_path == 1:  # direct connection
-                        reachable_targets.add(target)
-                        to_draw.add_node(target)
-                        to_draw.add_edge(regulator, target, weight=1)  # direct edge → weight=1
-                        direct_edges.append((regulator, target))
-                except nx.NetworkXNoPath:
-                    pass
-                except nx.NodeNotFound:
-                    pass
-
-    # ---- STEP 2: Process TF regulators ----
-    reachable_TFs = set()
-    for TF in TF_regulators:
-        for met in met_regs:
+        if regulator not in PKN_graph.nodes():
+            continue
+        to_draw.add_node(regulator)
+        for target in target_genes:
             try:
-                shortest_path = nx.shortest_path_length(PKN, source=TF, target=met)
-
-                if shortest_path == 1:  # TF connected directly to metabolite
-                    reachable_TFs.add(TF)
-                    print(f'{TF} can be reached from regulator {met} in 1 step')
-                    to_draw.add_node(TF)
-                    to_draw.add_edge(TF, met, weight=1)  # weight=1 for direct
-
-                elif shortest_path == 2:  # TF connected via an intermediate node
-                    print(f'{TF} can be reached from regulator {met} in 2 steps')
-                    reachable_TFs.add(TF)
-                    path = nx.shortest_path(PKN, source=TF, target=met)  # fixed variable name
-
-                    # add all nodes and edges in the path
-                    for i in range(len(path)-1):
-                        to_draw.add_node(path[i])
-                        to_draw.add_node(path[i+1])
-                        to_draw.add_edge(path[i], path[i+1], weight=2)  # indirect → weight=2
-
-            except nx.NetworkXNoPath:
-                pass
-            except nx.NodeNotFound:
+                if nx.shortest_path_length(PKN_graph, source=regulator, target=target) == 1:
+                    to_draw.add_nodes_from([regulator, target])
+                    to_draw.add_edge(regulator, target)
+                    src, etype, cat = get_edge_source_and_type(PKN_df, regulator, target)
+                    edge_info[(regulator, target)] = {'source': src, 'type': etype, 'category': cat}
+            except (nx.NetworkXNoPath, nx.NodeNotFound):
                 pass
 
-    # ---- STEP 2.5: Process lipid regulators ----
-    lipid_regs = []
-    for lipid in lipids_regulators:
-        lipid_regs.append(lipid)
-        if lipid in PKN.nodes():  # if the lipid regulator exists in the PKN
-            to_draw.add_node(lipid)
+    # --- STEP 1.5: Lipid regulators (direct edges to target genes) ---
+    for lipid in lipid_regulators:
+        if lipid not in PKN_graph.nodes():
+            continue
+        to_draw.add_node(lipid)
+        for target in target_genes:
+            try:
+                if nx.shortest_path_length(PKN_graph, source=lipid, target=target) == 1:
+                    to_draw.add_nodes_from([lipid, target])
+                    to_draw.add_edge(lipid, target)
+                    src, etype, cat = get_edge_source_and_type(PKN_df, lipid, target)
+                    edge_info[(lipid, target)] = {'source': src, 'type': etype, 'category': cat}
+            except (nx.NetworkXNoPath, nx.NodeNotFound):
+                pass
 
-            # Check for direct connections from lipid regulator to each target gene
-            for target in target_genes:
-                try:
-                    shortest_path = nx.shortest_path_length(PKN, source=lipid, target=target)
-                    if shortest_path == 1:  # direct connection
-                        reachable_targets.add(target)
-                        to_draw.add_node(target)
-                        to_draw.add_edge(lipid, target, weight=1)  # direct edge → weight=1
-                        direct_edges.append((lipid, target))
-                except nx.NetworkXNoPath:
-                    pass
-                except nx.NodeNotFound:
-                    pass
+    # --- STEP 2: TF regulators (via PPI path to metabolite, ≤2 steps) ---
+    for TF in TF_regulators:
+        for regulator in met_regs:
+            try:
+                if nx.shortest_path_length(PKN_graph, source=TF, target=regulator) <= 2:
+                    path = nx.shortest_path(PKN_graph, source=TF, target=regulator)
+                    for i in range(len(path) - 1):
+                        u, v = path[i], path[i + 1]
+                        to_draw.add_edge(u, v)
+                        src, etype, cat = get_edge_source_and_type(PKN_df, u, v)
+                        edge_info[(u, v)] = {'source': src, 'type': etype, 'category': cat}
+            except (nx.NetworkXNoPath, nx.NodeNotFound):
+                pass
 
-    # ---- STEP 3: Annotate nodes with their types ----
-    node_attributes = pd.DataFrame(columns=['node', 'type'])
-    node_colors = []
-    for node in to_draw.nodes():
-        if node in name_to_hmdb.values():
-            node_colors.append('red')  # metabolite regulator
-            node_attributes = pd.concat([node_attributes, pd.DataFrame([{'node': node, 'type': 'metabolite'}])], ignore_index=True)
+    # --- STEP 3: Additional PKN edges among already-included nodes ---
+    subgraph = PKN_graph.subgraph(to_draw.nodes())
+    for u, v in subgraph.edges():
+        if not to_draw.has_edge(u, v):
+            to_draw.add_edge(u, v)
+            src, etype, cat = get_edge_source_and_type(PKN_df, u, v)
+            edge_info[(u, v)] = {'source': src, 'type': etype, 'category': cat}
 
-        elif node in TF_regulators:
-            node_colors.append('green')  # TF regulator
-            node_attributes = pd.concat([node_attributes, pd.DataFrame([{'node': node, 'type': 'TF'}])], ignore_index=True)
+    # --- STEP 4: HumanNet edges among included nodes ---
+    if humannet_set is not None:
+        nodes = list(to_draw.nodes())
+        for i, u in enumerate(nodes):
+            for v in nodes[i + 1:]:
+                if not to_draw.has_edge(u, v) and (
+                        (u, v) in humannet_set or (v, u) in humannet_set):
+                    to_draw.add_edge(u, v)
+                    edge_info[(u, v)] = {'source': 'HumanNet', 'type': 'functional',
+                                         'category': 'HumanNet'}
 
-        elif node in lipids_regulators:
-            node_colors.append('purple')  # lipid regulator
-            node_attributes = pd.concat([node_attributes, pd.DataFrame([{'node': node, 'type': 'lipid'}])], ignore_index=True)
+    to_draw.remove_edges_from(nx.selfloop_edges(to_draw))
+    to_draw.remove_nodes_from([n for n in list(to_draw) if to_draw.degree(n) == 0])
 
-        elif node in target_genes:
-            node_colors.append('orange')  # target gene
-            node_attributes = pd.concat([node_attributes, pd.DataFrame([{'node': node, 'type': 'target'}])], ignore_index=True)
-
-        else:
-            node_colors.append('grey')  # intermediate (bridge) node
-            node_attributes = pd.concat([node_attributes, pd.DataFrame([{'node': node, 'type': 'bridge'}])], ignore_index=True)
-
-    # ---- STEP 4: Add additional edges from PKN (between included nodes) ----
-    subgraph = PKN.subgraph(to_draw.nodes())
-    for edge in subgraph.edges():
-        if edge not in to_draw.edges():
-            only_PKN_edge.append(edge)
-            to_draw.add_edge(edge[0], edge[1], weight=3)  # additional edges → weight=3
-
-    # ---- STEP 5: Clean up graph ----
-    to_draw.remove_edges_from(nx.selfloop_edges(to_draw))  # remove self-loops
-
-    # ---- STEP 8: Draw the network ----
-    # Dynamically adjust figure size based on max label length
-    if len(to_draw.nodes()) == 0:
+    if not to_draw.nodes:
         print(f'No valid connections found for module {module}')
         return
-        
-    max_label_length = max([len(str(label)) for label in to_draw.nodes()])
-    width = 3 + max_label_length * 0.2
-    height = 3 + max_label_length * 0.1  # optioneel iets hoger
-    plt.figure(figsize=(width, height))
 
-    ax = plt.gca()
-    pos = nx.spring_layout(to_draw, k=3.0, iterations=100, seed=42)  # meer spacing
+    # === Node categories ===
+    hmdb_nodes   = set(n for n in to_draw if n in name_to_hmdb.values())
+    lipid_nodes  = set(n for n in to_draw if n in lipid_regulators)
+    tf_nodes     = set(n for n in to_draw if n in TF_regulators)
+    target_nodes = set(n for n in to_draw if n in target_genes)
+    bridge_nodes = set(n for n in to_draw
+                       if n not in hmdb_nodes | lipid_nodes | tf_nodes | target_nodes)
 
-    # Separate nodes by type
-    hmdb_nodes = [n for n in to_draw.nodes() if n in name_to_hmdb.values()]
-    tf_nodes = [n for n in to_draw.nodes() if n in TF_regulators]
-    lipid_nodes = [n for n in to_draw.nodes() if n in lipids_regulators]
-    target_nodes = [n for n in to_draw.nodes() if n in target_genes]
-    bridge_nodes = [n for n in to_draw.nodes() if n not in hmdb_nodes + tf_nodes + lipid_nodes + target_nodes]
+    # === Build Graphviz graph ===
+    G = pgv.AGraph(directed=False, strict=False)
+    G.graph_attr['overlap'] = 'false'
+    G.graph_attr['splines'] = 'curved'
+    G.graph_attr['sep']     = '+0.5'
+    G.graph_attr['pad']     = '0.5'
 
-    # Dynamically scale node sizes based on label length
-    sizes_tf = [500 + len(str(node)) * 80 for node in tf_nodes]
-    sizes_lipid = [500 + len(str(node)) * 80 for node in lipid_nodes]
-    sizes_target = [500 + len(str(node)) * 80 for node in target_nodes]
-    sizes_bridge = [500 + len(str(node)) * 80 for node in bridge_nodes]
-
-    # Draw TF nodes as circles (green)
-    nx.draw_networkx_nodes(
-        to_draw, pos,
-        nodelist=tf_nodes,
-        node_color='lightgreen',
-        node_shape='o',
-        node_size=sizes_tf
-    )
-
-    # Draw lipid nodes as circles (purple)
-    nx.draw_networkx_nodes(
-        to_draw, pos,
-        nodelist=lipid_nodes,
-        node_color='purple',
-        node_shape='o',
-        node_size=sizes_lipid
-    )
-
-    # Draw target nodes as circles (orange)
-    nx.draw_networkx_nodes(
-        to_draw, pos,
-        nodelist=target_nodes,
-        node_color='orange',
-        node_shape='o',
-        node_size=sizes_target
-    )
-
-    # Draw bridge nodes as circles (gray)
-    nx.draw_networkx_nodes(
-        to_draw, pos,
-        nodelist=bridge_nodes,
-        node_color='lightgrey',
-        node_shape='o',
-        node_size=sizes_bridge
-    )
-
-    # Draw labels for HMDB nodes using metabolite names instead of HMDB IDs
-    metabolite_labels = {}
-    for node in hmdb_nodes:
-        if node in hmdb_to_name:
-            metabolite_labels[node] = hmdb_to_name[node]
+    for node in to_draw.nodes():
+        label = hmdb_to_name.get(node, node)
+        if node in hmdb_nodes:
+            fillcolor, edgecolor = 'red', 'darkred'
+        elif node in lipid_nodes:
+            fillcolor, edgecolor = 'mediumpurple', 'purple'
+        elif node in tf_nodes:
+            fillcolor, edgecolor = 'lightgreen', 'darkgreen'
+        elif node in target_nodes:
+            fillcolor, edgecolor = 'orange', 'darkorange'
         else:
-            metabolite_labels[node] = node  # fallback to HMDB ID if name not found
+            fillcolor, edgecolor = 'lightgrey', 'darkgrey'
+        G.add_node(node, label=label, shape='box', style='rounded,filled',
+                   fillcolor=fillcolor, color=edgecolor,
+                   fontname='Arial', fontsize='10', penwidth='2.0',
+                   height='0.55', width=str(0.6 + len(label) * 0.07))
 
-    nx.draw_networkx_labels(
-        to_draw, pos,
-        labels=metabolite_labels,
-        font_size=6,
-        font_weight='bold',
-        bbox=dict(boxstyle='round,pad=0.5', facecolor='red', edgecolor='none')
-    )
+    for u, v in to_draw.edges():
+        info     = edge_info.get((u, v)) or edge_info.get((v, u), {})
+        category = info.get('category', 'PPI')
+        if category == 'Causal':
+            G.add_edge(u, v, color='#555555', penwidth='3.0',
+                       arrowhead='vee', arrowtail='none', dir='forward', arrowsize='1.2')
+        elif category == 'Metabolic_pathway':
+            G.add_edge(u, v, color='#555555', penwidth='2.5',
+                       arrowhead='dot', arrowtail='none', dir='forward', arrowsize='1.8')
+        elif category == 'Ambiguous':
+            G.add_edge(u, v, color='#555555', penwidth='2.0',
+                       arrowhead='none', arrowtail='none', dir='none')
+        elif category == 'HumanNet':
+            G.add_edge(u, v, color='orange', penwidth='1.5',
+                       arrowhead='none', arrowtail='none', dir='none')
+        else:  # PPI
+            G.add_edge(u, v, color='#A9A9A9', penwidth='1.5',
+                       arrowhead='none', arrowtail='none', dir='none')
 
-    # Draw edges
-    nx.draw_networkx_edges(to_draw, pos, edge_color='black')
-
-    # Draw labels for all other nodes (excluding HMDB nodes which were labeled manually)
-    for node in tf_nodes + target_nodes + bridge_nodes:
-        x, y = pos[node]
-        ax.text(x, y, node, ha='center', va='center', fontsize=5, fontweight='bold')
-
-    plt.axis('off') 
-    plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05)
-    plt.title(f'Subnetwork of module {module} in the Lemonite PKN', fontsize=10)
-
-    # Create output directory
+    # === Layout and save ===
+    G.layout(prog=layout_engine)
     output_dir = os.path.join(os.getcwd(), 'Networks', 'subnetworks')
     os.makedirs(output_dir, exist_ok=True)
-    
-    # Save figure to file
-    plt.savefig(os.path.join(output_dir, f'graph_{module}.png'))
-    plt.close()
-    
-    print(f'Graph with {to_draw.number_of_nodes()} nodes and {to_draw.number_of_edges()} edges')
+    out_png = os.path.join(output_dir, f'graph_{module}.png')
+    G.draw(out_png, prog=layout_engine, format='png', args='-Gdpi=200')
+
+    print_edge_statistics(edge_info)
+    print(f'Saved subnetwork: {out_png} '
+          f'({to_draw.number_of_nodes()} nodes, {to_draw.number_of_edges()} edges)')
 
 def calculate_ppi_enrichment(module2genes, PKN_graph, all_module_genes):
     """
@@ -1081,6 +1139,70 @@ def evaluate_network_against_pkn(args):
         print(f"PPI MVF file successfully created with size: {os.path.getsize(ppi_mvf_file)} bytes")
     
     # ========================================
+    # Generate HumanNet interactions MVF file
+    # ========================================
+    print("\n" + "=" * 60)
+    print("Generating HumanNet interactions MVF file for ModuleViewer...")
+    print("=" * 60)
+
+    humannet_mvf_file = os.path.join(moduleviewer_dir, 'HumanNet_interactions.mvf')
+
+    # Locate HumanNet CSV file
+    humannet_csv = None
+    for candidate in [
+        os.path.join(os.path.dirname(args.pkn_file), 'HumanNet_interactions.csv'),
+        '/opt/PKN/HumanNet_interactions.csv',
+    ]:
+        if os.path.exists(candidate):
+            humannet_csv = candidate
+            print(f"Found HumanNet file: {humannet_csv}")
+            break
+
+    if humannet_csv is None:
+        print("Warning: HumanNet_interactions.csv not found - HumanNet MVF will be empty")
+
+    humannet_set = set()
+    if humannet_csv is not None:
+        hn_df = pd.read_csv(humannet_csv, header=0)
+        for _, row in hn_df.iterrows():
+            g1, g2 = str(row.iloc[0]), str(row.iloc[1])
+            if g1 in all_module_genes and g2 in all_module_genes:
+                humannet_set.add((g1, g2))
+                humannet_set.add((g2, g1))
+        print(f"HumanNet pairs filtered for module genes (bidirectional): {len(humannet_set)}")
+
+    total_hn_written = 0
+    modules_with_hn = 0
+
+    with open(humannet_mvf_file, 'w') as handle:
+        handle.write('::TYPE=HumanNet\n')
+        handle.write('::TITLE=HumanNet Functional Interactions\n')
+        handle.write('::OBJECT=GENE_PAIRS\n')
+        handle.write('::COLOR=saddlebrown\n')
+
+        for module in module2genes.keys():
+            module_genes = module2genes[module]
+            module_hn = []
+            for i, gene1 in enumerate(module_genes):
+                for gene2 in module_genes[i+1:]:
+                    if (gene1, gene2) in humannet_set:
+                        module_hn.append(f"{gene1}|{gene2}")
+            for pair in module_hn:
+                handle.write(f"{int(module)}\t{pair}\n")
+                total_hn_written += 1
+            if len(module_hn) > 0:
+                modules_with_hn += 1
+                print(f"Module {module}: Found {len(module_hn)} HumanNet interactions")
+
+        if total_hn_written == 0:
+            handle.write('# No HumanNet interactions found for module genes\n')
+
+    print(f"\nHumanNet MVF file generation summary:")
+    print(f"  - File created: {humannet_mvf_file}")
+    print(f"  - Total HumanNet pairs written: {total_hn_written}")
+    print(f"  - Modules with HumanNet interactions: {modules_with_hn}/{len(module2genes)}")
+
+    # ========================================
     # Calculate PPI enrichment for modules
     # ========================================
     ppi_enrichment_df = calculate_ppi_enrichment(module2genes, PKN_graph, all_module_genes)
@@ -1172,11 +1294,12 @@ def evaluate_network_against_pkn(args):
                 print(f'Module {module}: No regulators found, skipping subnetwork visualization')
                 continue
             
-            # Draw subnetwork for this module (DISABLED - using categorized graphs from SUBNETWORK_GRAPHS process instead)
-            # draw_subnetwork(module, target_genes, regulators_dict, PKN_graph, metabolite_mapping)
-            
+            # Draw subnetwork for this module
+            draw_subnetwork(module, target_genes, regulators_dict, PKN_graph, metabolite_mapping,
+                            PKN_df=PKN_df, humannet_set=humannet_set)
+
             modules_processed += 1
-            # modules_with_subnetworks += 1  # Commented out since we're not creating subnetworks here anymore
+            modules_with_subnetworks += 1
             
         except KeyError:
             print(f'Module {module}: Key error during subnetwork visualization')

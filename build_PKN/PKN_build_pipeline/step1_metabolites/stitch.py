@@ -176,9 +176,15 @@ class STITCHRetriever(LocalFileRetriever):
         
         # Add HMDB_ID
         df['HMDB_ID'] = df['PubChem_ID'].map(pubchem_to_hmdb)
-        
+
+        # Generate provenance URL
+        df['url'] = df['PubChem_ID'].apply(
+            lambda cid: f"http://stitch.embl.de/cgi/show_network_section.pl?identifier=CID{cid}&species=9606"
+            if pd.notna(cid) else ''
+        )
+
         # Select final columns
-        result = df[['HMDB_ID', 'Gene', 'Source']].copy()
+        result = df[['HMDB_ID', 'Gene', 'Source', 'url']].copy()
         
         self.logger.info(
             f"Found {len(result)} STITCH interactions for "

@@ -415,6 +415,11 @@ for (comp in 1:ncomp) {
   dev.off()
 }
 
+blocks <- rep(names(data), sapply(data, ncol))  # Create a vector indicating the block for each variable
+
+# Statistic test on differential sample loadings?
+auc.diablo <- auroc(final.diablo.model, roc.block = blocks, roc.comp = 1:ncomp)
+
 
 # Sample projection into latent components
 png(paste0(base_dir, 'results/MixOmics/Diablo_final_plotIndiv_comp1-3.png'))
@@ -592,7 +597,7 @@ library(ggplot2)
 library(patchwork)
 
 # --- 1. Extract loadings ---
-loadings_list <- lapply(final.diablo.model$loadings, function(x) x[, 1:4, drop = FALSE])
+loadings_list <- lapply(final.diablo.model$loadings, function(x) x[, 1:3, drop = FALSE])
 blocks <- rep(names(loadings_list), sapply(loadings_list, nrow))
 feature_names <- unlist(lapply(loadings_list, rownames))
 # Map feature names to original names for display

@@ -1,0 +1,17 @@
+nextflow.trace/v2
+realtime=376168
+%cpu=1014
+cpu_model=11th Gen Intel(R) Core(TM) i5-11400H @ 2.70GHz
+rchar=3013259
+wchar=17259
+syscr=930
+syscw=183
+read_bytes=0
+write_bytes=1314816
+%mem=13
+vmem=12589716
+rss=414064
+peak_vmem=12655252
+peak_rss=414064
+vol_ctxt=11
+inv_ctxt=11

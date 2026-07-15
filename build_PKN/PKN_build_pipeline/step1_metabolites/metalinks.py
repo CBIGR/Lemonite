@@ -33,16 +33,30 @@ class MetalinksRetriever(LocalFileRetriever):
             cache_file=cache_file or config.DB_OUTPUT_FILES['MetalinksDB']
         )
     
+    # Per-source URL mapping (matches the notebook's METALINKS_SOURCE_URLS,
+    # extended with actual values found in metalinks.csv)
+    METALINKS_SOURCE_URLS = {
+        'CellPhoneDB': 'https://www.cellphonedb.org',
+        'NicheNet':    'https://github.com/saeyslab/nichenetr',
+        'HMDB':        'https://hmdb.ca',
+        'MetalinksDB': 'https://metalinks.omnipathdb.org',
+        'recon':       'https://www.vmh.life/',           # Recon2/Recon3D metabolic model
+        'hmr':         'https://www.metabolicatlas.org/', # Human Metabolome Reconstruction
+        'rhea':        'https://www.rhea-db.org/',        # Rhea biochemical reactions
+        'scConnect':   'https://github.com/JonETJakobsson/scConnect',
+        'Cellinker':   'https://doi.org/10.1093/nar/gkac079',         # Cellinker paper (site may be down)
+    }
+
     def parse_file(self) -> pd.DataFrame:
         """
         Parse MetalinksDB CSV file.
         
-        Expected columns: 'hmdb', 'gene_symbol'
+        Expected columns: 'hmdb', 'gene_symbol', 'source'
         
         Returns:
         --------
         pd.DataFrame
-            Columns: ['HMDB_ID', 'Gene', 'Source']
+            Columns: ['HMDB_ID', 'Gene', 'Source', 'url']
         """
         self.logger.info(f"Loading MetalinksDB from {self.file_path}")
         
@@ -63,12 +77,18 @@ class MetalinksRetriever(LocalFileRetriever):
         for _, row in metalinks.iterrows():
             hmdb_id = row['hmdb']
             gene = row['gene_symbol']
+            src = row.get('source', None)
+            url = (
+                self.METALINKS_SOURCE_URLS.get(src, 'https://metalinks.omnipathdb.org')
+                if pd.notna(src) else 'https://metalinks.omnipathdb.org'
+            )
             
             if pd.notna(hmdb_id) and pd.notna(gene):
                 interactions.append({
                     'HMDB_ID': hmdb_id,
                     'Gene': gene,
-                    'Source': 'MetalinksDB'
+                    'Source': 'MetalinksDB',
+                    'url': url
                 })
         
         df = pd.DataFrame(interactions)

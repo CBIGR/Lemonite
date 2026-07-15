@@ -771,7 +771,12 @@ def createListFile(input_file, output_file):
 def create_reg_distribution(reg_file_list):
     """Create regulator distribution plot - Cell 7 from notebook"""
     try:
-        with open('./ModuleViewer_files/' + reg_file_list, 'r') as handle:
+        # reg_file_list may be a full path or just a filename; normalise to full path
+        if not reg_file_list.startswith('./ModuleViewer_files/') and not os.path.isabs(reg_file_list):
+            reg_file_path = './ModuleViewer_files/' + reg_file_list
+        else:
+            reg_file_path = reg_file_list
+        with open(reg_file_path, 'r') as handle:
             regs = {}
             for line in handle:
                 line = line.rstrip().split('\t')
@@ -827,7 +832,21 @@ def calculate_module_coherence(expression_file, clusters_dict, coherence_thresho
     print(f"Loaded expression data: {expression_data.shape}")
     
     # Set gene symbols as index for easier subsetting
-    expression_data_indexed = expression_data.set_index('symbol')
+    # Support both RNA-style ('symbol') and proteomics-style ('Gene_symbol') column names
+    symbol_col = None
+    for candidate in ('symbol', 'Gene_symbol', 'gene_symbol'):
+        if candidate in expression_data.columns:
+            symbol_col = candidate
+            break
+    if symbol_col is None:
+        symbol_col = expression_data.columns[0]
+        print(f"Warning: No 'symbol' or 'Gene_symbol' column found; using first column '{symbol_col}' as gene index")
+    expression_data_indexed = expression_data.set_index(symbol_col)
+    # Drop non-numeric metadata columns (e.g. Protein_id) before subsetting
+    non_numeric = [c for c in expression_data_indexed.columns
+                   if expression_data_indexed[c].dtype == object]
+    if non_numeric:
+        expression_data_indexed = expression_data_indexed.drop(columns=non_numeric)
     # drop any duplicated symbols (should not happen for expression-only file)
     if expression_data_indexed.index.duplicated().any():
         dupes = expression_data_indexed.index[expression_data_indexed.index.duplicated()]
@@ -864,6 +883,17 @@ def calculate_module_coherence(expression_file, clusters_dict, coherence_thresho
             
             # Extract expression data for module genes
             module_expression = expression_matrix.loc[module_genes_in_data]
+            
+            # Drop columns (samples) with any NaN — needed for proteomics data with missing values
+            module_expression = module_expression.dropna(axis=1)
+            # Drop genes (rows) with any remaining NaN
+            module_expression = module_expression.dropna(axis=0)
+            
+            if module_expression.shape[1] < 3:
+                print(f"Module {module}: Too few samples without NaN ({module_expression.shape[1]}), marking for removal")
+                modules_to_remove.append(str(module))
+                coherence_scores[module] = 0.0
+                continue
             
             # Calculate eigengene using PCA (first principal component)
             pca = PCA(n_components=1)

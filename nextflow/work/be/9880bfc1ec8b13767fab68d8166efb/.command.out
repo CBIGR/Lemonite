@@ -1,0 +1,69 @@
+Using bundled network from projectDir: /home/borisvdm/repo/LemonIte/nextflow/PKN/CollecTRI_network.txt
+Found core files:
+Expression: /home/borisvdm/Documents/PhD/24_AML_Dhaenens-Lammens/data/proteomics_scaled.csv
+Metadata: /home/borisvdm/Documents/PhD/24_AML_Dhaenens-Lammens/data/Metadata_AML_nextflow.csv
+Prior network: /home/borisvdm/repo/LemonIte/nextflow/PKN/CollecTRI_network.txt
+Using Preprocessing_TFA_Proteomics.R (pre-scaled proteomics mode)
+WARNING: ignoring environment value of R_HOME
+=== Preprocessing Pre-scaled Proteomics/Multi-Omics Data ===
+Expression file: /home/borisvdm/Documents/PhD/24_AML_Dhaenens-Lammens/data/proteomics_scaled.csv 
+Metadata file: /home/borisvdm/Documents/PhD/24_AML_Dhaenens-Lammens/data/Metadata_AML_nextflow.csv 
+Output dir: . 
+TFA enabled: FALSE 
+
+Reading metadata...
+Metadata samples: 107 
+PCA contrast column: Cell_line 
+
+Reading proteomics data...
+Proteomics dimensions: 4611 x 97 
+Matched samples: 97 
+
+Selecting top 10000 variable features...
+Selected 4611 features
+
+=== Creating PCA plot for Proteomics ===
+[OK] Saved PCA plot: ./LemonTree/Preprocessing/PCA_proteomics.pdf
+
+Adding ID mapping...
+[OK] Saved: LemonPreprocessed_proteomics.txt
+
+=== Processing hPTM data ===
+hPTM dimensions: 157 x 99 
+hPTM samples matched: 97 
+[OK] Saved LemonPreprocessed_hPTM.txt and hptms.txt
+
+=== Creating PCA plot for hPTM ===
+[OK] Saved PCA plot: ./LemonTree/Preprocessing/PCA_hptm.pdf
+
+=== Processing metabolomics data ===
+Metabolomics dimensions: 701 x 97 
+Metabolomics samples matched: 97 
+[OK] Saved LemonPreprocessed_metabolomics.txt and metabolites.txt
+
+=== Creating PCA plot for Metabolomics ===
+[OK] Saved PCA plot: ./LemonTree/Preprocessing/PCA_metabolomics.pdf
+
+=== Creating combined LemonTree input ===
+[OK] Saved: LemonPreprocessed_complete.txt
+[1] TRUE
+[OK] Saved: LemonPreprocessed_expression.txt
+[OK] Saved: DESeq_groups.txt
+[OK] Saved: name_mapping.tsv
+
+=== Preprocessing complete ===
+Output directory: ./LemonTree/Preprocessing 
+Files produced:
+  - LemonTree/Preprocessing/DESeq_groups.txt
+  - LemonTree/Preprocessing/hptms.txt
+  - LemonTree/Preprocessing/LemonPreprocessed_complete.txt
+  - LemonTree/Preprocessing/LemonPreprocessed_expression.txt
+  - LemonTree/Preprocessing/LemonPreprocessed_hPTM.txt
+  - LemonTree/Preprocessing/LemonPreprocessed_metabolomics.txt
+  - LemonTree/Preprocessing/LemonPreprocessed_proteomics.txt
+  - LemonTree/Preprocessing/metabolites.txt
+  - LemonTree/Preprocessing/name_mapping.tsv
+  - LemonTree/Preprocessing/PCA_hptm.pdf
+  - LemonTree/Preprocessing/PCA_metabolomics.pdf
+  - LemonTree/Preprocessing/PCA_proteomics.pdf
+TFA: skipped (perform_TFA=FALSE or network unavailable)

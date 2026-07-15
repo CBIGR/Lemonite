@@ -1,0 +1,127 @@
+=== LemonTree Clustering Debug Info ===
+Cluster ID: 1
+Input file: LemonPreprocessed_expression.txt
+Output dir: .
+LemonTree JAR: /home/borisvdm/repo/LemonIte/nextflow/LemonTree/lemontree_v3.1.1.jar
+========================================
+Java found: openjdk version "17.0.19" 2026-04-21 LTS
+LemonTree directory: /home/borisvdm/repo/LemonIte/nextflow/LemonTree
+Found lib directory at /home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib
+Classpath includes 11 dependency JARs
+Final classpath: /home/borisvdm/repo/LemonIte/nextflow/LemonTree/lemontree_v3.1.1.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/BiNGO.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/colt.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/commons-cli-1.1.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/cytoscape.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/cytoscape-task.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/epsgraphics-1.0.0.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/epsgraphics-1.1.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/freehep-graphicsio.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/giny.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/xercesImpl.jar:/home/borisvdm/repo/LemonIte/nextflow/LemonTree/lib/xom-1.0a5.jar
+Running LemonTree...
+
+LemonTree - Version 3.1.1
+-------------------------
+
+Parameters
+----------
+task:               ganesh
+data_file:          LemonPreprocessed_expression.txt
+gene_file:          null
+output_file:        ./Lemon_results/cluster_1
+lambda:             0.1
+mu:                 0.0
+alpha:              0.1
+beta:               0.1
+num_steps:          100
+burn_in:            50
+sample_steps:       100
+score_gain:         0.0
+Reading expression data... [ok]
+Number of genes in the data matrix: 4611
+Number of conditions in the data matrix: 99
+Number of missing values in the data matrix: 9222
+Total number of expression values: 456489
+Gibbs sampling modules...
+Initial number of clusters: 2305
+step 1 timestamp: Fri May 29 12:12:59 CEST 2026
+step 2 timestamp: Fri May 29 12:13:41 CEST 2026
+step 3 timestamp: Fri May 29 12:14:10 CEST 2026
+step 4 timestamp: Fri May 29 12:14:33 CEST 2026
+step 5 timestamp: Fri May 29 12:14:55 CEST 2026
+step 6 timestamp: Fri May 29 12:15:17 CEST 2026
+step 7 timestamp: Fri May 29 12:15:39 CEST 2026
+step 8 timestamp: Fri May 29 12:16:03 CEST 2026
+step 9 timestamp: Fri May 29 12:16:25 CEST 2026
+step 10 timestamp: Fri May 29 12:16:46 CEST 2026
+step 11 timestamp: Fri May 29 12:17:08 CEST 2026
+step 12 timestamp: Fri May 29 12:17:29 CEST 2026
+step 13 timestamp: Fri May 29 12:17:50 CEST 2026
+step 14 timestamp: Fri May 29 12:18:11 CEST 2026
+step 15 timestamp: Fri May 29 12:18:32 CEST 2026
+step 16 timestamp: Fri May 29 12:18:53 CEST 2026
+step 17 timestamp: Fri May 29 12:19:14 CEST 2026
+step 18 timestamp: Fri May 29 12:19:36 CEST 2026
+step 19 timestamp: Fri May 29 12:19:58 CEST 2026
+step 20 timestamp: Fri May 29 12:20:18 CEST 2026
+step 21 timestamp: Fri May 29 12:20:40 CEST 2026
+step 22 timestamp: Fri May 29 12:21:03 CEST 2026
+step 23 timestamp: Fri May 29 12:21:24 CEST 2026
+step 24 timestamp: Fri May 29 12:21:45 CEST 2026
+step 25 timestamp: Fri May 29 12:22:06 CEST 2026
+step 26 timestamp: Fri May 29 12:22:28 CEST 2026
+step 27 timestamp: Fri May 29 12:22:48 CEST 2026
+step 28 timestamp: Fri May 29 12:23:09 CEST 2026
+step 29 timestamp: Fri May 29 12:23:31 CEST 2026
+step 30 timestamp: Fri May 29 12:23:51 CEST 2026
+step 31 timestamp: Fri May 29 12:24:13 CEST 2026
+step 32 timestamp: Fri May 29 12:24:34 CEST 2026
+step 33 timestamp: Fri May 29 12:24:55 CEST 2026
+step 34 timestamp: Fri May 29 12:25:16 CEST 2026
+step 35 timestamp: Fri May 29 12:25:38 CEST 2026
+step 36 timestamp: Fri May 29 12:25:59 CEST 2026
+step 37 timestamp: Fri May 29 12:26:21 CEST 2026
+step 38 timestamp: Fri May 29 12:26:41 CEST 2026
+step 39 timestamp: Fri May 29 12:27:03 CEST 2026
+step 40 timestamp: Fri May 29 12:27:24 CEST 2026
+step 41 timestamp: Fri May 29 12:27:47 CEST 2026
+step 42 timestamp: Fri May 29 12:28:08 CEST 2026
+step 43 timestamp: Fri May 29 12:28:30 CEST 2026
+step 44 timestamp: Fri May 29 12:28:51 CEST 2026
+step 45 timestamp: Fri May 29 12:29:12 CEST 2026
+step 46 timestamp: Fri May 29 12:29:34 CEST 2026
+step 47 timestamp: Fri May 29 12:29:55 CEST 2026
+step 48 timestamp: Fri May 29 12:30:17 CEST 2026
+step 49 timestamp: Fri May 29 12:30:39 CEST 2026
+step 50 timestamp: Fri May 29 12:31:01 CEST 2026
+step 51 timestamp: Fri May 29 12:31:22 CEST 2026
+step 52 timestamp: Fri May 29 12:31:43 CEST 2026
+step 53 timestamp: Fri May 29 12:32:05 CEST 2026
+step 54 timestamp: Fri May 29 12:32:26 CEST 2026
+step 55 timestamp: Fri May 29 12:32:47 CEST 2026
+step 56 timestamp: Fri May 29 12:33:08 CEST 2026
+step 57 timestamp: Fri May 29 12:33:29 CEST 2026
+step 58 timestamp: Fri May 29 12:33:50 CEST 2026
+step 59 timestamp: Fri May 29 12:34:11 CEST 2026
+step 60 timestamp: Fri May 29 12:34:33 CEST 2026
+step 61 timestamp: Fri May 29 12:34:54 CEST 2026
+step 62 timestamp: Fri May 29 12:35:15 CEST 2026
+step 63 timestamp: Fri May 29 12:35:36 CEST 2026
+step 64 timestamp: Fri May 29 12:35:57 CEST 2026
+step 65 timestamp: Fri May 29 12:36:18 CEST 2026
+step 66 timestamp: Fri May 29 12:36:39 CEST 2026
+step 67 timestamp: Fri May 29 12:37:00 CEST 2026
+step 68 timestamp: Fri May 29 12:37:21 CEST 2026
+step 69 timestamp: Fri May 29 12:37:43 CEST 2026
+step 70 timestamp: Fri May 29 12:38:04 CEST 2026
+step 71 timestamp: Fri May 29 12:38:27 CEST 2026
+step 72 timestamp: Fri May 29 12:38:48 CEST 2026
+step 73 timestamp: Fri May 29 12:39:09 CEST 2026
+step 74 timestamp: Fri May 29 12:39:31 CEST 2026
+step 75 timestamp: Fri May 29 12:39:52 CEST 2026
+step 76 timestamp: Fri May 29 12:40:13 CEST 2026
+step 77 timestamp: Fri May 29 12:40:34 CEST 2026
+step 78 timestamp: Fri May 29 12:40:55 CEST 2026
+step 79 timestamp: Fri May 29 12:41:17 CEST 2026
+step 80 timestamp: Fri May 29 12:41:38 CEST 2026
+step 81 timestamp: Fri May 29 12:42:00 CEST 2026
+step 82 timestamp: Fri May 29 12:42:21 CEST 2026
+step 83 timestamp: Fri May 29 12:42:42 CEST 2026
+step 84 timestamp: Fri May 29 12:43:03 CEST 2026
+step 85 timestamp: Fri May 29 12:43:24 CEST 2026
+step 86 timestamp: Fri May 29 12:43:45 CEST 2026
+step 87 timestamp: Fri May 29 12:44:06 CEST 2026
+step 88 timestamp: Fri May 29 12:44:28 CEST 2026
+step 89 timestamp: Fri May 29 12:44:49 CEST 2026
+step 90 timestamp: Fri May 29 12:45:13 CEST 2026

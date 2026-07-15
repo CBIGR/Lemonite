@@ -47,6 +47,10 @@ GEM_METABOLITES_PATH = '/home/borisvdm/Documents/PhD/resources/models/Human1-GEM
 GEM_REACTIONS_PATH = '/home/borisvdm/Documents/PhD/resources/models/Human1-GEM/model/reactions.tsv'
 GEM_GENES_PATH = '/home/borisvdm/Documents/PhD/resources/models/Human1-GEM/model/genes.tsv'
 
+# GEM provenance URLs
+GEM_GITHUB_URL = 'https://github.com/SysBioChalmers/Human-GEM'
+GEM_PAPER_URL = 'https://doi.org/10.1126/scisignal.aaz1482'
+
 # MetalinksDB (from liana+ package)
 METALINKS_PATH = os.path.join(DB_DIR, 'metalinks/metalinks.csv')
 

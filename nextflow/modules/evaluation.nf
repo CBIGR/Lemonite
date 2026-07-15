@@ -249,6 +249,17 @@ process PKN_EVALUATION {
         echo "Warning: PPI_interactions.mvf not found - this may affect module viewer PPI visualization"
         ls -la ModuleViewer_files/ || echo "ModuleViewer_files directory not found"
     fi
+
+    # Check for HumanNet_interactions.mvf file
+    if [ -f "\$workdir/ModuleViewer_files/HumanNet_interactions.mvf" ]; then
+        echo "HumanNet_interactions.mvf generated successfully"
+        cp \$workdir/ModuleViewer_files/HumanNet_interactions.mvf ModuleViewer_files/ || true
+    elif [ -f "ModuleViewer_files/HumanNet_interactions.mvf" ]; then
+        echo "HumanNet_interactions.mvf found in ModuleViewer_files"
+    else
+        echo "Warning: HumanNet_interactions.mvf not found - this may affect module viewer HumanNet visualization"
+        ls -la ModuleViewer_files/ || echo "ModuleViewer_files directory not found"
+    fi
     
     echo "PKN evaluation completed"
     """
@@ -261,6 +272,7 @@ process PKN_EVALUATION {
     touch PKN_Evaluation/evaluation_summary.txt
     touch ModuleViewer_files/metabolite_LemoniteKG_interactions.mvf
     touch ModuleViewer_files/PPI_interactions.mvf
+    touch ModuleViewer_files/HumanNet_interactions.mvf
     touch ModuleViewer_files/sample_mapping.mvf
     """
 }

@@ -15,7 +15,13 @@ From: rocker/r-ver:4.3.0
 
 %post
     set -e  # Abort build on any error
-    
+
+    # Ensure the container has a writable, world-writable /tmp. Under a --fakeroot
+    # user-namespace build, apt-key writes /tmp/apt.conf.XXXXXX; if /tmp is not
+    # writable, apt reports every repo as "not signed" and %post aborts (exit 100).
+    mkdir -p /tmp
+    chmod 1777 /tmp
+
     # Use up to 6 cores for parallel compilation and R installs
     PARALLEL_CORES=$(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN || echo 1)
     PARALLEL_CORES=$(( PARALLEL_CORES > 8 ? 6 : (PARALLEL_CORES > 2 ? PARALLEL_CORES - 2 : 1) ))
@@ -66,7 +72,9 @@ RPROFILE_EOF
         libbz2-dev \
         libfontconfig1-dev \
         libcairo2-dev \
-        libwebp-dev
+        libwebp-dev \
+        graphviz \
+        libgraphviz-dev
     rm -rf /var/lib/apt/lists/*
     apt-get clean
         
@@ -154,7 +162,8 @@ MKVSITE_EOF
         plotly==5.14.1 \
         megago \
         openpyxl \
-        argparse
+        argparse \
+        pygraphviz
 
     # Install BiocManager first
     R -e "install.packages('BiocManager', repos='https://cran.rstudio.com')"
@@ -213,7 +222,12 @@ REOF
     
     # Install igraph first (needed by many packages)
     R -e "install.packages('igraph', repos='https://cran.rstudio.com', dependencies=TRUE)"
-    
+
+    # Avoid tar "Cannot change ownership ... Operation not permitted" failures when
+    # source packages (e.g. Rhdf5lib, which bundles and extracts the hdf5 sources)
+    # are untarred under a --fakeroot user namespace build.
+    export TAR_OPTIONS="--no-same-owner"
+
     # Install Bioconductor packages in dependency order
     R -e "BiocManager::install(c( \
         'BiocGenerics', \
@@ -392,6 +406,7 @@ PY
     export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
     export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH
     export LEMONTREE_JAR=/opt/lemontree/lemontree_v3.1.1.jar
+    export MPLBACKEND=Agg
 
 %runscript
     echo "Lemonite Analysis Pipeline Container"

@@ -53,7 +53,9 @@ From: rocker/r-ver:4.3.0
         libbz2-dev \
         libfontconfig1-dev \
         libcairo2-dev \
-        libwebp-dev
+        libwebp-dev \
+        graphviz \
+        libgraphviz-dev
     rm -rf /var/lib/apt/lists/*
     apt-get clean
         
@@ -141,7 +143,8 @@ MKVSITE_EOF
         plotly==5.14.1 \
         megago \
         openpyxl \
-        argparse
+        argparse \
+        pygraphviz
 
     # Install BiocManager first
     R -e "install.packages('BiocManager', repos='https://cran.rstudio.com')"
@@ -379,6 +382,7 @@ PY
     export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
     export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH
     export LEMONTREE_JAR=/opt/lemontree/lemontree_v3.1.1.jar
+    export MPLBACKEND=Agg
 
 %runscript
     echo "Lemonite Analysis Pipeline Container"

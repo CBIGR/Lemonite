@@ -52,30 +52,44 @@ def integrate_databases(results: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     
     if not valid_results:
         logger.error("No valid results to integrate!")
-        return pd.DataFrame(columns=['HMDB_ID', 'Gene', 'Source'])
-    
+        return pd.DataFrame(columns=['Metabolite', 'Gene', 'Source', 'url', 'reaction_id'])
+
     # Combine all dataframes
     combined = pd.concat(valid_results.values(), ignore_index=True)
-    
-    # Remove duplicates (same metabolite-gene pair from multiple sources)
-    # Keep all source information by grouping
-    combined_grouped = combined.groupby(['HMDB_ID', 'Gene'])['Source'].apply(
-        lambda x: '|'.join(sorted(set(x)))
-    ).reset_index()
-    
+
+    # Ensure url and reaction_id columns exist (default '' when not provided by a retriever)
+    if 'url' not in combined.columns:
+        combined['url'] = ''
+    else:
+        combined['url'] = combined['url'].fillna('')
+    if 'reaction_id' not in combined.columns:
+        combined['reaction_id'] = ''
+    else:
+        combined['reaction_id'] = combined['reaction_id'].fillna('')
+
+    # Drop true duplicates (same metabolite-gene-source triple); keep separate rows per source
+    combined = combined.drop_duplicates(subset=['HMDB_ID', 'Gene', 'Source'])
+
+    # Rename HMDB_ID → Metabolite to match notebook output format
+    combined = combined.rename(columns={'HMDB_ID': 'Metabolite'})
+
+    # Enforce consistent column order
+    combined = combined[['Metabolite', 'Gene', 'Source', 'url', 'reaction_id']]
+
     logger.info(f"\nIntegration summary:")
-    logger.info(f"  Total interactions: {len(combined)}")
-    logger.info(f"  Unique metabolite-gene pairs: {len(combined_grouped)}")
-    logger.info(f"  Unique metabolites: {combined_grouped['HMDB_ID'].nunique()}")
-    logger.info(f"  Unique genes: {combined_grouped['Gene'].nunique()}")
-    
+    logger.info(f"  Total interactions (rows): {len(combined)}")
+    logger.info(f"  Unique metabolite-gene pairs: {combined[['Metabolite', 'Gene']].drop_duplicates().shape[0]}")
+    logger.info(f"  Unique metabolites: {combined['Metabolite'].nunique()}")
+    logger.info(f"  Unique genes: {combined['Gene'].nunique()}")
+    logger.info(f"  Sources: {sorted(combined['Source'].unique())}")
+
     # Save final network
     output_file = config.METABOLITE_GENE_PKN
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
-    combined_grouped.to_csv(output_file, index=False, sep='\t')
+    combined.to_csv(output_file, index=False, sep='\t')
     logger.info(f"  Saved to: {output_file}")
-    
-    return combined_grouped
+
+    return combined
 
 
 def create_database_matrix(results: Dict[str, pd.DataFrame]) -> pd.DataFrame:

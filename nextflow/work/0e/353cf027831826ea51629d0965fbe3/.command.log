@@ -1,0 +1,135 @@
+=== Files staged by Nextflow ===
+total 36
+drwxr-xr-x 5 borisvdm users  4096 May 29 11:42 .
+drwxr-xr-x 3 borisvdm users    44 May 29 11:42 ..
+lrwxrwxrwx 1 borisvdm users   113 May 29 11:42 clusters_list.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/4b/f6adec63587e40ae831940f37b9fdb/ModuleViewer_files/clusters_list.txt
+-rw-r--r-- 1 borisvdm users     0 May 29 11:42 .command.begin
+-rw-r--r-- 1 borisvdm users     0 May 29 11:42 .command.err
+-rw-r--r-- 1 borisvdm users    33 May 29 11:42 .command.log
+-rw-r--r-- 1 borisvdm users    33 May 29 11:42 .command.out
+-rw-r--r-- 1 borisvdm users 13565 May 29 11:42 .command.run
+-rw-r--r-- 1 borisvdm users  4341 May 29 11:42 .command.sh
+-rw-r--r-- 1 borisvdm users     0 May 29 11:42 .command.trace
+lrwxrwxrwx 1 borisvdm users   107 May 29 11:42 DESeq_groups.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/DESeq_groups.txt
+lrwxrwxrwx 1 borisvdm users   124 May 29 11:42 hPTMs.selected_regs_list.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/4b/f6adec63587e40ae831940f37b9fdb/ModuleViewer_files/hPTMs.selected_regs_list.txt
+lrwxrwxrwx 1 borisvdm users   132 May 29 11:42 hPTMs.selected_regulators_scores.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/4b/f6adec63587e40ae831940f37b9fdb/ModuleViewer_files/hPTMs.selected_regulators_scores.txt
+lrwxrwxrwx 1 borisvdm users   100 May 29 11:42 hptms.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/hptms.txt
+drwxr-xr-x 2 borisvdm users     6 May 29 11:42 Lemon_out
+lrwxrwxrwx 1 borisvdm users   121 May 29 11:42 LemonPreprocessed_complete.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/LemonPreprocessed_complete.txt
+lrwxrwxrwx 1 borisvdm users   123 May 29 11:42 LemonPreprocessed_expression.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/LemonPreprocessed_expression.txt
+lrwxrwxrwx 1 borisvdm users   117 May 29 11:42 LemonPreprocessed_hPTM.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/LemonPreprocessed_hPTM.txt
+lrwxrwxrwx 1 borisvdm users   125 May 29 11:42 LemonPreprocessed_metabolomics.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/LemonPreprocessed_metabolomics.txt
+lrwxrwxrwx 1 borisvdm users   123 May 29 11:42 LemonPreprocessed_proteomics.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/LemonPreprocessed_proteomics.txt
+lrwxrwxrwx 1 borisvdm users   130 May 29 11:42 Metabolites.selected_regs_list.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/4b/f6adec63587e40ae831940f37b9fdb/ModuleViewer_files/Metabolites.selected_regs_list.txt
+lrwxrwxrwx 1 borisvdm users   138 May 29 11:42 Metabolites.selected_regulators_scores.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/4b/f6adec63587e40ae831940f37b9fdb/ModuleViewer_files/Metabolites.selected_regulators_scores.txt
+lrwxrwxrwx 1 borisvdm users   106 May 29 11:42 metabolites.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/metabolites.txt
+drwxr-xr-x 2 borisvdm users     6 May 29 11:42 ModuleViewer_files
+lrwxrwxrwx 1 borisvdm users   107 May 29 11:42 name_mapping.tsv -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/name_mapping.tsv
+lrwxrwxrwx 1 borisvdm users   103 May 29 11:42 PCA_hptm.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/PCA_hptm.pdf
+lrwxrwxrwx 1 borisvdm users   111 May 29 11:42 PCA_metabolomics.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/PCA_metabolomics.pdf
+lrwxrwxrwx 1 borisvdm users   109 May 29 11:42 PCA_proteomics.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/PCA_proteomics.pdf
+drwxr-xr-x 2 borisvdm users     6 May 29 11:42 Preprocessing
+lrwxrwxrwx 1 borisvdm users   114 May 29 11:42 sample_mapping.mvf -> /home/borisvdm/repo/LemonIte/nextflow/work/4b/f6adec63587e40ae831940f37b9fdb/ModuleViewer_files/sample_mapping.mvf
+=================================
+=== ModuleViewer_files contents ===
+total 56
+drwxr-xr-x 2 borisvdm users  4096 May 29 11:42 .
+drwxr-xr-x 5 borisvdm users  4096 May 29 11:42 ..
+-rw-r--r-- 1 borisvdm users 12317 May 29 11:42 clusters_list.txt
+-rw-r--r-- 1 borisvdm users  1506 May 29 11:42 hPTMs.selected_regs_list.txt
+-rw-r--r-- 1 borisvdm users  3589 May 29 11:42 hPTMs.selected_regulators_scores.txt
+-rw-r--r-- 1 borisvdm users  4065 May 29 11:42 Metabolites.selected_regs_list.txt
+-rw-r--r-- 1 borisvdm users  8502 May 29 11:42 Metabolites.selected_regulators_scores.txt
+-rw-r--r-- 1 borisvdm users  7361 May 29 11:42 sample_mapping.mvf
+=== Preprocessing contents ===
+total 8288
+drwxr-xr-x 2 borisvdm users    4096 May 29 11:42 .
+drwxr-xr-x 5 borisvdm users    4096 May 29 11:42 ..
+-rw-r--r-- 1 borisvdm users    4253 May 29 11:42 DESeq_groups.txt
+-rw-r--r-- 1 borisvdm users    2719 May 29 11:42 hptms.txt
+-rw-r--r-- 1 borisvdm users 3300343 May 29 11:42 LemonPreprocessed_complete.txt
+-rw-r--r-- 1 borisvdm users 1770988 May 29 11:42 LemonPreprocessed_expression.txt
+-rw-r--r-- 1 borisvdm users  283605 May 29 11:42 LemonPreprocessed_hPTM.txt
+-rw-r--r-- 1 borisvdm users 1256055 May 29 11:42 LemonPreprocessed_metabolomics.txt
+-rw-r--r-- 1 borisvdm users 1770988 May 29 11:42 LemonPreprocessed_proteomics.txt
+-rw-r--r-- 1 borisvdm users   17549 May 29 11:42 metabolites.txt
+-rw-r--r-- 1 borisvdm users      16 May 29 11:42 name_mapping.tsv
+-rw-r--r-- 1 borisvdm users   12843 May 29 11:42 PCA_hptm.pdf
+-rw-r--r-- 1 borisvdm users   12852 May 29 11:42 PCA_metabolomics.pdf
+-rw-r--r-- 1 borisvdm users   12907 May 29 11:42 PCA_proteomics.pdf
+=================================
+Warning: Multiple files found for hPTMs, using: ModuleViewer_files/hPTMs.selected_regs_list.txt
+Found hPTMs regulators: ModuleViewer_files/hPTMs.selected_regs_list.txt
+Warning: Multiple files found for Metabolites, using: ModuleViewer_files/Metabolites.selected_regs_list.txt
+Found Metabolites regulators: ModuleViewer_files/Metabolites.selected_regs_list.txt
+Creating subnetwork visualization graphs...
+No metabolite mapping file found - proceeding without metabolite name mapping
+Using name mapping file for original name restoration: ./Preprocessing/name_mapping.tsv
+============================================================
+Creating subnetwork visualizations
+============================================================
+Parsing regulator files: hPTMs:ModuleViewer_files/hPTMs.selected_regs_list.txt,Metabolites:ModuleViewer_files/Metabolites.selected_regs_list.txt
+Found regulator types: ['hPTMs', 'Metabolites']
+Reading hPTMs regulators from ModuleViewer_files/hPTMs.selected_regs_list.txt
+Reading Metabolites regulators from ModuleViewer_files/Metabolites.selected_regs_list.txt
+Reading module genes from ./Lemon_out/clusters_list.txt
+Reading PKN from /home/borisvdm/repo/LemonIte/nextflow/PKN/Lemonite_PKN.tsv
+PKN contains 41137 nodes and 1955213 edges
+No metabolite mapping provided - metabolite names will not be converted to HMDB IDs
+
+Creating subnetwork graphs for 23 modules
+[Graphviz] Module 0: 10 metabolites, 4 TFs, 736 targets.
+No valid connections for module 0.
+[Graphviz] Module 1: 7 metabolites, 4 TFs, 17 targets.
+No valid connections for module 1.
+[Graphviz] Module 10: 12 metabolites, 4 TFs, 13 targets.
+No valid connections for module 10.
+[Graphviz] Module 11: 3 metabolites, 3 TFs, 15 targets.
+No valid connections for module 11.
+[Graphviz] Module 12: 3 metabolites, 4 TFs, 50 targets.
+No valid connections for module 12.
+[Graphviz] Module 13: 11 metabolites, 3 TFs, 12 targets.
+No valid connections for module 13.
+[Graphviz] Module 14: 5 metabolites, 2 TFs, 134 targets.
+No valid connections for module 14.
+[Graphviz] Module 15: 12 metabolites, 4 TFs, 149 targets.
+No valid connections for module 15.
+[Graphviz] Module 16: 4 metabolites, 4 TFs, 14 targets.
+No valid connections for module 16.
+[Graphviz] Module 17: 5 metabolites, 4 TFs, 35 targets.
+No valid connections for module 17.
+[Graphviz] Module 18: 7 metabolites, 1 TFs, 12 targets.
+No valid connections for module 18.
+[Graphviz] Module 19: 10 metabolites, 8 TFs, 14 targets.
+No valid connections for module 19.
+[Graphviz] Module 2: 10 metabolites, 6 TFs, 64 targets.
+No valid connections for module 2.
+[Graphviz] Module 20: 4 metabolites, 5 TFs, 11 targets.
+No valid connections for module 20.
+[Graphviz] Module 21: 11 metabolites, 2 TFs, 10 targets.
+No valid connections for module 21.
+[Graphviz] Module 22: 10 metabolites, 7 TFs, 11 targets.
+No valid connections for module 22.
+[Graphviz] Module 3: 7 metabolites, 4 TFs, 28 targets.
+No valid connections for module 3.
+[Graphviz] Module 4: 9 metabolites, 3 TFs, 31 targets.
+No valid connections for module 4.
+[Graphviz] Module 5: 10 metabolites, 1 TFs, 337 targets.
+No valid connections for module 5.
+[Graphviz] Module 6: 11 metabolites, 3 TFs, 26 targets.
+No valid connections for module 6.
+[Graphviz] Module 7: 11 metabolites, 5 TFs, 15 targets.
+No valid connections for module 7.
+[Graphviz] Module 8: 6 metabolites, 3 TFs, 236 targets.
+No valid connections for module 8.
+[Graphviz] Module 9: 4 metabolites, 5 TFs, 17 targets.
+No valid connections for module 9.
+
+Saving standalone legend...
+✓ Saved legend: ./Networks/subnetworks_graphviz/legend.png, ./Networks/subnetworks_graphviz/legend.pdf
+
+============================================================
+Subnetwork visualization complete: 23 created, 0 skipped
+Output: ./Networks/subnetworks_graphviz/
+============================================================
+Subnetwork graphs created successfully

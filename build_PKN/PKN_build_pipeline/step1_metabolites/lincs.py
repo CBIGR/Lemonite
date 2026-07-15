@@ -205,12 +205,17 @@ class LINCSRetriever(LocalFileRetriever):
                 continue
             
             genes = self.get_genes_for_chembl_id(chembl_id)
-            
+        # URL for the LINCS biochemical binding data source (HMS LINCS database)
+        # The lsp-cheminformatics GitHub Pages does not host per-compound pages;
+        # use the HMS LINCS portal URL for all interactions.
+        url = 'https://lincs.hms.harvard.edu/'
+
             for gene in genes:
                 interactions.append({
                     'HMDB_ID': hmdb_id,
                     'Gene': gene,
-                    'Source': 'LINCS'
+                    'Source': 'LINCS',
+                    'url': url
                 })
             
             processed_count += 1

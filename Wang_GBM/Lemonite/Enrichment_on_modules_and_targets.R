@@ -43,7 +43,7 @@ ANALYSIS_METHOD <- "GSEA"  # Change this to choose your analysis method
 # Options: "all_genes" (all genes in expression matrix),
 #          "module_members" (genes that are members of any module),
 #          "specific_module_genes" (genes in the specific module being analyzed)
-GSEA_SCOPE <- "all_genes"
+GSEA_SCOPE <- "module_members"
 
 # Base directory - UPDATE THIS PATH for IBD Lloyd-Price data
 base_dir <- '/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum/'
@@ -170,6 +170,15 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
 
 
   process_gsea_result <- function(result, cluster, db) {
+    extract_all_significant <- function(subset, direction) {
+      if (nrow(subset) == 0) return(data.frame())
+      subset <- subset[subset$p.adjust <= 0.05, ]
+      subset <- subset[order(-abs(subset$NES)), ]
+      subset$Module <- cluster
+      subset$Database <- db
+      subset$Term <- paste(subset$ID, subset$Description, sep = " - ")
+      subset[, c("Module", "Database", "Term", "p.adjust")]
+    }
     extract_top <- function(subset, direction) {
       if (nrow(subset) == 0) return(data.frame())
       subset <- subset[order(-abs(subset$NES)), ][1:10, ]
@@ -181,7 +190,9 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
     }
     up <- tryCatch(extract_top(result[result$NES > 0, ], "up"), error = function(e) data.frame())
     down <- tryCatch(extract_top(result[result$NES < 0, ], "down"), error = function(e) data.frame())
-    list(up, down)
+    up_all <- tryCatch(extract_all_significant(result[result$NES > 0, ], "up"), error = function(e) data.frame())
+    down_all <- tryCatch(extract_all_significant(result[result$NES < 0, ], "down"), error = function(e) data.frame())
+    list(up, down, up_all, down_all)
   }
 
   run_all_gsea <- function(cluster, dbs, organism, module_eigengenes, expression, output_dir,
@@ -217,6 +228,8 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
 
     local_up <- list()
     local_down <- list()
+    local_up_all <- list()
+    local_down_all <- list()
 
     # --- GO-based GSEA ---
     for (db in dbs) {
@@ -240,6 +253,8 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
         res <- process_gsea_result(result, cluster, db)
         local_up <- append(local_up, list(res[[1]]))
         local_down <- append(local_down, list(res[[2]]))
+        local_up_all <- append(local_up_all, list(res[[3]]))
+        local_down_all <- append(local_down_all, list(res[[4]]))
       }, error = function(e) message(paste("GO GSEA error in", cluster, "db:", db, e$message)))
     }
 
@@ -260,6 +275,8 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
       res <- process_gsea_result(kegg@result, cluster, "KEGG")
       local_up <- append(local_up, list(res[[1]]))
       local_down <- append(local_down, list(res[[2]]))
+      local_up_all <- append(local_up_all, list(res[[3]]))
+      local_down_all <- append(local_down_all, list(res[[4]]))
     }, error = function(e) message(paste("KEGG error in", cluster, e$message)))
 
     # --- Reactome ---
@@ -276,9 +293,11 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
       res <- process_gsea_result(reactome@result, cluster, "Reactome")
       local_up <- append(local_up, list(res[[1]]))
       local_down <- append(local_down, list(res[[2]]))
+      local_up_all <- append(local_up_all, list(res[[3]]))
+      local_down_all <- append(local_down_all, list(res[[4]]))
     }, error = function(e) message(paste("Reactome error in", cluster, e$message)))
 
-    list(do.call(rbind, local_up), do.call(rbind, local_down))
+    list(do.call(rbind, local_up), do.call(rbind, local_down), do.call(rbind, local_up_all), do.call(rbind, local_down_all))
 
   }
 
@@ -302,18 +321,26 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
   # Split up/down results
   top_pathways_list_up <- lapply(gsea_results, `[[`, 1)
   top_pathways_list_down <- lapply(gsea_results, `[[`, 2)
+  all_pathways_list_up <- lapply(gsea_results, `[[`, 3)
+  all_pathways_list_down <- lapply(gsea_results, `[[`, 4)
 
   # Combine into data.frames
   top_pathways_df_up <- do.call(rbind, top_pathways_list_up)
   top_pathways_df_down <- do.call(rbind, top_pathways_list_down)
+  all_pathways_df_up <- do.call(rbind, all_pathways_list_up)
+  all_pathways_df_down <- do.call(rbind, all_pathways_list_down)
 
   # Remove NA
   top_pathways_df_up <- top_pathways_df_up[!is.na(top_pathways_df_up$p.adjust), ]
   top_pathways_df_down <- top_pathways_df_down[!is.na(top_pathways_df_down$p.adjust), ]
+  all_pathways_df_up <- all_pathways_df_up[!is.na(all_pathways_df_up$p.adjust), ]
+  all_pathways_df_down <- all_pathways_df_down[!is.na(all_pathways_df_down$p.adjust), ]
 
   # Save GSEA results in format compatible with Module_Overview_Generator
   fwrite(top_pathways_df_up, file.path(output_dir, "Gsea_top_10_enriched_pathways_up_per_module.csv"))
   fwrite(top_pathways_df_down, file.path(output_dir, "Gsea_top_10_enriched_pathways_down_per_module.csv"))
+  fwrite(all_pathways_df_up, file.path(output_dir, "Gsea_all_enriched_pathways_up_per_module.csv"))
+  fwrite(all_pathways_df_down, file.path(output_dir, "Gsea_all_enriched_pathways_down_per_module.csv"))
 
   cat("GSEA Analysis completed!\n")
   cat("Results saved to:", output_dir, "\n")
@@ -451,8 +478,8 @@ cat("- Update enrichment_up_file path to point to your chosen analysis results\n
 cat("- Update enrichment_down_file path accordingly\n")
 
 if (ANALYSIS_METHOD == "GSEA") {
-  cat("- Use: enrichment_up_file = base_dir + '/Enrichment/Modules_gsea/Gsea_top_10_enriched_pathways_up_per_module.csv'\n")
-  cat("- Use: enrichment_down_file = base_dir + '/Enrichment/Modules_gsea/Gsea_top_10_enriched_pathways_down_per_module.csv'\n")
+  cat("- Use: enrichment_up_file = base_dir + '/Enrichment/Modules_gsea/Gsea_all_enriched_pathways_up_per_module.csv'\n")
+  cat("- Use: enrichment_down_file = base_dir + '/Enrichment/Modules_gsea/Gsea_all_enriched_pathways_down_per_module.csv'\n")
 } else if (ANALYSIS_METHOD == "EnrichR") {
   cat("- Use: enrichment_up_file = base_dir + '/Enrichment/Modules_enrichr/Enrichr_top_10_enriched_pathways_up_per_module.csv'\n")
   cat("- Use: enrichment_down_file = base_dir + '/Enrichment/Modules_enrichr/Enrichr_top_10_enriched_pathways_down_per_module.csv'\n")

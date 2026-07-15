@@ -75,7 +75,1152 @@ CANONICAL_ONTOLOGY = 'BP'
 CANONICAL_TOP_N = 30
 RRVGO_THRESHOLD = 0.7
 RRVGO_METHOD = 'Rel'
-ENRICHMENT_SOURCE_PRIORITY = ('EnrichR', 'GSEA')
+ENRICHMENT_SOURCE_PRIORITY = ('GSEA', 'EnrichR')
+
+# ── Cytoscape.JS network constants ───────────────────────────────────────────
+import colorsys
+
+CLUSTER_PALETTE = ['#F44336', '#2196F3', '#4CAF50', '#FF9800', '#00E5FF']
+UNASSIGNED_COLOR = '#B0B0B0'
+
+# Per-regulator-type gradient anchors (light low-out-degree -> dark high). Known
+# regulator types map to a curated colour; any other type present in the data is
+# assigned the next free anchor from REGULATOR_GRADIENT_POOL. This keeps the
+# config-driven regulator-types design working without code changes.
+REGULATOR_TYPE_COLORS = {
+    'TF':          ('#D7C3F0', '#5E35B1'),   # lavender   -> deep purple
+    'TFs':         ('#D7C3F0', '#5E35B1'),
+    'metabolite':  ('#FFE0B2', '#E65100'),   # pale amber -> burnt orange
+    'metabolites': ('#FFE0B2', '#E65100'),
+    'Metabolites': ('#FFE0B2', '#E65100'),
+    'Metabolomics':('#FFE0B2', '#E65100'),
+    'lipid':       ('#B2EBF2', '#006064'),   # pale cyan  -> deep teal
+    'lipids':      ('#B2EBF2', '#006064'),
+    'Lipids':      ('#B2EBF2', '#006064'),
+}
+# Fallback anchors handed out (in order) to any unrecognised regulator type.
+REGULATOR_GRADIENT_POOL = [
+    ('#C8E6C9', '#1B5E20'),   # green
+    ('#F8BBD0', '#880E4F'),   # pink
+    ('#FFF9C4', '#F57F17'),   # yellow
+    ('#CFD8DC', '#37474F'),   # blue-grey
+]
+REGULATOR_FALLBACK_COLORS = ('#D0D0D0', '#606060')
+
+
+def _hex_to_rgb(h):
+    h = h.lstrip('#')
+    return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def _rgb_to_hex(rgb):
+    return '#{:02X}{:02X}{:02X}'.format(*(max(0, min(255, int(round(c)))) for c in rgb))
+
+
+def _interp_color(light_hex, dark_hex, frac):
+    """Interpolate light->dark in HSV so the gradient stays vivid (frac in [0,1])."""
+    l = colorsys.rgb_to_hsv(*[c / 255 for c in _hex_to_rgb(light_hex)])
+    d = colorsys.rgb_to_hsv(*[c / 255 for c in _hex_to_rgb(dark_hex)])
+    hsv = tuple(l[i] + (d[i] - l[i]) * frac for i in range(3))
+    rgb = tuple(c * 255 for c in colorsys.hsv_to_rgb(*hsv))
+    return _rgb_to_hex(rgb)
+
+
+def resolve_regulator_type_anchors(reg_types):
+    """Return {reg_type: (light, dark)} for every regulator type present.
+
+    Known types use their curated colour; unknown types are assigned, in sorted
+    order, from REGULATOR_GRADIENT_POOL so each type gets a distinct hue.
+    """
+    anchors = {}
+    pool_idx = 0
+    for rt in sorted(reg_types):
+        if rt in REGULATOR_TYPE_COLORS:
+            anchors[rt] = REGULATOR_TYPE_COLORS[rt]
+        else:
+            anchors[rt] = REGULATOR_GRADIENT_POOL[pool_idx % len(REGULATOR_GRADIENT_POOL)]
+            pool_idx += 1
+    return anchors
+
+
+def compute_regulator_colors(nodes, edges):
+    """Return ({regulator_id: hex_color}, {regulator_id: out_degree}).
+
+    Colour is shaded light->dark by out-degree, normalised within each regulator
+    type so every type uses its full gradient range independently.
+    """
+    out_degree = {}
+    for e in edges:
+        src = str(e['source'])
+        out_degree[src] = out_degree.get(src, 0) + 1
+
+    by_type = {}
+    for node in nodes:
+        ntype = str(node.get('type', ''))
+        if ntype == 'module':
+            continue
+        nid = str(node['id'])
+        by_type.setdefault(ntype, []).append((nid, out_degree.get(nid, 0)))
+
+    anchors = resolve_regulator_type_anchors(by_type.keys())
+    colors = {}
+    for ntype, items in by_type.items():
+        light, dark = anchors.get(ntype, REGULATOR_FALLBACK_COLORS)
+        degs = [d for _, d in items]
+        lo, hi = min(degs), max(degs)
+        for nid, deg in items:
+            frac = (deg - lo) / (hi - lo) if hi > lo else 0.6
+            colors[nid] = _interp_color(light, dark, frac)
+    return colors, out_degree
+
+
+def build_cluster_color_map(module_clusters):
+    all_clusters = sorted(set(v for v in module_clusters.values() if v != 'Unassigned'))
+    color_map = {cl: CLUSTER_PALETTE[i % len(CLUSTER_PALETTE)] for i, cl in enumerate(all_clusters)}
+    color_map['Unassigned'] = UNASSIGNED_COLOR
+    return color_map
+
+
+def _build_cytoscape_hover_text(module_id, module_overview, module_enrichment_all, edges, name_lookup=None):
+    hover_text = f"<b>Module {module_id}</b><br>"
+    if module_overview is not None and not module_overview.empty:
+        rows = module_overview[module_overview['Module'].astype(str) == str(module_id)]
+        if len(rows) > 0:
+            row = rows.iloc[0]
+            expr_p = row.get('Expression_adjusted_pval', 'NA')
+            if expr_p != 'NA' and pd.notna(expr_p):
+                try:
+                    hover_text += f"<b>Expression Analysis:</b><br>"
+                    hover_text += f"  \u2022 adj. p-value: {float(expr_p):.2e}<br>"
+                    hover_text += f"  \u2022 Rank: {row.get('Expression_rank', 'NA')}<br><br>"
+                except (ValueError, TypeError):
+                    pass
+            genes_val = row.get('Module_genes', 'NA')
+            if genes_val != 'NA' and pd.notna(genes_val):
+                hover_text += f"<b>Genes:</b> {len(str(genes_val).split('|'))} genes<br><br>"
+    module_target = f"Module_{module_id}"
+    reg_type_labels = {}
+    for e in edges:
+        if e['target'] == module_target:
+            rtype = e.get('type', '').replace('_regulation', '')
+            reg_type_labels.setdefault(rtype, set()).add(e['source'])
+    for reg_type in sorted(reg_type_labels.keys()):
+        regs = sorted(reg_type_labels[reg_type])
+        if regs:
+            display_regs = [name_lookup.get(r, r) for r in regs] if name_lookup else regs
+            hover_text += f"<b>{reg_type.capitalize()} ({len(regs)}):</b> "
+            hover_text += ', '.join(display_regs[:10])
+            if len(regs) > 10:
+                hover_text += f", ... (+{len(regs)-10} more)"
+            hover_text += '<br>'
+    hover_text += '<br>'
+    if module_enrichment_all is not None and not module_enrichment_all.empty:
+        mod_enrich = module_enrichment_all[module_enrichment_all['Module'].astype(str) == str(module_id)]
+        for db in ['BP', 'MF', 'CC', 'KEGG', 'Reactome']:
+            db_enrich = mod_enrich[mod_enrich['Database'].str.upper() == db.upper()].sort_values('p.adjust').head(3)
+            if len(db_enrich) > 0:
+                hover_text += f"<b>Top {db}:</b><br>"
+                for _, erow in db_enrich.iterrows():
+                    term = str(erow['Term'])
+                    if len(term) > 55:
+                        term = term[:52] + '...'
+                    try:
+                        hover_text += f"  \u2022 {term} (p={float(erow['p.adjust']):.1e})<br>"
+                    except (ValueError, TypeError):
+                        hover_text += f"  \u2022 {term}<br>"
+    return hover_text
+
+
+def create_cytoscape_html_network(nodes, edges, module_clusters, config_name,
+                                   variant_name, output_file,
+                                   module_overview=None, module_enrichment_all=None,
+                                   name_lookup=None, filter_description=None):
+    """Create a self-contained Cytoscape.JS interactive network HTML."""
+    # The pipeline includes every regulator-module connection from module_data
+    # (no top-N/connectivity filtering), so the header always says so -
+    # regardless of variant_name, which is currently always 'filtered' here.
+    if filter_description is None:
+        filter_description = "Showing all regulator–module connections (unfiltered)"
+
+    cluster_color_map = build_cluster_color_map(module_clusters)
+    regulator_colors, regulator_out_degree = compute_regulator_colors(nodes, edges)
+
+    # Map each MegaGO cluster -> its rrvgo descriptive label (for the legend).
+    cluster_label_map = {}
+    if module_overview is not None and not module_overview.empty and 'MegaGO_Label' in module_overview.columns:
+        _ccol = 'MegaGO_Cluster' if 'MegaGO_Cluster' in module_overview.columns else 'Functional_Cluster'
+        if _ccol in module_overview.columns:
+            for _cl, _grp in module_overview.dropna(subset=[_ccol]).groupby(_ccol):
+                _lbls = _grp['MegaGO_Label'].dropna()
+                if len(_lbls):
+                    cluster_label_map[str(_cl)] = str(_lbls.iloc[0])
+
+    cy_nodes = []
+    for node in nodes:
+        node_id = str(node['id'])
+        node_type = str(node.get('type', ''))
+        if node_type == 'module':
+            module_num = node_id.replace('Module_', '')
+            label = f"M{module_num}"
+            cluster = module_clusters.get(module_num, 'Unassigned')
+            color = cluster_color_map.get(cluster, UNASSIGNED_COLOR)
+            node_class = 'module'
+            hover_info = _build_cytoscape_hover_text(
+                module_num, module_overview, module_enrichment_all, edges, name_lookup
+            )
+            hover_info += f"<b>MegaGO Cluster:</b> {cluster}"
+            # Also show the rrvgo descriptive label for the cluster, if available.
+            if module_overview is not None and not module_overview.empty:
+                _lrows = module_overview[module_overview['Module'].astype(str) == str(module_num)]
+                if len(_lrows) > 0:
+                    _lbl = _lrows.iloc[0].get('MegaGO_Label', '')
+                    if pd.notna(_lbl) and str(_lbl).strip() not in ('', 'NA', 'nan'):
+                        hover_info += f"<br><b>MegaGO Label:</b> {_lbl}"
+        else:
+            # Full label (no truncation); shaded light->dark by out-degree.
+            label = str(node.get('label', node_id))
+            cluster = None
+            color = regulator_colors.get(node_id, REGULATOR_FALLBACK_COLORS[1])
+            node_class = 'regulator'
+            target_modules = sorted(set(
+                e['target'].replace('Module_', 'M')
+                for e in edges if str(e['source']) == node_id
+            ))
+            hover_info = f"<b>{node.get('label', node_id)}</b><br>"
+            hover_info += f"<b>Type:</b> {node_type}<br>"
+            hover_info += f"<b>Out-degree:</b> {regulator_out_degree.get(node_id, 0)} module(s)<br>"
+            if target_modules:
+                hover_info += f"<b>Targets ({len(target_modules)}):</b> {', '.join(target_modules)}"
+        cy_nodes.append({
+            'data': {'id': node_id, 'label': label, 'type': node_type,
+                     'cluster': cluster if cluster else 'N/A', 'hover_info': hover_info},
+            'classes': node_class,
+            'style': {'background-color': color},
+        })
+
+    cy_edges = []
+    for edge in edges:
+        category = str(edge.get('category', 'Other'))
+        corr = edge.get('correlation', 0)
+        color = '#27AE60' if corr > 0 else ('#E74C3C' if corr < 0 else '#5D6D7E')
+        source = str(edge['source'])
+        target = str(edge['target'])
+        cy_edges.append({'data': {
+            'id': f"{source}-{target}", 'source': source, 'target': target,
+            'category': category, 'correlation': round(float(corr), 4), 'color': color,
+        }})
+
+    # Group module ids by cluster so the fcose layout can seed each cluster
+    # around its own anchor (keeps same-cluster modules clumped together).
+    cluster_groups = {}
+    for n in cy_nodes:
+        if n['classes'] == 'module':
+            cl = n['data']['cluster']
+            if cl and cl != 'Unassigned' and cl != 'N/A':
+                cluster_groups.setdefault(cl, []).append(n['data']['id'])
+    ordered_clusters = sorted(cluster_groups.keys())
+    cluster_members = {cl: cluster_groups[cl] for cl in ordered_clusters}
+
+    elements_json = json.dumps(cy_nodes + cy_edges, indent=2)
+    cluster_members_json = json.dumps(cluster_members)
+
+    # Legends ----------------------------------------------------------
+    # Cluster legend (module colours)
+    cluster_legend_html = ""
+    for cl_name, cl_color in cluster_color_map.items():
+        cluster_legend_html += (
+            f'        <div class="legend-item">\n'
+            f'            <div class="legend-color" style="background: {cl_color};"></div>\n'
+            f'            <span class="legend-label">{cl_name}</span>\n'
+            f'        </div>\n'
+        )
+    # Regulator legend (one gradient swatch per type that is actually present)
+    present_reg_types = sorted({str(n.get('type', '')) for n in nodes if str(n.get('type', '')) != 'module'})
+    reg_anchors = resolve_regulator_type_anchors(present_reg_types)
+    regulator_legend_html = ""
+    for rt in present_reg_types:
+        light, dark = reg_anchors.get(rt, REGULATOR_FALLBACK_COLORS)
+        rt_label = (rt[:1].upper() + rt[1:]) if rt else rt
+        regulator_legend_html += (
+            f'        <div class="legend-item">\n'
+            f'            <div class="legend-color" '
+            f'style="background: linear-gradient(135deg, {light} 0%, {dark} 100%);"></div>\n'
+            f'            <span class="legend-label">{rt_label} (light→dark = out-degree)</span>\n'
+            f'        </div>\n'
+        )
+
+    # Structured legend data (mirrors the on-screen legend) so the PNG
+    # export can redraw the legend directly onto the exported canvas.
+    legend_data = {
+        'sections': [
+            {
+                'title': 'Regulator types',
+                'items': [
+                    {
+                        'label': f'{(rt[:1].upper() + rt[1:]) if rt else rt} (light→dark = out-degree)',
+                        'kind': 'gradient',
+                        'light': reg_anchors.get(rt, REGULATOR_FALLBACK_COLORS)[0],
+                        'dark': reg_anchors.get(rt, REGULATOR_FALLBACK_COLORS)[1],
+                    }
+                    for rt in present_reg_types
+                ],
+            },
+            {
+                'title': 'Module clusters',
+                'items': [
+                    {'label': (f"{cl_name}: {cluster_label_map[cl_name]}"
+                               if cluster_label_map.get(cl_name) else cl_name),
+                     'kind': 'dot', 'color': cl_color}
+                    for cl_name, cl_color in cluster_color_map.items()
+                ],
+            },
+            {
+                'title': 'Edge types',
+                'items': [
+                    {'label': 'Causal (arrow)', 'kind': 'line', 'color': '#555555', 'width': 3, 'arrow': 'triangle'},
+                    {'label': 'Metabolic (dot)', 'kind': 'line', 'color': '#555555', 'width': 2, 'arrow': 'dot'},
+                    {'label': 'Other (line)', 'kind': 'line', 'color': '#555555', 'width': 1, 'arrow': 'none'},
+                ],
+            },
+            {
+                'title': 'Correlation',
+                'items': [
+                    {'label': 'Positive', 'kind': 'line', 'color': '#27AE60', 'width': 3, 'arrow': 'none'},
+                    {'label': 'Negative', 'kind': 'line', 'color': '#E74C3C', 'width': 3, 'arrow': 'none'},
+                    {'label': 'N/A', 'kind': 'line', 'color': '#5D6D7E', 'width': 2, 'arrow': 'none'},
+                ],
+            },
+        ]
+    }
+    legend_data_json = json.dumps(legend_data)
+
+    # Generate HTML ----------------------------------------------------
+    html_content = f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Module-Regulator Network: {variant_name}</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.23.0/cytoscape.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/layout-base@2.0.1/layout-base.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cose-base@2.2.0/cose-base.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-fcose@2.2.0/cytoscape-fcose.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-svg@0.4.0/cytoscape-svg.min.js"></script>
+<style>
+    * {{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }}
+
+    body {{
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+    }}
+
+    #cy {{
+        width: 100%;
+        height: calc(100vh - 100px);
+        display: block;
+        background: linear-gradient(to bottom, #f5f5f5 0%, #ffffff 100%);
+    }}
+
+    .header {{
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }}
+
+    .header h1 {{
+        margin: 0;
+        font-size: 20px;
+    }}
+
+    .header p {{
+        margin: 5px 0 0 0;
+        font-size: 12px;
+        opacity: 0.9;
+    }}
+
+    .controls {{
+        position: absolute;
+        top: 110px;
+        left: 20px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        z-index: 100;
+        font-size: 12px;
+    }}
+
+    .control-group {{
+        margin-bottom: 12px;
+    }}
+
+    .control-group label {{
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+    }}
+
+    button {{
+        padding: 8px 12px;
+        margin: 3px 0;
+        cursor: pointer;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        transition: background 0.2s;
+        display: block;
+        width: 100%;
+    }}
+
+    button:hover {{
+        background: #764ba2;
+    }}
+
+    .legend {{
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        font-size: 12px;
+        max-width: 280px;
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }}
+
+    .legend-item {{
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }}
+
+    .legend-color {{
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 8px;
+        border: 2px solid #fff;
+        flex-shrink: 0;
+    }}
+
+    .legend-line {{
+        width: 30px;
+        height: 0;
+        margin-right: 8px;
+        flex-shrink: 0;
+    }}
+
+    .legend-label {{
+        color: #333;
+    }}
+
+    .info-box {{
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        font-size: 11px;
+        color: #666;
+        max-width: 250px;
+    }}
+
+    .search-box {{
+        position: relative;
+    }}
+
+    .search-box input {{
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        font-size: 11px;
+        outline: none;
+    }}
+
+    .search-box input:focus {{
+        border-color: #667eea;
+    }}
+
+    .autocomplete-list {{
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ccc;
+        border-top: none;
+        border-radius: 0 0 3px 3px;
+        max-height: 150px;
+        overflow-y: auto;
+        z-index: 200;
+        display: none;
+    }}
+
+    .autocomplete-list div {{
+        padding: 4px 8px;
+        cursor: pointer;
+        font-size: 11px;
+    }}
+
+    .autocomplete-list div:hover,
+    .autocomplete-list div.active {{
+        background: #667eea;
+        color: white;
+    }}
+
+    /* Tooltip for node hover */
+    #tooltip {{
+        position: absolute;
+        display: none;
+        background: rgba(255, 255, 255, 0.97);
+        border: 1px solid #aaa;
+        border-radius: 6px;
+        padding: 10px 14px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+        font-size: 12px;
+        line-height: 1.5;
+        color: #333;
+        max-width: 500px;
+        z-index: 1000;
+        pointer-events: none;
+    }}
+</style>
+</head>
+<body>
+<div class="header">
+    <h1>Module-Regulator Network</h1>
+    <p>{filter_description} | Nodes: {len(cy_nodes)} | Edges: {len(cy_edges)}</p>
+</div>
+
+<div id="cy"></div>
+
+<!-- Tooltip element for node hover info -->
+<div id="tooltip"></div>
+
+<div class="controls">
+    <div class="control-group">
+        <label>Layout:</label>
+        <button onclick="runLayout('fcose')">Cluster grouped (fCoSE)</button>
+        <button onclick="runLayout('concentric')">Concentric</button>
+        <button onclick="runLayout('breadthfirst')">Breadth-First</button>
+    </div>
+
+    <div class="control-group">
+        <label>Actions:</label>
+        <button onclick="fitView()">Fit View</button>
+        <button onclick="resetView()">Reset</button>
+        <button onclick="exportPositions()">Export Positions</button>
+        <button onclick="exportPNG()">&#128247; Export PNG (hi-res)</button>
+        <button onclick="exportSVG()">&#9998; Export SVG (vector)</button>
+    </div>
+    <div class="control-group">
+        <label>Search:</label>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Type node name..." autocomplete="off" />
+            <div class="autocomplete-list" id="autocompleteList"></div>
+        </div>
+        <button onclick="clearHighlight()" style="margin-top:6px">Clear Highlight</button>
+    </div>
+</div>
+
+<div class="legend">
+    <strong>Regulator types:</strong>
+{regulator_legend_html}
+    <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
+    <strong>Module clusters:</strong>
+{cluster_legend_html}
+    <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
+    <strong>Edge types:</strong>
+    <div class="legend-item">
+        <div class="legend-line" style="border-top: 3px solid #555;"><span style="float:right;font-size:12px;margin-top:-9px;color:#555">&#9654;</span></div>
+        <span class="legend-label">Causal (arrow)</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-line" style="border-top: 2px solid #555;"><span style="float:right;font-size:8px;margin-top:-6px;color:#555">&#9679;</span></div>
+        <span class="legend-label">Metabolic (dot)</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-line" style="border-top: 1px solid #555;"></div>
+        <span class="legend-label">Other (line)</span>
+    </div>
+    <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
+    <strong>Correlation:</strong>
+    <div class="legend-item">
+        <div class="legend-line" style="border-top: 3px solid #27AE60;"></div>
+        <span class="legend-label">Positive</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-line" style="border-top: 3px solid #E74C3C;"></div>
+        <span class="legend-label">Negative</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-line" style="border-top: 2px solid #5D6D7E;"></div>
+        <span class="legend-label">N/A</span>
+    </div>
+</div>
+
+<div class="info-box">
+    <strong>Controls:</strong><br>
+    &bull; Drag nodes to move<br>
+    &bull; Scroll to zoom<br>
+    &bull; Pan with right-click drag<br>
+    &bull; Hover over nodes for details<br>
+    &bull; PNG/SVG export keeps your manual layout
+</div>
+
+<script>
+    // Register fcose extension (cluster-grouping force layout)
+    if (typeof cytoscapeFcose !== 'undefined') {{
+        cytoscape.use(cytoscapeFcose);
+    }}
+    // Register cytoscape-svg extension
+    if (typeof cytoscapeSvg !== 'undefined') {{
+        cytoscape.use(cytoscapeSvg);
+    }}
+
+    // Build elements data
+    var elements = {elements_json};
+
+    // Module ids grouped by cluster -> used to seed each cluster around a
+    // big circle so fcose relaxes into visibly separated clumps.
+    var clusterMembers = {cluster_members_json};
+
+    // Legend data for compositing onto the exported PNG.
+    var legendData = {legend_data_json};
+
+    // Compute a fixed anchor point per cluster on a large circle, then place
+    // every module of that cluster in a small jittered disc around its
+    // anchor. fcose then relaxes locally from these seeds (it does not lock
+    // them), so clusters stay clumped while nodes remain draggable.
+    function clusterAnchors() {{
+        var clusters = Object.keys(clusterMembers);
+        var R = 350 + clusters.length * 60;   // ring radius scales with #clusters
+        var anchors = {{}};
+        clusters.forEach(function(cl, i) {{
+            var ang = (2 * Math.PI * i) / clusters.length;
+            anchors[cl] = {{ x: R * Math.cos(ang), y: R * Math.sin(ang) }};
+        }});
+        return anchors;
+    }}
+
+    // Seed module positions near their cluster anchor before running fcose.
+    function seedClusterPositions() {{
+        var anchors = clusterAnchors();
+        Object.keys(clusterMembers).forEach(function(cl) {{
+            var a = anchors[cl];
+            var members = clusterMembers[cl];
+            var spread = 40 + members.length * 12;
+            members.forEach(function(id, k) {{
+                var n = cy.getElementById(id);
+                if (n.length === 0) return;
+                var t = (2 * Math.PI * k) / Math.max(1, members.length);
+                n.position({{
+                    x: a.x + spread * Math.cos(t) * Math.random(),
+                    y: a.y + spread * Math.sin(t) * Math.random()
+                }});
+            }});
+        }});
+    }}
+
+    // fcose layout. randomize:false makes it relax FROM the seeded
+    // positions instead of starting over, preserving the cluster clumps.
+    function fcoseOptions() {{
+        return {{
+            name: 'fcose',
+            quality: 'proof',
+            randomize: false,        // start from seeded cluster positions
+            animate: true,
+            animationDuration: 800,
+            fit: true,
+            padding: 60,
+            nodeSeparation: 110,
+            idealEdgeLength: 80,
+            nodeRepulsion: 9000,
+            gravity: 0.15,           // weak global gravity so clumps don't merge
+            gravityRange: 2.0,
+            numIter: 2500,
+            tile: false
+        }};
+    }}
+
+    // Initialize Cytoscape
+    var cy = cytoscape({{
+        container: document.getElementById('cy'),
+        elements: elements,
+
+        style: [
+            {{
+                selector: 'node.module',
+                style: {{
+                    'label': 'data(label)',
+                    'width': '65px',
+                    'height': '65px',
+                    'border-width': '3px',
+                    'border-color': 'rgba(255, 255, 255, 0.8)',
+                    'text-valign': 'center',
+                    'text-halign': 'center',
+                    'font-size': '13px',
+                    'font-weight': 'bold',
+                    'color': '#000',
+                    'text-outline-width': '0px',
+                    'cursor': 'grab'
+                }}
+            }},
+            {{
+                selector: 'node.regulator',
+                style: {{
+                    'label': 'data(label)',
+                    'text-wrap': 'none',
+                    'text-events': 'no',
+                    'shape': 'round-rectangle',
+                    'width': '50px',
+                    'height': '50px',
+                    'border-width': '2px',
+                    'border-color': 'rgba(255, 255, 255, 0.7)',
+                    'text-valign': 'center',
+                    'text-halign': 'center',
+                    'font-size': '11px',
+                    'font-weight': 'bold',
+                    'color': '#000',
+                    'text-outline-width': '0px',
+                    'cursor': 'grab'
+                }}
+            }},
+            {{
+                selector: 'node:selected',
+                style: {{
+                    'border-width': '4px',
+                    'border-color': '#FFD700',
+                    'shadow-blur': '10px',
+                    'shadow-color': 'rgba(0, 0, 0, 0.5)',
+                    'shadow-offset-x': '0px',
+                    'shadow-offset-y': '4px'
+                }}
+            }},
+            {{
+                selector: 'edge[category="Causal"]',
+                style: {{
+                    'width': '3px',
+                    'line-color': 'data(color)',
+                    'target-arrow-color': 'data(color)',
+                    'target-arrow-shape': 'triangle',
+                    'target-arrow-fill': 'filled',
+                    'curve-style': 'bezier',
+                    'opacity': 0.8
+                }}
+            }},
+            {{
+                selector: 'edge[category="Metabolic_pathway"]',
+                style: {{
+                    'width': '2px',
+                    'line-color': 'data(color)',
+                    'target-arrow-color': 'data(color)',
+                    'target-arrow-shape': 'circle',
+                    'target-arrow-fill': 'filled',
+                    'curve-style': 'bezier',
+                    'line-dash-pattern': [5, 5],
+                    'opacity': 0.7
+                }}
+            }},
+            {{
+                selector: 'edge[category="Other"]',
+                style: {{
+                    'width': '1px',
+                    'line-color': 'data(color)',
+                    'target-arrow-color': 'data(color)',
+                    'curve-style': 'bezier',
+                    'opacity': 0.5
+                }}
+            }},
+            {{
+                selector: 'edge:selected',
+                style: {{
+                    'width': '4px',
+                    'opacity': 1,
+                    'shadow-blur': '8px',
+                    'shadow-color': 'rgba(0, 0, 0, 0.4)'
+                }}
+            }},
+            {{
+                selector: '.dimmed',
+                style: {{
+                    'opacity': 0.15
+                }}
+            }},
+            {{
+                selector: '.highlighted',
+                style: {{
+                    'opacity': 1,
+                    'border-width': '4px',
+                    'border-color': '#FFD700'
+                }}
+            }}
+        ],
+
+        layout: {{ name: 'preset' }},   // positions set by seedClusterPositions(), then fcose runs
+
+        wheelSensitivity: 0.1,
+        autoungrabify: false,
+        userPanningEnabled: true
+    }});
+
+    // Seed cluster positions then run fcose so clusters relax into clumps.
+    seedClusterPositions();
+    cy.layout(fcoseOptions()).run();
+
+    // Store initial layout positions
+    var initialPositions = {{}};
+    cy.on('layoutstop', function() {{
+        initialPositions = {{}};
+        cy.nodes().forEach(function(n) {{
+            initialPositions[n.id()] = {{ x: n.position('x'), y: n.position('y') }};
+        }});
+    }});
+
+    // Fit to view on load
+    setTimeout(() => cy.fit(undefined, 50), 500);
+
+    // Mouse tracking for tooltip
+    var tooltip = document.getElementById('tooltip');
+    cy.on('mouseover', 'node', function(e) {{
+        var node = e.target;
+        var hover_info = node.data('hover_info');
+        tooltip.innerHTML = hover_info;
+        tooltip.style.display = 'block';
+    }});
+
+    cy.on('mouseout', 'node', function(e) {{
+        tooltip.style.display = 'none';
+    }});
+
+    cy.on('mousemove', function(e) {{
+        if (tooltip.style.display === 'block') {{
+            tooltip.style.left = (e.originalEvent.pageX + 10) + 'px';
+            tooltip.style.top = (e.originalEvent.pageY + 10) + 'px';
+        }}
+    }});
+
+    // Layout switching
+    function runLayout(layoutName) {{
+        if (layoutName === 'fcose') {{
+            seedClusterPositions();
+            cy.layout(fcoseOptions()).run();
+            return;
+        }}
+        cy.layout({{
+            name: layoutName,
+            directed: false,
+            animate: true,
+            animationDuration: 800,
+            fit: true,
+            padding: 50,
+            spacingFactor: 1.2
+        }}).run();
+    }}
+
+    // Fit to view
+    function fitView() {{
+        cy.fit(undefined, 50);
+    }}
+
+    // Reset view and positions
+    function resetView() {{
+        if (Object.keys(initialPositions).length > 0) {{
+            cy.nodes().forEach(function(n) {{
+                if (initialPositions[n.id()]) {{
+                    n.position(initialPositions[n.id()]);
+                }}
+            }});
+        }}
+        cy.fit(undefined, 50);
+    }}
+
+    // Export node positions as JSON
+    function exportPositions() {{
+        var positions = {{}};
+        cy.nodes().forEach(function(n) {{
+            positions[n.id()] = {{ x: n.position('x'), y: n.position('y') }};
+        }});
+        console.log(JSON.stringify(positions, null, 2));
+        alert('Positions exported to console (F12)');
+    }}
+
+    // Export the WHOLE network at its current node positions as a high-res
+    // PNG. `full: true` renders the entire graph model (not just the visible
+    // viewport), so any manual node rearrangement is preserved in the image.
+    // Draw the legend onto a canvas context at the given offset. Returns
+    // the total height consumed, so callers can size the canvas. Pass
+    // measureOnly=true to compute height without drawing.
+    function drawLegend(ctx, x, y, scale, measureOnly) {{
+        var pad = 18 * scale;
+        var titleFont = 'bold ' + (15 * scale) + 'px Segoe UI, sans-serif';
+        var itemFont = (13 * scale) + 'px Segoe UI, sans-serif';
+        var rowH = 26 * scale;
+        var sectGap = 14 * scale;
+        var swatch = 18 * scale;
+        var cy0 = y + pad;
+
+        legendData.sections.forEach(function(section) {{
+            if (!measureOnly) {{
+                ctx.fillStyle = '#222';
+                ctx.font = titleFont;
+                ctx.textBaseline = 'middle';
+                ctx.fillText(section.title, x + pad, cy0 + rowH / 2);
+            }}
+            cy0 += rowH;
+
+            section.items.forEach(function(item) {{
+                var sx = x + pad;
+                var sy = cy0 + rowH / 2;
+                if (!measureOnly) {{
+                    if (item.kind === 'dot') {{
+                        ctx.beginPath();
+                        ctx.arc(sx + swatch / 2, sy, swatch / 2, 0, 2 * Math.PI);
+                        ctx.fillStyle = item.color;
+                        ctx.fill();
+                    }} else if (item.kind === 'gradient') {{
+                        var g = ctx.createLinearGradient(sx, sy, sx + swatch, sy);
+                        g.addColorStop(0, item.light);
+                        g.addColorStop(1, item.dark);
+                        ctx.beginPath();
+                        ctx.arc(sx + swatch / 2, sy, swatch / 2, 0, 2 * Math.PI);
+                        ctx.fillStyle = g;
+                        ctx.fill();
+                    }} else if (item.kind === 'line') {{
+                        ctx.strokeStyle = item.color;
+                        ctx.lineWidth = (item.width || 2) * scale;
+                        ctx.beginPath();
+                        ctx.moveTo(sx, sy);
+                        ctx.lineTo(sx + swatch + 8 * scale, sy);
+                        ctx.stroke();
+                        if (item.arrow === 'triangle') {{
+                            var ax = sx + swatch + 8 * scale;
+                            ctx.beginPath();
+                            ctx.moveTo(ax, sy);
+                            ctx.lineTo(ax - 6 * scale, sy - 4 * scale);
+                            ctx.lineTo(ax - 6 * scale, sy + 4 * scale);
+                            ctx.closePath();
+                            ctx.fillStyle = item.color;
+                            ctx.fill();
+                        }} else if (item.arrow === 'dot') {{
+                            ctx.beginPath();
+                            ctx.arc(sx + swatch + 8 * scale, sy, 3 * scale, 0, 2 * Math.PI);
+                            ctx.fillStyle = item.color;
+                            ctx.fill();
+                        }}
+                    }}
+                    ctx.fillStyle = '#333';
+                    ctx.font = itemFont;
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(item.label, sx + swatch + 16 * scale, sy);
+                }}
+                cy0 += rowH;
+            }});
+            cy0 += sectGap;
+        }});
+        return (cy0 - y);
+    }}
+
+    // Export the WHOLE network at its current node positions as a high-res
+    // PNG, with the legend composited onto a white panel on the right.
+    function exportPNG() {{
+        var scale = 4;   // print-quality raster; legend is matched to this scale
+
+        // WYSIWYG export: render exactly what is currently on screen (the
+        // visible viewport, current pan/zoom) so the legend can be placed at
+        // the *same position and size* it has in the HTML at this moment.
+        var cyEl = document.getElementById('cy');
+        var legendEl = document.querySelector('.legend');
+        var cyRect = cyEl.getBoundingClientRect();
+        var legRect = legendEl ? legendEl.getBoundingClientRect() : null;
+
+        var netDataUrl = cy.png({{
+            output: 'base64uri',
+            scale: scale,
+            full: false,        // current viewport only -> matches the screen
+            bg: 'white'
+        }});
+        var netImg = new Image();
+        netImg.onload = function() {{
+            var canvas = document.createElement('canvas');
+            canvas.width = netImg.width;
+            canvas.height = netImg.height;
+            var ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(netImg, 0, 0);
+
+            if (legRect) {{
+                // Legend position/size relative to the #cy container, in CSS
+                // px, scaled to output px. (0,0) of the rendered viewport PNG
+                // is the top-left of #cy, so this reproduces the on-screen
+                // placement and footprint exactly.
+                var lx = (legRect.left - cyRect.left) * scale;
+                var ly = (legRect.top  - cyRect.top ) * scale;
+                var lw = legRect.width  * scale;
+                var lh = legRect.height * scale;
+
+                // Pick the legend draw-scale so its rendered height fills the
+                // on-screen legend box (height parity with the HTML legend).
+                var natH = drawLegend(ctx, 0, 0, 1, true);
+                var legendScale = lh / natH;
+
+                // White rounded panel + border + soft shadow, mirroring the
+                // .legend CSS so the exported legend looks identical.
+                var r = 4 * scale;
+                ctx.save();
+                ctx.shadowColor = 'rgba(0,0,0,0.10)';
+                ctx.shadowBlur = 8 * scale;
+                ctx.shadowOffsetY = 2 * scale;
+                roundRect(ctx, lx, ly, lw, lh, r);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                ctx.restore();
+                roundRect(ctx, lx, ly, lw, lh, r);
+                ctx.strokeStyle = '#dddddd';
+                ctx.lineWidth = 1 * scale;
+                ctx.stroke();
+
+                // Clip to the panel and draw the legend content.
+                ctx.save();
+                roundRect(ctx, lx, ly, lw, lh, r);
+                ctx.clip();
+                drawLegend(ctx, lx, ly, legendScale, false);
+                ctx.restore();
+            }}
+
+            canvas.toBlob(function(blob) {{
+                var filename = '{config_name}_{variant_name}.png';
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }}, 'image/png');
+        }};
+        netImg.src = netDataUrl;
+    }}
+
+    // Rounded-rectangle path helper for the legend panel.
+    function roundRect(ctx, x, y, w, h, r) {{
+        r = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y,     x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x,     y + h, r);
+        ctx.arcTo(x,     y + h, x,     y,     r);
+        ctx.arcTo(x,     y,     x + w, y,     r);
+        ctx.closePath();
+    }}
+
+    // Export the whole network as SVG (vector — best for publication).
+    // Also uses current node positions.
+    function exportSVG() {{
+        if (typeof cy.svg !== 'function') {{
+            alert('SVG export plugin not loaded — check your internet connection and reload.');
+            return;
+        }}
+        var svgContent = cy.svg({{scale: 1, full: true, bg: 'white'}});
+        var blob = new Blob([svgContent], {{type: 'image/svg+xml'}});
+        var filename = '{config_name}_{variant_name}.svg';
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }}
+
+    // Search / filter functionality
+    var nodeList = [];
+    cy.nodes().forEach(function(n) {{
+        nodeList.push(n.data('label'));
+    }});
+
+    var searchInput = document.getElementById('searchInput');
+    var autocompleteList = document.getElementById('autocompleteList');
+
+    searchInput.addEventListener('input', function() {{
+        var query = searchInput.value.toLowerCase();
+        var matches = nodeList.filter(n => n.toLowerCase().includes(query));
+
+        autocompleteList.innerHTML = '';
+        if (query && matches.length > 0) {{
+            matches.slice(0, 10).forEach(function(match) {{
+                var div = document.createElement('div');
+                div.textContent = match;
+                div.onclick = function() {{
+                    searchInput.value = match;
+                    autocompleteList.innerHTML = '';
+                    highlightNode(match);
+                }};
+                autocompleteList.appendChild(div);
+            }});
+            autocompleteList.style.display = 'block';
+        }} else {{
+            autocompleteList.style.display = 'none';
+        }}
+    }});
+
+    searchInput.addEventListener('keypress', function(e) {{
+        if (e.key === 'Enter') {{
+            var query = searchInput.value;
+            highlightNode(query);
+            autocompleteList.innerHTML = '';
+            autocompleteList.style.display = 'none';
+        }}
+    }});
+
+    function highlightNode(nodeLabel) {{
+        cy.nodes().removeClass('dimmed').removeClass('highlighted');
+        var node = cy.nodes().filter(n => n.data('label') === nodeLabel)[0];
+
+        if (node) {{
+            node.addClass('highlighted');
+            cy.nodes().not(node).addClass('dimmed');
+            cy.center(node);
+        }}
+    }}
+
+    function clearHighlight() {{
+        cy.nodes().removeClass('dimmed').removeClass('highlighted');
+        searchInput.value = '';
+        autocompleteList.innerHTML = '';
+    }}
+</script>
+</body>
+</html>
+"""
+
+    # Save HTML
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    print(f"✓ Cytoscape network saved: {output_file}")
+
+    return output_file
+
 
 
 def module_sort_key(module_id):
@@ -1552,7 +2697,7 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
                                               module_overview_df=None, enrichment_all_df=None,
                                               cluster_label_lookup=None, pkn_lookup=None,
                                               name_to_hmdb=None, module_genes_map=None,
-                                              name_lookup=None):
+                                              name_lookup=None, run_id=None):
     """
     Create interactive network visualization using Plotly with MegaGO cluster coloring,
     cluster labels, and PKN-based edge categorization.
@@ -1848,17 +2993,18 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
         )
         return fig
 
-    # -- Generate standard network --
+    # -- Generate Cytoscape.JS movable network --
     fig_standard = _build_figure(movable=False)
-    output_file = os.path.join(output_dir, 'interactive_module_network.html')
-    pyo.plot(fig_standard, filename=output_file, auto_open=False)
-    print(f"Interactive network visualization saved to: {output_file}")
-
-    # -- Generate movable network --
-    fig_movable = _build_figure(movable=True)
     output_movable = os.path.join(output_dir, 'interactive_module_network_movable.html')
-    fig_movable.write_html(output_movable, config={'editable': True})
-    print(f"Movable network visualization saved to: {output_movable}")
+    create_cytoscape_html_network(
+        nodes, edges, module_clusters,
+        config_name=run_id or 'Lemonite',
+        variant_name='filtered',
+        output_file=output_movable,
+        module_overview=module_overview_df,
+        module_enrichment_all=enrichment_all_df,
+        name_lookup=name_lookup,
+    )
 
     return fig_standard
 
@@ -2677,6 +3823,8 @@ def main():
                        help='Path to expression data file (LemonPreprocessed_expression.txt)')
     parser.add_argument('--metadata_file', type=str, default=None,
                        help='Path to metadata file (DESeq_groups.txt)')
+    parser.add_argument('--run_id', type=str, default='Lemonite',
+                       help='Run identifier used as network title')
     
     args = parser.parse_args()
     
@@ -2927,10 +4075,17 @@ def main():
             'Coherence': coherence_lookup.get(str(module_id), 'NA')
         }
         
-        # Add regulator data dynamically
+        # Add regulator data dynamically, restoring original names via name_lookup
         for reg_type, regulators in regulators_dict.items():
             column_name = f'{reg_type}_regulators'
-            module_entry[column_name] = '|'.join(regulators.get(module_id, [])) if regulators.get(module_id) else 'NA'
+            raw_regs = regulators.get(module_id, [])
+            if raw_regs:
+                if name_lookup:
+                    module_entry[column_name] = '|'.join(name_lookup.get(r, r) for r in raw_regs)
+                else:
+                    module_entry[column_name] = '|'.join(raw_regs)
+            else:
+                module_entry[column_name] = 'NA'
         
         # Add pathway enrichment data
         pathway_types = {
@@ -3187,7 +4342,8 @@ def main():
         pkn_lookup=pkn_lookup,
         name_to_hmdb=name_to_hmdb,
         module_genes_map=module_genes_map,
-        name_lookup=name_lookup
+        name_lookup=name_lookup,
+        run_id=args.run_id,
     )
 
     # Export Cytoscape-compatible TSV files
@@ -3235,6 +4391,9 @@ def main():
     output_file = os.path.join(output_dir, 'Module_Overview.csv')
     module_df.to_csv(output_file, sep='\t', index=False)
     print(f"Enhanced module overview saved to: {output_file}")
+    xlsx_file = os.path.join(output_dir, 'Module_Overview.xlsx')
+    module_df.to_excel(xlsx_file, index=False)
+    print(f"Enhanced module overview saved to: {xlsx_file}")
     
     # Generate regulator ranking tables HTML
     regulator_tables_html = None
@@ -3325,9 +4484,6 @@ def main():
     print(f"\nFiles created:")
     print(f"  - {output_file}")
     
-    network_html_path = os.path.join(output_dir, 'interactive_module_network.html')
-    print(f"  - {network_html_path}")
-    
     movable_html_path = os.path.join(output_dir, 'interactive_module_network_movable.html')
     if os.path.exists(movable_html_path):
         print(f"  - {movable_html_path}")
@@ -3343,14 +4499,6 @@ def main():
         regulator_html_path = os.path.join(output_dir, 'regulator_rankings.html')
         print(f"  - {regulator_html_path}")
 
-    
-    # Generate comprehensive HTML report combining network and regulator tables
-    comprehensive_report = create_comprehensive_html_report(
-        regulator_tables_html_path=regulator_html_path,
-        network_html_path=network_html_path,
-        output_dir=output_dir
-    )
-    print(f"  - {comprehensive_report}")
     
     if args.prioritize_by_expression and not expression_results_df.empty:
         print(f"  - {os.path.join(output_dir, 'module_expression_analysis.csv')}")

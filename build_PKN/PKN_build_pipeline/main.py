@@ -28,10 +28,20 @@ import logging
 import sys
 import os
 import time
+import gc
 from pathlib import Path
 
 # Add current directory to Python path
 sys.path.append(str(Path(__file__).parent))
+
+# Allow an alternate config module via PKN_CONFIG env var.
+# This must happen before any pipeline submodule is imported so that all
+# subsequent "import config" statements resolve to the chosen module.
+_config_name = os.environ.get('PKN_CONFIG', 'config')
+if _config_name != 'config':
+    import importlib as _importlib
+    _cfg_mod = _importlib.import_module(_config_name)
+    sys.modules['config'] = _cfg_mod
 
 import config
 from utils.file_io import load_hmdb_metabolites
@@ -148,18 +158,32 @@ def run_step1_metabolites(databases=None, resume=False, max_metabolites=None):
                 logger.info(f"✓ {db_name}: {len(interactions)} interactions")
             else:
                 logger.warning(f"✗ {db_name}: No interactions found")
+            
+            # Clean up memory after each retriever
+            del retriever
+            gc.collect()
         
         except Exception as e:
             logger.error(f"✗ {db_name}: Failed with error: {e}", exc_info=True)
             results[db_name] = None
+            gc.collect()  # Clean up even on error
     
     # Integrate results
     logger.info(f"\n{'='*80}")
     logger.info("INTEGRATING RESULTS")
     logger.info(f"{'='*80}")
     
+    # Clean up large metabolites dataframe before integration
+    del metabolites
+    del metabolites_df
+    gc.collect()
+    
     final_network = integration.integrate_databases(results)
     integration.create_visualizations(results)
+    
+    # Clean up results dictionary after integration
+    del results
+    gc.collect()
     
     logger.info(f"\n{'='*80}")
     logger.info("STEP 1 COMPLETE!")
@@ -195,7 +219,7 @@ def run_step2_proteins():
     
     logger.info(f"\nPPI network:")
     logger.info(f"  Total interactions: {len(ppi_network)}")
-    logger.info(f"  Unique proteins: {ppi_network[['Node1', 'Node2']].stack().nunique()}")
+    logger.info(f"  Unique proteins: {ppi_network[['GeneA', 'GeneB']].stack().nunique()}")
     logger.info(f"  Output: {config.PPI_OUTPUT_FILE}")
     logger.info(f"Step 2 elapsed time: {time.time() - step_start:.1f}s")
     

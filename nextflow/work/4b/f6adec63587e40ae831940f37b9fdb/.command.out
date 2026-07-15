@@ -1,0 +1,329 @@
+=== Files staged by Nextflow ===
+total 32
+drwxr-xr-x 4 borisvdm users  4096 May 29 11:42 .
+drwxr-xr-x 3 borisvdm users    44 May 29 11:42 ..
+lrwxrwxrwx 1 borisvdm users    98 May 29 11:42 clusterfile -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Lemon_out/clusterfile
+-rw-r--r-- 1 borisvdm users     0 May 29 11:42 .command.begin
+-rw-r--r-- 1 borisvdm users     0 May 29 11:42 .command.err
+-rw-r--r-- 1 borisvdm users    33 May 29 11:42 .command.log
+-rw-r--r-- 1 borisvdm users    33 May 29 11:42 .command.out
+-rw-r--r-- 1 borisvdm users 14407 May 29 11:42 .command.run
+-rw-r--r-- 1 borisvdm users  3008 May 29 11:42 .command.sh
+-rw-r--r-- 1 borisvdm users     0 May 29 11:42 .command.trace
+lrwxrwxrwx 1 borisvdm users   107 May 29 11:42 DESeq_groups.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/DESeq_groups.txt
+lrwxrwxrwx 1 borisvdm users   103 May 29 11:42 hPTMs.allreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Lemon_out/hPTMs.allreg.txt
+lrwxrwxrwx 1 borisvdm users   106 May 29 11:42 hPTMs.randomreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Lemon_out/hPTMs.randomreg.txt
+lrwxrwxrwx 1 borisvdm users   103 May 29 11:42 hPTMs.topreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Lemon_out/hPTMs.topreg.txt
+lrwxrwxrwx 1 borisvdm users   100 May 29 11:42 hptms.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/hptms.txt
+lrwxrwxrwx 1 borisvdm users    99 May 29 11:42 hPTMs.xml.gz -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Lemon_out/hPTMs.xml.gz
+drwxr-xr-x 2 borisvdm users     6 May 29 11:42 Lemon_out
+lrwxrwxrwx 1 borisvdm users   121 May 29 11:42 LemonPreprocessed_complete.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/LemonPreprocessed_complete.txt
+lrwxrwxrwx 1 borisvdm users   123 May 29 11:42 LemonPreprocessed_expression.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/LemonPreprocessed_expression.txt
+lrwxrwxrwx 1 borisvdm users   117 May 29 11:42 LemonPreprocessed_hPTM.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/LemonPreprocessed_hPTM.txt
+lrwxrwxrwx 1 borisvdm users   125 May 29 11:42 LemonPreprocessed_metabolomics.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/LemonPreprocessed_metabolomics.txt
+lrwxrwxrwx 1 borisvdm users   123 May 29 11:42 LemonPreprocessed_proteomics.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/LemonPreprocessed_proteomics.txt
+lrwxrwxrwx 1 borisvdm users   100 May 29 11:42 Lemon_results -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Lemon_out/Lemon_results
+lrwxrwxrwx 1 borisvdm users   109 May 29 11:42 Metabolites.allreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Lemon_out/Metabolites.allreg.txt
+lrwxrwxrwx 1 borisvdm users   112 May 29 11:42 Metabolites.randomreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Lemon_out/Metabolites.randomreg.txt
+lrwxrwxrwx 1 borisvdm users   109 May 29 11:42 Metabolites.topreg.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Lemon_out/Metabolites.topreg.txt
+lrwxrwxrwx 1 borisvdm users   106 May 29 11:42 metabolites.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/metabolites.txt
+lrwxrwxrwx 1 borisvdm users   105 May 29 11:42 Metabolites.xml.gz -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Lemon_out/Metabolites.xml.gz
+lrwxrwxrwx 1 borisvdm users   107 May 29 11:42 name_mapping.tsv -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/name_mapping.tsv
+lrwxrwxrwx 1 borisvdm users   103 May 29 11:42 PCA_hptm.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/PCA_hptm.pdf
+lrwxrwxrwx 1 borisvdm users   111 May 29 11:42 PCA_metabolomics.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/PCA_metabolomics.pdf
+lrwxrwxrwx 1 borisvdm users   109 May 29 11:42 PCA_proteomics.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Preprocessing/PCA_proteomics.pdf
+drwxr-xr-x 2 borisvdm users     6 May 29 11:42 Preprocessing
+lrwxrwxrwx 1 borisvdm users   105 May 29 11:42 tight_clusters.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/c5/308931803293cf97fd48a4762118fe/Lemon_out/tight_clusters.txt
+=================================
+=== Available files before network generation ===
+=== Lemon_out contents ===
+total 1952
+drwxr-xr-x 3 borisvdm users   4096 May 29 11:42 .
+drwxr-xr-x 4 borisvdm users   4096 May 29 11:42 ..
+-rw-r--r-- 1 borisvdm users    240 May 29 11:42 clusterfile
+-rw-r--r-- 1 borisvdm users  72803 May 29 11:42 hPTMs.allreg.txt
+-rw-r--r-- 1 borisvdm users 101131 May 29 11:42 hPTMs.randomreg.txt
+-rw-r--r-- 1 borisvdm users    708 May 29 11:42 hPTMs.topreg.txt
+-rw-r--r-- 1 borisvdm users 591071 May 29 11:42 hPTMs.xml.gz
+drwxr-xr-x 2 borisvdm users     91 May 29 11:42 Lemon_results
+-rw-r--r-- 1 borisvdm users 160735 May 29 11:42 Metabolites.allreg.txt
+-rw-r--r-- 1 borisvdm users 303108 May 29 11:42 Metabolites.randomreg.txt
+-rw-r--r-- 1 borisvdm users   1421 May 29 11:42 Metabolites.topreg.txt
+-rw-r--r-- 1 borisvdm users 713134 May 29 11:42 Metabolites.xml.gz
+-rw-r--r-- 1 borisvdm users  16712 May 29 11:42 tight_clusters.txt
+Lemon_out/Metabolites.allreg.txt
+Lemon_out/Metabolites.topreg.txt
+Lemon_out/hPTMs.allreg.txt
+Lemon_out/hPTMs.topreg.txt
+=== Preprocessing contents ===
+total 8288
+drwxr-xr-x 2 borisvdm users    4096 May 29 11:42 .
+drwxr-xr-x 4 borisvdm users    4096 May 29 11:42 ..
+-rw-r--r-- 1 borisvdm users    4253 May 29 11:42 DESeq_groups.txt
+-rw-r--r-- 1 borisvdm users    2719 May 29 11:42 hptms.txt
+-rw-r--r-- 1 borisvdm users 3300343 May 29 11:42 LemonPreprocessed_complete.txt
+-rw-r--r-- 1 borisvdm users 1770988 May 29 11:42 LemonPreprocessed_expression.txt
+-rw-r--r-- 1 borisvdm users  283605 May 29 11:42 LemonPreprocessed_hPTM.txt
+-rw-r--r-- 1 borisvdm users 1256055 May 29 11:42 LemonPreprocessed_metabolomics.txt
+-rw-r--r-- 1 borisvdm users 1770988 May 29 11:42 LemonPreprocessed_proteomics.txt
+-rw-r--r-- 1 borisvdm users   17549 May 29 11:42 metabolites.txt
+-rw-r--r-- 1 borisvdm users      16 May 29 11:42 name_mapping.tsv
+-rw-r--r-- 1 borisvdm users   12843 May 29 11:42 PCA_hptm.pdf
+-rw-r--r-- 1 borisvdm users   12852 May 29 11:42 PCA_metabolomics.pdf
+-rw-r--r-- 1 borisvdm users   12907 May 29 11:42 PCA_proteomics.pdf
+=================================================
+Running network generation...
+
+================================================================================
+LEMONTREE TO NETWORK CONVERSION
+================================================================================
+Run ID: minW0p10
+Input directory: .
+Output directory: .
+Regulator selection method: fold_per_module
+Method suffix: fold2.0x_permodule
+Threshold value: 2.0
+Coherence threshold: 0.5
+Skip coherence filtering: False
+
+================================================================================
+REGULATOR CONFIGURATION
+================================================================================
+Available regulator types: 2
+  [OK] hPTMs: hPTMs
+  [OK] Metabolites: Metabolites
+
+================================================================================
+STEP 1: Creating sample mapping file
+================================================================================
+97 samples included in the analysis.
+Found metadata column 'Cell_line' with 18 unique values: FKH-1, HL-60, KASUMI-1, KG-1a, ME-1, MOLM-13, MOLM-16, MONO-MAC-6, MUTZ-3, MV4-11, OCI-AML3, OCI-AML5, OCI-AML6, OCI-M1, SHI-1, SKM-1, THP-1, USCD-AML1
+Found metadata column 'Origin' with 2 unique values: adult, pediatric
+Found metadata column 'FAB' with 6 unique values: M0, M2, M4, M5, M6, No data
+Found metadata column 'MITO_subtype' with 2 unique values: MITOhigh, MITOlow
+Found metadata column 'Risk_classification' with 3 unique values: adverse, favorable, intermediate
+Created sample mapping with 5 metadata types: Cell_line, Origin, FAB, MITO_subtype, Risk_classification
+
+================================================================================
+STEP 2: REGULATOR SELECTION (FOLD_PER_MODULE)
+Selection performed on ORIGINAL LemonTree scores before normalization
+================================================================================
+
+Processing hPTMs regulators (hPTMs)...
+Max random score across all modules:
+4.513974
+4 remain for module 0 with a cutoff of 2.0 > random
+4 remain for module 1 with a cutoff of 2.0 > random
+6 remain for module 2 with a cutoff of 2.0 > random
+4 remain for module 3 with a cutoff of 2.0 > random
+3 remain for module 4 with a cutoff of 2.0 > random
+1 remain for module 5 with a cutoff of 2.0 > random
+3 remain for module 6 with a cutoff of 2.0 > random
+5 remain for module 7 with a cutoff of 2.0 > random
+3 remain for module 8 with a cutoff of 2.0 > random
+5 remain for module 9 with a cutoff of 2.0 > random
+4 remain for module 10 with a cutoff of 2.0 > random
+3 remain for module 11 with a cutoff of 2.0 > random
+4 remain for module 12 with a cutoff of 2.0 > random
+3 remain for module 13 with a cutoff of 2.0 > random
+2 remain for module 14 with a cutoff of 2.0 > random
+4 remain for module 15 with a cutoff of 2.0 > random
+4 remain for module 16 with a cutoff of 2.0 > random
+4 remain for module 17 with a cutoff of 2.0 > random
+1 remain for module 18 with a cutoff of 2.0 > random
+8 remain for module 19 with a cutoff of 2.0 > random
+5 remain for module 20 with a cutoff of 2.0 > random
+2 remain for module 21 with a cutoff of 2.0 > random
+7 remain for module 22 with a cutoff of 2.0 > random
+Processing ./Lemon_out/hPTMs.fold2.0x_permodule.txt: 4 columns
+Written 23 clusters to ./ModuleViewer_files/hPTMs.selected_regs_list.txt
+Saved distribution plot to: Networks/hPTMs.selected_regs_list_distribution_plot.png
+
+Processing Metabolites regulators (Metabolites)...
+Max random score across all modules:
+2.434237
+10 remain for module 0 with a cutoff of 2.0 > random
+7 remain for module 1 with a cutoff of 2.0 > random
+10 remain for module 2 with a cutoff of 2.0 > random
+7 remain for module 3 with a cutoff of 2.0 > random
+9 remain for module 4 with a cutoff of 2.0 > random
+10 remain for module 5 with a cutoff of 2.0 > random
+11 remain for module 6 with a cutoff of 2.0 > random
+11 remain for module 7 with a cutoff of 2.0 > random
+6 remain for module 8 with a cutoff of 2.0 > random
+4 remain for module 9 with a cutoff of 2.0 > random
+12 remain for module 10 with a cutoff of 2.0 > random
+3 remain for module 11 with a cutoff of 2.0 > random
+3 remain for module 12 with a cutoff of 2.0 > random
+11 remain for module 13 with a cutoff of 2.0 > random
+5 remain for module 14 with a cutoff of 2.0 > random
+12 remain for module 15 with a cutoff of 2.0 > random
+4 remain for module 16 with a cutoff of 2.0 > random
+5 remain for module 17 with a cutoff of 2.0 > random
+7 remain for module 18 with a cutoff of 2.0 > random
+10 remain for module 19 with a cutoff of 2.0 > random
+4 remain for module 20 with a cutoff of 2.0 > random
+11 remain for module 21 with a cutoff of 2.0 > random
+10 remain for module 22 with a cutoff of 2.0 > random
+Processing ./Lemon_out/Metabolites.fold2.0x_permodule.txt: 4 columns
+Written 23 clusters to ./ModuleViewer_files/Metabolites.selected_regs_list.txt
+Saved distribution plot to: Networks/Metabolites.selected_regs_list_distribution_plot.png
+
+================================================================================
+STEP 3: NORMALIZING SELECTED REGULATOR SCORES (SUM NORMALIZATION)
+Global sum normalization divides scores by the TOTAL sum of selected regulator scores,
+then scales by 100 to make numbers more interpretable
+Normalized scores OVERWRITE original selection files for downstream use
+================================================================================
+
+Normalizing selected hPTMs regulators (hPTMs)...
+  Normalized 89 selected regulator-module pairs
+  Original range: [5.4963, 82.3357]
+  Original sum (all modules): 1669.2800
+  Normalized sum (all modules): 1000.0000 (scaled to sum=1000 across all modules)
+  Normalized range: [3.292599, 49.324065]
+  Note: Scores now sum to ~100 across all modules (global normalization and scaling)
+  Overwritten: ./Lemon_out/hPTMs.fold2.0x_permodule.txt
+
+Normalizing selected Metabolites regulators (Metabolites)...
+  Normalized 182 selected regulator-module pairs
+  Original range: [3.0091, 62.8921]
+  Original sum (all modules): 2031.9839
+  Normalized sum (all modules): 1000.0000 (scaled to sum=1000 across all modules)
+  Normalized range: [1.480862, 30.951086]
+  Note: Scores now sum to ~100 across all modules (global normalization and scaling)
+  Overwritten: ./Lemon_out/Metabolites.fold2.0x_permodule.txt
+
+================================================================================
+STEP 4: Creating list files and distribution plots
+================================================================================
+
+================================================================================
+STEP 5: Creating cluster list files
+================================================================================
+Processing ./Lemon_out/tight_clusters.txt: 2 columns
+Written 23 clusters to ./ModuleViewer_files/clusters_list.txt
+  Copied selected regulator scores: ./ModuleViewer_files/hPTMs.selected_regulators_scores.txt
+  Copied selected regulator scores: ./ModuleViewer_files/Metabolites.selected_regulators_scores.txt
+
+================================================================================
+STEP 6: Loading module-gene mappings
+================================================================================
+Found 23 modules
+
+================================================================================
+STEP 7: Calculating module coherence
+================================================================================
+Loaded expression data: (1000, 100)
+Calculating module coherence scores...
+Module 0: Low coherence (0.270 < 0.5), marking for removal
+Module 2: Low coherence (0.436 < 0.5), marking for removal
+Module 5: Low coherence (0.235 < 0.5), marking for removal
+Module 8: Low coherence (0.260 < 0.5), marking for removal
+Module 12: Low coherence (0.401 < 0.5), marking for removal
+Module 14: Low coherence (0.273 < 0.5), marking for removal
+Module 15: Low coherence (0.260 < 0.5), marking for removal
+Module 17: Low coherence (0.319 < 0.5), marking for removal
+Module 18: Low coherence (0.418 < 0.5), marking for removal
+Module 19: Low coherence (0.495 < 0.5), marking for removal
+Module 20: Low coherence (0.394 < 0.5), marking for removal
+Original number of modules: 23
+Modules after coherence filtering: 12
+Saved coherence scores to: ./Networks/Module_coherence_scores.txt
+   Module  coherence_score
+0      11         0.687577
+1       1         0.679563
+2      10         0.649725
+3       6         0.621547
+4       7         0.606412
+5       4         0.590714
+6       9         0.586020
+7      13         0.585378
+8      16         0.578991
+9      22         0.563301
+10      3         0.552702
+11     21         0.524440
+
+================================================================================
+STEP 9: Defining modules for network construction
+================================================================================
+12 modules in specific_modules
+================================================================================
+SUMMARY OF MODULE FILTERING AND PRIORITIZATION
+================================================================================
+Original number of modules: 23
+Modules removed due to low coherence (< 0.5): 11
+Modules remaining after coherence filtering: 12
+
+Prioritization method: Module coherence scores
+All coherence-filtered modules used for network construction: 12
+
+Final network will be built using 12 modules
+Coherence threshold used: 0.5
+Regulator selection method: fold_per_module
+Method suffix: fold2.0x_permodule
+
+IMPORTANT: No modules are removed based on expression significance.
+Modules are only filtered by coherence, then ordered by coherence scores.
+================================================================================
+
+================================================================================
+STEP 11: Building regulatory network
+================================================================================
+Building network for 12 selected modules
+Modules to keep: ['11', '1', '10', '6', '7', '4', '9', '13', '16', '22']...
+Network saved to: ./Networks/LemonNetwork_fold2.0x_permodule_12modules.txt
+The network contains 165 unique genes.
+The network contains 28 unique hPTMs regulators.
+The network contains 71 unique Metabolites regulators.
+
+================================================================================
+STEP 12: Creating regulator-target mappings
+================================================================================
+  hPTMs: 28 regulators
+  Metabolites: 71 regulators
+  hPTMs: 28 regulators -> ./Networks/hPTMs2targets_fold2.0x_permodule_12_modules.txt
+  Metabolites: 71 regulators -> ./Networks/Metabolites2targets_fold2.0x_permodule_12_modules.txt
+
+================================================================================
+STEP 13: Creating ranked regulator files
+================================================================================
+  Top hPTMs regulators:
+            Regulator  ...                                            Targets
+26      H4_[8]_(K)_Ac  ...  BPNT2|YIPF3|PDXDC1|ITM2B|LAPTM5|ARL1|HLA-C|TM9...
+16    H31_[14]_(K)_Ac  ...  PTPRJ|ARID3A|SLC12A9|TREX1|TLR2|CD300LF|IAH1|G...
+11     H2A_[5]_(K)_Ac  ...  BPNT2|YIPF3|PDXDC1|ITM2B|LAPTM5|ARL1|HLA-C|TM9...
+23  H31_[9]_(K)_Unmod  ...  BPNT2|YIPF3|PDXDC1|ITM2B|LAPTM5|ARL1|HLA-C|TM9...
+2      H1_[16]_(K)_Bu  ...  HIBADH|MMAA|MYO18B|MRPL18|MRPL42|HSD17B10|NDUF...
+
+[5 rows x 6 columns]
+  Saved: ./Networks/Network_fold2.0x_permodule_12_modules_hPTMs_ranked_regulators.txt
+  Top Metabolites regulators:
+                         Regulator  ...                                            Targets
+29                    dl_lysine_HI  ...  BPNT2|YIPF3|PDXDC1|ITM2B|LAPTM5|ARL1|HLA-C|TM9...
+42             l_phenylalanine_C18  ...  BPNT2|YIPF3|PDXDC1|ITM2B|LAPTM5|ARL1|HLA-C|TM9...
+44  n6,n6,n6_trimethyl_l_lysine_HI  ...  PTPRJ|ARID3A|SLC12A9|TREX1|TLR2|CD300LF|IAH1|G...
+45            n6_methyladenine_C18  ...  PTPRJ|GGT1|PRKCD|ABR|SYTL1|IL1RAP|UBLCP1|RASSF...
+8         3_methylhippuric_acid_HI  ...  ATP5MG|SLC25A11|APAF1|NDUFA3|CORO1B|NDUFB8|PEX...
+
+[5 rows x 6 columns]
+  Saved: ./Networks/Network_fold2.0x_permodule_12_modules_Metabolites_ranked_regulators.txt
+
+================================================================================
+STEP 14: Creating Cytoscape network files
+================================================================================
+Creating Cytoscape files for 12 modules: [11, 1, 10, 6, 7, 4, 9, 13, 16, 22]...
+hPTMs regulators: 47 interactions for filtered modules
+Metabolites regulators: 100 interactions for filtered modules
+Created Cytoscape files for 99 regulators and 12 modules
+
+================================================================================
+STEP 15: Creating filtered distribution plots
+================================================================================
+Saved plot for 28 unique regulators
+Saved plot for 71 unique regulators
+
+================================================================================
+Network generation completed successfully for run: minW0p10
+================================================================================
+

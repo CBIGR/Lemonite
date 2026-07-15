@@ -73,35 +73,84 @@ process PREPROCESSING_TFA {
         echo "Copied name_map.csv to Preprocessing directory"
     fi
 
-    # Run R preprocessing script with regulator_types parameter
-    # Check host script first (allows updates without rebuilding container)
-    if [ -f "${projectDir}/scripts/preprocessing_tfa_complete.R" ]; then
-        SCRIPT_PATH="${projectDir}/scripts/preprocessing_tfa_complete.R"
-    elif [ -f "/app/scripts/preprocessing_tfa_complete.R" ]; then
-        SCRIPT_PATH="/app/scripts/preprocessing_tfa_complete.R"
+    # Determine which preprocessing script to use
+    # "proteomics" mode: uses Preprocessing_TFA_Proteomics.R (pre-scaled, Pareto/z-score, TFA optional)
+    # "rna" mode (default): uses Preprocessing_TFA_RNA.R (DESeq2 normalisation, TFA enabled)
+    if [ "${params.preprocessing_type}" = "proteomics" ] && [ -f "${projectDir}/scripts/Preprocessing_TFA_Proteomics.R" ]; then
+        SCRIPT_PATH="${projectDir}/scripts/Preprocessing_TFA_Proteomics.R"
+        echo "Using Preprocessing_TFA_Proteomics.R (pre-scaled proteomics mode)"
+        
+        # Build optional file arguments
+        OPTIONAL_ARGS=""
+        
+        # Check for ID mapping file
+        if [ -f "data/Proteins_ID_mapping.tsv" ]; then
+            OPTIONAL_ARGS="\$OPTIONAL_ARGS --id_mapping data/Proteins_ID_mapping.tsv"
+        fi
+        
+        # Parse regulator_types for hPTM and metabolomics files
+        # Format: "hPTMs:Histone_proteomics.csv,Metabolites:metabolomics_combined.csv"
+        REGULATOR_TYPES="${params.regulator_types ?: ''}"
+        if [[ "\$REGULATOR_TYPES" == *"hPTM"* ]]; then
+            HPTM_FILE=\$(echo "\$REGULATOR_TYPES" | grep -oP '(?<=hPTMs:)[^,]+')
+            if [ -f "data/\$HPTM_FILE" ]; then
+                OPTIONAL_ARGS="\$OPTIONAL_ARGS --hptm_file data/\$HPTM_FILE"
+            fi
+        fi
+        if [[ "\$REGULATOR_TYPES" == *"Metabolites"* ]]; then
+            METABO_FILE=\$(echo "\$REGULATOR_TYPES" | grep -oP '(?<=Metabolites:)[^,:]+')
+            if [ -f "data/\$METABO_FILE" ]; then
+                OPTIONAL_ARGS="\$OPTIONAL_ARGS --metabolomics_file data/\$METABO_FILE"
+            fi
+            # Check for metabolomics labels file (explicit param takes priority, then data/ fallback)
+            if [ -n "${params.metabolomics_labels_file ?: ''}" ] && [ -f "${params.metabolomics_labels_file}" ]; then
+                OPTIONAL_ARGS="\$OPTIONAL_ARGS --metabolomics_labels '${params.metabolomics_labels_file}'"
+            elif [ -f "data/metabolomics_name_map.csv" ]; then
+                OPTIONAL_ARGS="\$OPTIONAL_ARGS --metabolomics_labels data/metabolomics_name_map.csv"
+            fi
+        fi
+        
+        Rscript \$SCRIPT_PATH \\
+            --expression "\$EXPRESSION_FILE" \\
+            --metadata "\$METADATA_FILE" \\
+            --output_dir . \\
+            --top_n_genes "${params.top_n_genes}" \\
+            --perform_TFA "${params.perform_tfa}" \\
+            --organism "${params.organism}" \\
+            --sample_id_col "${params.sample_id_col}" \\
+            \$OPTIONAL_ARGS
     else
-        echo "Error: preprocessing_tfa_complete.R not found"
-        exit 1
-    fi
-    # Export gene annotation file path if provided; a local PKN backup will be available if online annotation fails.
-    export GENE_ANNOTATION_FILE="${params.gene_annotation_file ?: ''}"
-    export GENE_ANNOTATION_BACKUP="${projectDir}/PKN/ensembl_mapping_jan2024.txt"
+        # Default: RNA-seq preprocessing with DESeq2 and TFA
+        if [ -f "${projectDir}/scripts/Preprocessing_TFA_RNA.R" ]; then
+            SCRIPT_PATH="${projectDir}/scripts/Preprocessing_TFA_RNA.R"
+        elif [ -f "/app/scripts/Preprocessing_TFA_RNA.R" ]; then
+            SCRIPT_PATH="/app/scripts/Preprocessing_TFA_RNA.R"
+        else
+            echo "Error: Neither preprocessing script found (Preprocessing_TFA_RNA.R)"
+            exit 1
+        fi
+        echo "Using Preprocessing_TFA_RNA.R for RNA-seq count data"
+        
+        # Export gene annotation file path if provided
+        export GENE_ANNOTATION_FILE="${params.gene_annotation_file ?: ''}"
+        export GENE_ANNOTATION_BACKUP="${projectDir}/PKN/ensembl_mapping_jan2024.txt"
 
-    Rscript \$SCRIPT_PATH \\
-        --expression "\$EXPRESSION_FILE" \\
-        --metadata "\$METADATA_FILE" \\
-        --output_dir . \\
-        --regulator_types "${params.regulator_types}" \\
-        --top_n_genes "${params.top_n_genes}" \
-        --perform_TFA "${params.perform_tfa}" \
-        --use_omics_specific_scaling "${params.use_omics_specific_scaling}" \
-        --DESeq_contrast1 "${params.deseq_contrast1}" \
-        --design_formula "${params.design_formula}" \
-        --metadata_columns "${params.metadata_columns}" \
-        --expression_col "${params.expression_col}" \
-        --sample_id_col "${params.sample_id_col}" \
-        --organism "${params.organism}" \
-        \$([ ! -z "\$PRIOR_NETWORK" ] && echo "--prior_network \$PRIOR_NETWORK")
+        Rscript \$SCRIPT_PATH \\
+            --expression "\$EXPRESSION_FILE" \\
+            --metadata "\$METADATA_FILE" \\
+            --output_dir . \\
+            --regulator_types "${params.regulator_types}" \\
+            --top_n_genes "${params.top_n_genes}" \
+            --perform_TFA "${params.perform_tfa}" \
+            --use_omics_specific_scaling "${params.use_omics_specific_scaling}" \
+            --DESeq_contrast1 "${params.deseq_contrast1}" \
+            --design_formula "${params.design_formula}" \
+            --metadata_columns "${params.metadata_columns}" \
+            --expression_col "${params.expression_col}" \
+            --sample_id_col "${params.sample_id_col}" \
+            --organism "${params.organism}" \
+            \$([ ! -z "\$PRIOR_NETWORK" ] && echo "--prior_network \$PRIOR_NETWORK")
+    fi
     """
 
     stub:

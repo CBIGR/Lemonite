@@ -1,0 +1,461 @@
+=== Available staged files ===
+total 32
+drwxr-xr-x 5 borisvdm users  4096 May 29 11:49 .
+drwxr-xr-x 3 borisvdm users    44 May 29 11:49 ..
+-rw-r--r-- 1 borisvdm users     0 May 29 11:49 .command.begin
+-rw-r--r-- 1 borisvdm users     0 May 29 11:49 .command.err
+-rw-r--r-- 1 borisvdm users    31 May 29 11:49 .command.log
+-rw-r--r-- 1 borisvdm users    31 May 29 11:49 .command.out
+-rw-r--r-- 1 borisvdm users 13296 May 29 11:49 .command.run
+-rw-r--r-- 1 borisvdm users  2438 May 29 11:49 .command.sh
+-rw-r--r-- 1 borisvdm users     0 May 29 11:49 .command.trace
+lrwxrwxrwx 1 borisvdm users    57 May 29 11:49 data -> /home/borisvdm/Documents/PhD/24_AML_Dhaenens-Lammens/data
+lrwxrwxrwx 1 borisvdm users   117 May 29 11:49 DESeq_groups.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/73/3f1b7c11f340b579d126ac0ac47db3/LemonTree/Preprocessing/DESeq_groups.txt
+lrwxrwxrwx 1 borisvdm users   110 May 29 11:49 hptms.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/73/3f1b7c11f340b579d126ac0ac47db3/LemonTree/Preprocessing/hptms.txt
+drwxr-xr-x 3 borisvdm users    27 May 29 11:49 Lemon_out
+lrwxrwxrwx 1 borisvdm users   131 May 29 11:49 LemonPreprocessed_complete.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/73/3f1b7c11f340b579d126ac0ac47db3/LemonTree/Preprocessing/LemonPreprocessed_complete.txt
+lrwxrwxrwx 1 borisvdm users   133 May 29 11:49 LemonPreprocessed_expression.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/73/3f1b7c11f340b579d126ac0ac47db3/LemonTree/Preprocessing/LemonPreprocessed_expression.txt
+lrwxrwxrwx 1 borisvdm users   127 May 29 11:49 LemonPreprocessed_hPTM.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/73/3f1b7c11f340b579d126ac0ac47db3/LemonTree/Preprocessing/LemonPreprocessed_hPTM.txt
+lrwxrwxrwx 1 borisvdm users   135 May 29 11:49 LemonPreprocessed_metabolomics.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/73/3f1b7c11f340b579d126ac0ac47db3/LemonTree/Preprocessing/LemonPreprocessed_metabolomics.txt
+lrwxrwxrwx 1 borisvdm users   133 May 29 11:49 LemonPreprocessed_proteomics.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/73/3f1b7c11f340b579d126ac0ac47db3/LemonTree/Preprocessing/LemonPreprocessed_proteomics.txt
+drwxr-xr-x 2 borisvdm users    91 May 29 11:49 Lemon_results
+lrwxrwxrwx 1 borisvdm users   116 May 29 11:49 metabolites.txt -> /home/borisvdm/repo/LemonIte/nextflow/work/73/3f1b7c11f340b579d126ac0ac47db3/LemonTree/Preprocessing/metabolites.txt
+lrwxrwxrwx 1 borisvdm users   117 May 29 11:49 name_mapping.tsv -> /home/borisvdm/repo/LemonIte/nextflow/work/73/3f1b7c11f340b579d126ac0ac47db3/LemonTree/Preprocessing/name_mapping.tsv
+lrwxrwxrwx 1 borisvdm users   113 May 29 11:49 PCA_hptm.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/73/3f1b7c11f340b579d126ac0ac47db3/LemonTree/Preprocessing/PCA_hptm.pdf
+lrwxrwxrwx 1 borisvdm users   121 May 29 11:49 PCA_metabolomics.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/73/3f1b7c11f340b579d126ac0ac47db3/LemonTree/Preprocessing/PCA_metabolomics.pdf
+lrwxrwxrwx 1 borisvdm users   119 May 29 11:49 PCA_proteomics.pdf -> /home/borisvdm/repo/LemonIte/nextflow/work/73/3f1b7c11f340b579d126ac0ac47db3/LemonTree/Preprocessing/PCA_proteomics.pdf
+drwxr-xr-x 2 borisvdm users     6 May 29 11:49 Preprocessing
+=============================
+=== Files in Preprocessing directory ===
+total 8288
+drwxr-xr-x 2 borisvdm users    4096 May 29 11:49 .
+drwxr-xr-x 5 borisvdm users    4096 May 29 11:49 ..
+-rw-r--r-- 1 borisvdm users    4253 May 29 11:49 DESeq_groups.txt
+-rw-r--r-- 1 borisvdm users    2719 May 29 11:49 hptms.txt
+-rw-r--r-- 1 borisvdm users 3300343 May 29 11:49 LemonPreprocessed_complete.txt
+-rw-r--r-- 1 borisvdm users 1770988 May 29 11:49 LemonPreprocessed_expression.txt
+-rw-r--r-- 1 borisvdm users  283605 May 29 11:49 LemonPreprocessed_hPTM.txt
+-rw-r--r-- 1 borisvdm users 1256055 May 29 11:49 LemonPreprocessed_metabolomics.txt
+-rw-r--r-- 1 borisvdm users 1770988 May 29 11:49 LemonPreprocessed_proteomics.txt
+-rw-r--r-- 1 borisvdm users   17549 May 29 11:49 metabolites.txt
+-rw-r--r-- 1 borisvdm users      16 May 29 11:49 name_mapping.tsv
+-rw-r--r-- 1 borisvdm users   12843 May 29 11:49 PCA_hptm.pdf
+-rw-r--r-- 1 borisvdm users   12852 May 29 11:49 PCA_metabolomics.pdf
+-rw-r--r-- 1 borisvdm users   12907 May 29 11:49 PCA_proteomics.pdf
+========================================
+Running LemonTree post-clustering analysis...
+=====================================================
+LemonTree Post-Clustering Analysis
+=====================================================
+Regulator types: hPTMs:Histone_proteomics.csv,Metabolites:metabolomics_combined.csv
+LemonTree JAR: /home/borisvdm/repo/LemonIte/nextflow/LemonTree/lemontree_v3.1.1.jar
+Working directory: .
+=====================================================
+Running LemonTree post-clustering analysis...
+Creating consensus cluster file...
+Searching for cluster files...
+Found 10 cluster files
+Generating tight clusters...
+
+LemonTree - Version 3.1.1
+-------------------------
+
+Parameters
+----------
+task:               tight_clusters
+data_file:          Preprocessing/LemonPreprocessed_expression.txt
+cluster_file:       Lemon_out/clusterfile
+output_file:        Lemon_out/tight_clusters.txt
+node_clustering:    false
+min_weight:         0.15
+min_clust_size:     10
+min_clust_score:    2
+
+Reading expression data... [ok]
+Number of genes in the data matrix: 1000
+Number of conditions in the data matrix: 99
+Number of missing values in the data matrix: 2000
+Total number of expression values: 99000
+Reading multiple cluster files...
+Reading cluster file Lemon_results/cluster_1
+ [ok]
+Assigned genes: 1000
+Not assigned genes: 0
+Number of clusters: 99
+Reading cluster file Lemon_results/cluster_2
+ [ok]
+Assigned genes: 1000
+Not assigned genes: 0
+Number of clusters: 103
+Reading cluster file Lemon_results/cluster_3
+ [ok]
+Assigned genes: 1000
+Not assigned genes: 0
+Number of clusters: 102
+Reading cluster file Lemon_results/cluster_4
+ [ok]
+Assigned genes: 1000
+Not assigned genes: 0
+Number of clusters: 107
+Reading cluster file Lemon_results/cluster_5
+ [ok]
+Assigned genes: 1000
+Not assigned genes: 0
+Number of clusters: 110
+Reading cluster file Lemon_results/cluster_1
+ [ok]
+Assigned genes: 1000
+Not assigned genes: 0
+Number of clusters: 99
+Reading cluster file Lemon_results/cluster_2
+ [ok]
+Assigned genes: 1000
+Not assigned genes: 0
+Number of clusters: 103
+Reading cluster file Lemon_results/cluster_3
+ [ok]
+Assigned genes: 1000
+Not assigned genes: 0
+Number of clusters: 102
+Reading cluster file Lemon_results/cluster_4
+ [ok]
+Assigned genes: 1000
+Not assigned genes: 0
+Number of clusters: 107
+Reading cluster file Lemon_results/cluster_5
+ [ok]
+Assigned genes: 1000
+Not assigned genes: 0
+Number of clusters: 110
+[ok]
+Init CoClustering... [ok]
+Found cluster with score 25.39402985074627 and 67 nodes. Remaining network has 1000 nodes and 27370 edges.
+Found cluster with score 20.200000000000014 and 31 nodes. Remaining network has 1000 nodes and 26912 edges.
+Found cluster with score 18.795918367346943 and 539 nodes. Remaining network has 940 nodes and 11245 edges.
+Found cluster with score 10.797333333333329 and 75 nodes. Remaining network has 940 nodes and 9982 edges.
+Found cluster with score 9.618181818181817 and 44 nodes. Remaining network has 940 nodes and 9462 edges.
+Found cluster with score 8.999999999999996 and 41 nodes. Remaining network has 940 nodes and 9069 edges.
+Found cluster with score 12.575059952038359 and 417 nodes. Remaining network has 818 nodes and 4239 edges.
+Found cluster with score 5.68 and 10 nodes. Remaining network has 818 nodes and 4194 edges.
+Found cluster with score 8.507692307692308 and 26 nodes. Remaining network has 812 nodes and 4052 edges.
+Found cluster with score 14.309090909090905 and 33 nodes. Remaining network has 798 nodes and 3828 edges.
+Found cluster with score 5.009302325581396 and 43 nodes. Remaining network has 796 nodes and 3593 edges.
+Found cluster with score 6.734567901234566 and 324 nodes. Remaining network has 732 nodes and 1727 edges.
+Found cluster with score 10.254545454545452 and 22 nodes. Remaining network has 719 nodes and 1659 edges.
+Found cluster with score 6.8125 and 224 nodes. Remaining network has 623 nodes and 1064 edges.
+Found cluster with score 3.6153846153846154 and 13 nodes. Remaining network has 616 nodes and 1032 edges.
+Found cluster with score 4.173333333333334 and 15 nodes. Remaining network has 607 nodes and 999 edges.
+Found cluster with score 6.66153846153846 and 13 nodes. Remaining network has 600 nodes and 969 edges.
+Found cluster with score 2.9555555555555557 and 18 nodes. Remaining network has 596 nodes and 938 edges.
+Found cluster with score 6.381818181818182 and 11 nodes. Remaining network has 590 nodes and 914 edges.
+Found cluster with score 3.4000000000000004 and 8 nodes. Remaining network has 588 nodes and 899 edges.
+Found cluster with score 3.5500000000000007 and 72 nodes. Remaining network has 561 nodes and 770 edges.
+Found cluster with score 4.666666666666667 and 18 nodes. Remaining network has 549 nodes and 737 edges.
+Found cluster with score 2.066666666666667 and 12 nodes. Remaining network has 545 nodes and 719 edges.
+Found cluster with score 4.354838709677419 and 155 nodes. Remaining network has 457 nodes and 492 edges.
+Found cluster with score 1.9142857142857144 and 7 nodes. Remaining network has 455 nodes and 484 edges.
+Found cluster with score 4.531645569620257 and 158 nodes. Remaining network has 309 nodes and 296 edges.
+Found cluster with score 2.542857142857143 and 7 nodes. Remaining network has 304 nodes and 286 edges.
+Found cluster with score 2.8500000000000005 and 8 nodes. Remaining network has 296 nodes and 279 edges.
+Found cluster with score 2.0769230769230766 and 13 nodes. Remaining network has 290 nodes and 262 edges.
+Found cluster with score 2.0461538461538464 and 13 nodes. Remaining network has 283 nodes and 246 edges.
+Found cluster with score 1.6499999999999997 and 8 nodes. Remaining network has 281 nodes and 238 edges.
+Found cluster with score 1.9 and 4 nodes. Remaining network has 278 nodes and 234 edges.
+Found cluster with score 3.0000000000000004 and 9 nodes. Remaining network has 269 nodes and 226 edges.
+Found cluster with score 3.8666666666666667 and 6 nodes. Remaining network has 263 nodes and 221 edges.
+Found cluster with score 2.9999999999999996 and 18 nodes. Remaining network has 245 nodes and 204 edges.
+Found cluster with score 2.68 and 5 nodes. Remaining network has 242 nodes and 198 edges.
+Found cluster with score 1.8874999999999997 and 32 nodes. Remaining network has 219 nodes and 165 edges.
+Found cluster with score 1.8 and 6 nodes. Remaining network has 213 nodes and 160 edges.
+Found cluster with score 3.0571428571428574 and 7 nodes. Remaining network has 206 nodes and 148 edges.
+Found cluster with score 1.3999999999999997 and 6 nodes. Remaining network has 200 nodes and 143 edges.
+Found cluster with score 2.7600000000000007 and 5 nodes. Remaining network has 195 nodes and 137 edges.
+Found cluster with score 1.3 and 4 nodes. Remaining network has 191 nodes and 134 edges.
+Found cluster with score 1.9599999999999997 and 5 nodes. Remaining network has 186 nodes and 130 edges.
+Found cluster with score 2.6 and 5 nodes. Remaining network has 181 nodes and 124 edges.
+Found cluster with score 1.4000000000000001 and 4 nodes. Remaining network has 177 nodes and 120 edges.
+Found cluster with score 1.6857142857142857 and 7 nodes. Remaining network has 170 nodes and 114 edges.
+Found cluster with score 2.4 and 4 nodes. Remaining network has 166 nodes and 111 edges.
+Found cluster with score 2.8000000000000003 and 4 nodes. Remaining network has 162 nodes and 108 edges.
+Found cluster with score 1.7 and 4 nodes. Remaining network has 158 nodes and 105 edges.
+Found cluster with score 1.9600000000000002 and 5 nodes. Remaining network has 153 nodes and 101 edges.
+Found cluster with score 1.9333333333333333 and 3 nodes. Remaining network has 150 nodes and 99 edges.
+Found cluster with score 1.7666666666666666 and 12 nodes. Remaining network has 138 nodes and 88 edges.
+Found cluster with score 2.8 and 4 nodes. Remaining network has 134 nodes and 85 edges.
+Found cluster with score 2.2 and 4 nodes. Remaining network has 130 nodes and 82 edges.
+Found cluster with score 2.36 and 5 nodes. Remaining network has 125 nodes and 78 edges.
+Found cluster with score 2.0999999999999996 and 8 nodes. Remaining network has 117 nodes and 71 edges.
+Found cluster with score 1.5999999999999999 and 4 nodes. Remaining network has 113 nodes and 68 edges.
+Found cluster with score 1.2999999999999998 and 4 nodes. Remaining network has 109 nodes and 65 edges.
+Found cluster with score 1.3999999999999997 and 3 nodes. Remaining network has 106 nodes and 63 edges.
+Found cluster with score 1.7 and 4 nodes. Remaining network has 102 nodes and 60 edges.
+Found cluster with score 1.6666666666666667 and 3 nodes. Remaining network has 99 nodes and 58 edges.
+Found cluster with score 1.3999999999999997 and 3 nodes. Remaining network has 96 nodes and 56 edges.
+Found cluster with score 1.4 and 4 nodes. Remaining network has 92 nodes and 53 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 89 nodes and 51 edges.
+Found cluster with score 1.5999999999999999 and 4 nodes. Remaining network has 85 nodes and 48 edges.
+Found cluster with score 1.5999999999999999 and 4 nodes. Remaining network has 81 nodes and 45 edges.
+Found cluster with score 1.3999999999999997 and 3 nodes. Remaining network has 78 nodes and 43 edges.
+Found cluster with score 1.8 and 3 nodes. Remaining network has 75 nodes and 41 edges.
+Found cluster with score 1.5333333333333332 and 3 nodes. Remaining network has 72 nodes and 39 edges.
+Found cluster with score 1.3999999999999997 and 3 nodes. Remaining network has 69 nodes and 37 edges.
+Found cluster with score 1.3999999999999997 and 3 nodes. Remaining network has 66 nodes and 35 edges.
+Found cluster with score 1.3999999999999997 and 3 nodes. Remaining network has 63 nodes and 33 edges.
+Found cluster with score 1.9333333333333336 and 3 nodes. Remaining network has 60 nodes and 31 edges.
+Found cluster with score 1.3999999999999997 and 3 nodes. Remaining network has 57 nodes and 29 edges.
+Found cluster with score 1.3999999999999997 and 3 nodes. Remaining network has 54 nodes and 27 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 52 nodes and 26 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 50 nodes and 25 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 48 nodes and 24 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 46 nodes and 23 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 44 nodes and 22 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 42 nodes and 21 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 40 nodes and 20 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 38 nodes and 19 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 36 nodes and 18 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 34 nodes and 17 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 32 nodes and 16 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 30 nodes and 15 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 28 nodes and 14 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 26 nodes and 13 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 24 nodes and 12 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 22 nodes and 11 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 20 nodes and 10 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 18 nodes and 9 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 16 nodes and 8 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 14 nodes and 7 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 12 nodes and 6 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 10 nodes and 5 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 8 nodes and 4 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 6 nodes and 3 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 4 nodes and 2 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 2 nodes and 1 edges.
+Found cluster with score 1.2 and 2 nodes. Remaining network has 0 nodes and 0 edges.
+Found 27 clusters with at least 10 nodes and score higher than 2.0.
+Printing clusters... [ok]
+Generating regulators for all regulator types...
+
+Processing hPTMs regulators...
+  Regulator list: ./Preprocessing/hptms.txt
+  Data type: c (c=continuous, d=discrete)
+  Output prefix: Lemon_out/hPTMs
+
+LemonTree - Version 3.1.1
+-------------------------
+
+Parameters
+----------
+task:               regulators
+data_file:          Preprocessing/LemonPreprocessed_complete.txt
+reg_file:           ./Preprocessing/hptms.txt
+cluster_file:       Lemon_out/tight_clusters.txt
+output_file:        Lemon_out/hPTMs
+lambda:             0.1
+mu:                 0.0
+alpha:              0.1
+beta:               0.1
+num_runs:           1
+num_steps:          1100
+burn_in:            100
+sample_steps:       100
+score_gain:         0.0
+num_reg:            10
+Reading expression data... [ok]
+Number of genes in the data matrix: 1858
+Number of conditions in the data matrix: 98
+Number of missing values in the data matrix: 1858
+Total number of expression values: 182084
+Reading cluster file Lemon_out/tight_clusters.txt
+ [ok]
+Assigned genes: 2425
+Not assigned genes: 0
+Number of clusters: 27
+Reading candidate regulators... [ok]
+Found 157 regulators belonging to the geneset.
+0 of them are discrete
+0 regulators do not belong to the gene set
+dataMean: -3.617715236862517E-16
+dataSigma: 0.9948320067476087
+dataMin: -7.35234628227794
+dataMax: 3.94348353801568
+Gibbs sampling hierarchical trees...
+sampling module 0 timestamp: Fri May 29 11:49:12 CEST 2026
+sampling module 1 timestamp: Fri May 29 11:49:14 CEST 2026
+sampling module 2 timestamp: Fri May 29 11:49:15 CEST 2026
+sampling module 3 timestamp: Fri May 29 11:49:30 CEST 2026
+sampling module 4 timestamp: Fri May 29 11:49:33 CEST 2026
+sampling module 5 timestamp: Fri May 29 11:49:34 CEST 2026
+sampling module 6 timestamp: Fri May 29 11:49:35 CEST 2026
+sampling module 7 timestamp: Fri May 29 11:49:52 CEST 2026
+sampling module 8 timestamp: Fri May 29 11:49:52 CEST 2026
+sampling module 9 timestamp: Fri May 29 11:49:53 CEST 2026
+sampling module 10 timestamp: Fri May 29 11:49:54 CEST 2026
+sampling module 11 timestamp: Fri May 29 11:49:56 CEST 2026
+sampling module 12 timestamp: Fri May 29 11:50:02 CEST 2026
+sampling module 13 timestamp: Fri May 29 11:50:03 CEST 2026
+sampling module 14 timestamp: Fri May 29 11:50:08 CEST 2026
+sampling module 15 timestamp: Fri May 29 11:50:09 CEST 2026
+sampling module 16 timestamp: Fri May 29 11:50:09 CEST 2026
+sampling module 17 timestamp: Fri May 29 11:50:10 CEST 2026
+sampling module 18 timestamp: Fri May 29 11:50:10 CEST 2026
+sampling module 19 timestamp: Fri May 29 11:50:11 CEST 2026
+sampling module 20 timestamp: Fri May 29 11:50:13 CEST 2026
+sampling module 21 timestamp: Fri May 29 11:50:13 CEST 2026
+sampling module 22 timestamp: Fri May 29 11:50:14 CEST 2026
+sampling module 23 timestamp: Fri May 29 11:50:16 CEST 2026
+sampling module 24 timestamp: Fri May 29 11:50:19 CEST 2026
+sampling module 25 timestamp: Fri May 29 11:50:19 CEST 2026
+sampling module 26 timestamp: Fri May 29 11:50:20 CEST 2026
+done.
+Assigning regulators stochastically ...
+module: 0
+module: 1
+module: 2
+module: 3
+module: 4
+module: 5
+module: 6
+module: 7
+module: 8
+module: 9
+module: 10
+module: 11
+module: 12
+module: 13
+module: 14
+module: 15
+module: 16
+module: 17
+module: 18
+module: 19
+module: 20
+module: 21
+module: 22
+module: 23
+module: 24
+module: 25
+module: 26
+[ok]
+Printing regulator file Lemon_out/hPTMs.allreg.txt [ok]
+Printing regulator file Lemon_out/hPTMs.topreg.txt [ok]
+Printing random regulator file Lemon_out/hPTMs.randomreg.txt [ok]
+Writing xml file Lemon_out/hPTMs.xml.gz [ok]
+✅ Successfully generated hPTMs regulators (from ./Preprocessing/hptms.txt)
+
+Processing Metabolites regulators...
+  Regulator list: ./Preprocessing/metabolites.txt
+  Data type: c (c=continuous, d=discrete)
+  Output prefix: Lemon_out/Metabolites
+
+LemonTree - Version 3.1.1
+-------------------------
+
+Parameters
+----------
+task:               regulators
+data_file:          Preprocessing/LemonPreprocessed_complete.txt
+reg_file:           ./Preprocessing/metabolites.txt
+cluster_file:       Lemon_out/tight_clusters.txt
+output_file:        Lemon_out/Metabolites
+lambda:             0.1
+mu:                 0.0
+alpha:              0.1
+beta:               0.1
+num_runs:           1
+num_steps:          1100
+burn_in:            100
+sample_steps:       100
+score_gain:         0.0
+num_reg:            10
+Reading expression data... [ok]
+Number of genes in the data matrix: 1858
+Number of conditions in the data matrix: 98
+Number of missing values in the data matrix: 1858
+Total number of expression values: 182084
+Reading cluster file Lemon_out/tight_clusters.txt
+ [ok]
+Assigned genes: 2425
+Not assigned genes: 0
+Number of clusters: 27
+Reading candidate regulators... [ok]
+Found 701 regulators belonging to the geneset.
+0 of them are discrete
+0 regulators do not belong to the gene set
+dataMean: -3.617715236862517E-16
+dataSigma: 0.9948320067476087
+dataMin: -7.35234628227794
+dataMax: 3.94348353801568
+Gibbs sampling hierarchical trees...
+sampling module 0 timestamp: Fri May 29 11:50:42 CEST 2026
+sampling module 1 timestamp: Fri May 29 11:50:44 CEST 2026
+sampling module 2 timestamp: Fri May 29 11:50:45 CEST 2026
+sampling module 3 timestamp: Fri May 29 11:50:57 CEST 2026
+sampling module 4 timestamp: Fri May 29 11:51:00 CEST 2026
+sampling module 5 timestamp: Fri May 29 11:51:01 CEST 2026
+sampling module 6 timestamp: Fri May 29 11:51:02 CEST 2026
+sampling module 7 timestamp: Fri May 29 11:51:19 CEST 2026
+sampling module 8 timestamp: Fri May 29 11:51:19 CEST 2026
+sampling module 9 timestamp: Fri May 29 11:51:20 CEST 2026
+sampling module 10 timestamp: Fri May 29 11:51:21 CEST 2026
+sampling module 11 timestamp: Fri May 29 11:51:22 CEST 2026
+sampling module 12 timestamp: Fri May 29 11:51:29 CEST 2026
+sampling module 13 timestamp: Fri May 29 11:51:29 CEST 2026
+sampling module 14 timestamp: Fri May 29 11:51:34 CEST 2026
+sampling module 15 timestamp: Fri May 29 11:51:35 CEST 2026
+sampling module 16 timestamp: Fri May 29 11:51:35 CEST 2026
+sampling module 17 timestamp: Fri May 29 11:51:36 CEST 2026
+sampling module 18 timestamp: Fri May 29 11:51:36 CEST 2026
+sampling module 19 timestamp: Fri May 29 11:51:37 CEST 2026
+sampling module 20 timestamp: Fri May 29 11:51:38 CEST 2026
+sampling module 21 timestamp: Fri May 29 11:51:39 CEST 2026
+sampling module 22 timestamp: Fri May 29 11:51:40 CEST 2026
+sampling module 23 timestamp: Fri May 29 11:51:43 CEST 2026
+sampling module 24 timestamp: Fri May 29 11:51:46 CEST 2026
+sampling module 25 timestamp: Fri May 29 11:51:47 CEST 2026
+sampling module 26 timestamp: Fri May 29 11:51:47 CEST 2026
+done.
+Assigning regulators stochastically ...
+module: 0
+module: 1
+module: 2
+module: 3
+module: 4
+module: 5
+module: 6
+module: 7
+module: 8
+module: 9
+module: 10
+module: 11
+module: 12
+module: 13
+module: 14
+module: 15
+module: 16
+module: 17
+module: 18
+module: 19
+module: 20
+module: 21
+module: 22
+module: 23
+module: 24
+module: 25
+module: 26
+[ok]
+Printing regulator file Lemon_out/Metabolites.allreg.txt [ok]
+Printing regulator file Lemon_out/Metabolites.topreg.txt [ok]
+Printing random regulator file Lemon_out/Metabolites.randomreg.txt [ok]
+Writing xml file Lemon_out/Metabolites.xml.gz [ok]
+✅ Successfully generated Metabolites regulators (from ./Preprocessing/metabolites.txt)
+
+LemonTree post-clustering analysis completed successfully
+=== Files generated by post-clustering ===
+Lemon_out/tight_clusters.txt
+Lemon_out/hPTMs.allreg.txt
+Lemon_out/hPTMs.topreg.txt
+Lemon_out/hPTMs.randomreg.txt
+Lemon_out/Metabolites.allreg.txt
+Lemon_out/Metabolites.topreg.txt
+Lemon_out/Metabolites.randomreg.txt
+==========================================

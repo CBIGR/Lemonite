@@ -190,17 +190,27 @@ def collect_input_statistics(input_dir, regulator_configs, output_dir='.'):
         stats['files_found'].append(('Transcriptomics', os.path.basename(expr_file)))
         stats['data_types'].append('Transcriptomics')
         
-        df = safe_read_file(expr_file)
-        if df is not None:
-            # First column is usually gene names
-            stats['features_per_type']['Transcriptomics (genes)'] = {
-                'input': len(df),
-                'file': os.path.basename(expr_file)
-            }
-            # Count samples (columns minus gene column)
-            stats['samples'] = len(df.columns) - 1
-            print(f"[DEBUG] Expression file found: {expr_file}", file=sys.stderr)
-            print(f"[DEBUG] DataFrame shape: {df.shape}, Columns: {len(df.columns)}, Samples: {stats['samples']}", file=sys.stderr)
+        # Read the header only for columns, and count data rows directly, so the
+        # gene count is not truncated by safe_read_file's 10k-row cap.
+        header_df = pd.read_csv(expr_file, sep='\t', nrows=0)
+        cols = list(header_df.columns)
+        try:
+            with open(expr_file) as _fh:
+                n_genes = sum(1 for _ in _fh) - 1
+        except Exception:
+            n_genes = len(safe_read_file(expr_file))
+        # Non-sample identifier columns that may precede the sample columns
+        # (an expression matrix may carry both a symbol and an ensembl_gene_id column).
+        id_cols = {'symbol', 'ensembl_gene_id', 'Gene_symbol', 'gene_symbol',
+                   'GeneID', 'gene', 'Gene', 'Symbol', 'genes'}
+        n_id_cols = sum(1 for c in cols if c in id_cols) or 1
+        stats['features_per_type']['Transcriptomics (genes)'] = {
+            'input': n_genes,
+            'file': os.path.basename(expr_file)
+        }
+        stats['samples'] = len(cols) - n_id_cols
+        print(f"[DEBUG] Expression file found: {expr_file}", file=sys.stderr)
+        print(f"[DEBUG] Columns: {len(cols)}, id-cols: {n_id_cols}, Genes: {n_genes}, Samples: {stats['samples']}", file=sys.stderr)
     
     # Find metadata file - include DESeq_groups.txt from preprocessing
     meta_patterns = [
@@ -321,13 +331,12 @@ def collect_preprocessing_statistics(output_dir, run_id):
     # Read preprocessed expression file
     expr_file = os.path.join(preproc_dir, 'LemonPreprocessed_expression.txt')
     if os.path.exists(expr_file):
-        df = safe_read_file(expr_file)
-        if df is not None:
-            # First column is 'symbol', rest are samples
-            # Subtract 1 for header line
-            stats['genes_retained'] = len(df)
-            stats['genes_after_hvg'] = len(df)
-            stats['input_features']['Genes'] = len(df)
+        # Count genes by lines (minus header) to avoid safe_read_file's 10k-row cap.
+        n_genes = count_lines(expr_file) - 1
+        if n_genes >= 0:
+            stats['genes_retained'] = n_genes
+            stats['genes_after_hvg'] = n_genes
+            stats['input_features']['Genes'] = n_genes
     
     # Read TF activity file
     tfa_file = os.path.join(preproc_dir, 'tfs.txt')
@@ -636,8 +645,11 @@ def collect_network_statistics(output_dir, run_id, regulator_configs):
         if os.path.exists(module_overview_file):
             df = safe_read_file(module_overview_file, sep='\t')  # Tab-separated
             if df is not None:
-                # Count TFs, Metabolites, Proteins regulators
-                for reg_type in ['TFs', 'Metabolites', 'Proteins']:
+                # Count regulators for the actual configured types (not a fixed list),
+                # so e.g. Gains/Losses are not silently dropped.
+                reg_type_names = [c['prefix'] for c in regulator_configs] if regulator_configs \
+                    else ['TFs', 'Metabolites', 'Proteins']
+                for reg_type in reg_type_names:
                     col_name = f'{reg_type}_regulators'
                     if col_name in df.columns:
                         all_regs = set()
@@ -653,10 +665,13 @@ def collect_network_statistics(output_dir, run_id, regulator_configs):
                                 'modules_with_regulators': modules_with_regs
                             }
     
-    # Fallback: Count regulators from viewer_dir files
-    if not stats['regulators_per_type'] and viewer_dir:
+    # Supplement from viewer_dir files: fill in any configured type not already
+    # captured above (e.g. when Module_Overview.csv lacks its column).
+    if viewer_dir:
         for config in regulator_configs:
             prefix = config['prefix']
+            if prefix in stats['regulators_per_type']:
+                continue
             reg_file = os.path.join(viewer_dir, f'{prefix}.selected_regs_list.txt')
             if os.path.exists(reg_file):
                 df = safe_read_file(reg_file, header=None)
@@ -776,13 +791,17 @@ def collect_enrichment_statistics(output_dir, run_id):
     if enrich_dir:
         stats['enrichment_performed'] = True
         
-        # Collect enrichment data across ALL method directories (EnrichR + GSEA)
+        # Prefer GSEA results over EnrichR when both are present
+        gsea_dir = os.path.join(enrich_dir, 'Modules_gsea')
+        walk_root = gsea_dir if os.path.isdir(gsea_dir) else enrich_dir
+        
+        # Collect enrichment data (GSEA preferred, EnrichR as fallback)
         csv_count = 0
         all_modules = set()
         all_terms = {}  # term -> count
-        for root, dirs, files in os.walk(enrich_dir):
-            # Allow up to 3 levels deep to find CSVs in Enrichment/Modules_enrichr/*.csv
-            depth = root[len(enrich_dir):].count(os.sep)
+        for root, dirs, files in os.walk(walk_root):
+            # Allow up to 3 levels deep to find CSVs in Enrichment/Modules_gsea/*.csv
+            depth = root[len(walk_root):].count(os.sep)
             if depth > 2:
                 dirs[:] = []  # Don't recurse deeper
                 continue
@@ -827,12 +846,10 @@ def collect_enrichment_statistics(output_dir, run_id):
         all_items = os.listdir(enrich_dir)
         has_enrichr = any('enrichr' in str(d).lower() for d in all_items if os.path.isdir(os.path.join(enrich_dir, d)))
         has_gsea = any('gsea' in str(d).lower() for d in all_items if os.path.isdir(os.path.join(enrich_dir, d)))
-        if has_enrichr and has_gsea:
-            stats['method'] = 'EnrichR + GSEA'
-        elif has_enrichr or 'EnrichR' in str(enrich_dir):
-            stats['method'] = 'EnrichR'
-        elif has_gsea or 'GSEA' in str(enrich_dir):
+        if has_gsea:
             stats['method'] = 'GSEA'
+        elif has_enrichr:
+            stats['method'] = 'EnrichR'
         else:
             stats['method'] = 'EnrichR/GSEA' if csv_count > 0 else None
     
@@ -948,7 +965,8 @@ def collect_module_rankings(output_dir, run_id):
             if 'Module_genes' in df.columns:
                 df['n_genes'] = df['Module_genes'].apply(lambda x: len(str(x).split('|')) if pd.notna(x) else 0)
                 df_sorted = df.sort_values('n_genes', ascending=False)
-                rankings['by_size'] = df_sorted.head(20)[['Module', 'n_genes', 'Coherence']].to_dict('records')
+                size_cols = [c for c in ['Module', 'n_genes', 'Coherence'] if c in df_sorted.columns]
+                rankings['by_size'] = df_sorted.head(20)[size_cols].to_dict('records')
                 del df_sorted
                 gc.collect()
             
@@ -1979,7 +1997,37 @@ def generate_html_report(all_stats, output_path):
     mean_coh_str = f"{mean_coh:.3f}" if isinstance(mean_coh, (int, float)) else 'N/A'
     median_coh = network_stats.get('median_coherence', 'N/A')
     median_coh_str = f"{median_coh:.3f}" if isinstance(median_coh, (int, float)) else 'N/A'
-    
+
+    # Module-overview HTML links: only offer files that were actually produced
+    # (the interactive_module_network / comprehensive variants are optional).
+    _report_dir = os.path.dirname(os.path.abspath(output_path))
+    _mo_dir = os.path.join(_report_dir, 'LemonTree', 'Module_Overview')
+    def _mo_exists(fn):
+        return os.path.exists(os.path.join(_mo_dir, fn))
+    def _mo_button(fn, color, label):
+        if not _mo_exists(fn):
+            return ''
+        return (f'<a href="LemonTree/Module_Overview/{fn}" target="_blank" '
+                f'style="display:inline-block; padding:0.6rem 1.2rem; background:{color}; color:white; '
+                f'border-radius:6px; text-decoration:none; font-weight:600;">{label}</a>')
+    mo_buttons_html = "\n                ".join(b for b in [
+        _mo_button('Module_Overview_Comprehensive.html', '#2E7D32', '📊 Open Comprehensive Report'),
+        _mo_button('interactive_module_network.html', '#1565C0', '🌐 Open Network Visualization'),
+        _mo_button('interactive_module_network_movable.html', '#6A1B9A', '🖱️ Open Draggable Network'),
+    ] if b) or '<em>No interactive module-overview files were produced for this run.</em>'
+    _mo_file_defs = [
+        ('Module_Overview_Comprehensive.html', '📊 Combined report: interactive network + regulator rankings'),
+        ('interactive_module_network.html', '🌐 Interactive module-regulator network (standalone)'),
+        ('interactive_module_network_movable.html', '🖱️ Draggable network visualization'),
+        ('regulator_rankings.html', '📋 Regulator rankings table'),
+    ]
+    mo_files_rows_html = "\n                ".join(
+        f'<tr><td><span class="badge badge-success">Overview</span></td>'
+        f'<td><a href="LemonTree/Module_Overview/{fn}" target="_blank">LemonTree/Module_Overview/{fn}</a></td>'
+        f'<td>{desc}</td></tr>'
+        for fn, desc in _mo_file_defs if _mo_exists(fn)
+    )
+
     content_parts.append(f"""
     <section class="section" id="network-section">
         <div class="section-header">
@@ -2056,21 +2104,7 @@ def generate_html_report(all_stats, output_path):
             <h3>🌐 Interactive Module Network</h3>
             <p>Visualize module-regulator interactions, functional clusters, and enrichment annotations.</p>
             <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:0.75rem;">
-                <a href="LemonTree/Module_Overview/Module_Overview_Comprehensive.html" target="_blank"
-                   style="display:inline-block; padding:0.6rem 1.2rem; background:#2E7D32; color:white;
-                          border-radius:6px; text-decoration:none; font-weight:600;">
-                    📊 Open Comprehensive Report
-                </a>
-                <a href="LemonTree/Module_Overview/interactive_module_network.html" target="_blank"
-                   style="display:inline-block; padding:0.6rem 1.2rem; background:#1565C0; color:white;
-                          border-radius:6px; text-decoration:none; font-weight:600;">
-                    🌐 Open Network Visualization
-                </a>
-                <a href="LemonTree/Module_Overview/interactive_module_network_movable.html" target="_blank"
-                   style="display:inline-block; padding:0.6rem 1.2rem; background:#6A1B9A; color:white;
-                          border-radius:6px; text-decoration:none; font-weight:600;">
-                    🖱️ Open Draggable Network
-                </a>
+                {mo_buttons_html}
             </div>
         </div>
     </section>
@@ -2144,9 +2178,7 @@ def generate_html_report(all_stats, output_path):
                 <tr><td><span class="badge badge-info">Enrichment</span></td><td>LemonTree/Enrichment/</td><td>Pathway enrichment results (GO, KEGG, Reactome)</td></tr>
                 <tr><td><span class="badge badge-info">PKN</span></td><td>LemonTree/PKN_Evaluation/</td><td>Validation against prior knowledge network</td></tr>
                 <tr><td><span class="badge badge-success">Overview</span></td><td>LemonTree/Module_Overview/</td><td>Interactive module overview and summary tables</td></tr>
-                <tr><td><span class="badge badge-success">Overview</span></td><td><a href="LemonTree/Module_Overview/Module_Overview_Comprehensive.html" target="_blank">LemonTree/Module_Overview/Module_Overview_Comprehensive.html</a></td><td>📊 Combined report: interactive network + regulator rankings</td></tr>
-                <tr><td><span class="badge badge-success">Overview</span></td><td><a href="LemonTree/Module_Overview/interactive_module_network.html" target="_blank">LemonTree/Module_Overview/interactive_module_network.html</a></td><td>🌐 Interactive module-regulator network (standalone)</td></tr>
-                <tr><td><span class="badge badge-success">Overview</span></td><td><a href="LemonTree/Module_Overview/interactive_module_network_movable.html" target="_blank">LemonTree/Module_Overview/interactive_module_network_movable.html</a></td><td>🖱️ Draggable network visualization</td></tr>
+                {mo_files_rows_html}
                 <tr><td><span class="badge badge-success">Report</span></td><td>Lemonite_Summary_Report.html</td><td>This summary report</td></tr>
             </table>
         </div>

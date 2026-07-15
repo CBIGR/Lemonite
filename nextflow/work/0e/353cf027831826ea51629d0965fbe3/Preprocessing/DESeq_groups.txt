@@ -1,0 +1,98 @@
+Cell_line	Origin	FAB	MITO_subtype	Risk_classification
+Kg1a_6	KG-1a	adult	No data	MITOlow	intermediate
+FKH1_2	FKH-1	adult	M4	MITOlow	adverse
+FKH1_3	FKH-1	adult	M4	MITOlow	adverse
+FKH1_4	FKH-1	adult	M4	MITOlow	adverse
+FKH1_5	FKH-1	adult	M4	MITOlow	adverse
+FKH1_6	FKH-1	adult	M4	MITOlow	adverse
+HL60_1	HL-60	adult	M2	MITOlow	adverse
+HL60_2	HL-60	adult	M2	MITOlow	adverse
+HL60_3	HL-60	adult	M2	MITOlow	adverse
+HL60_4	HL-60	adult	M2	MITOlow	adverse
+HL60_5	HL-60	adult	M2	MITOlow	adverse
+HL60_6	HL-60	adult	M2	MITOlow	adverse
+KASUMI1_1	KASUMI-1	adult	M2	MITOlow	adverse
+OCIAML6_5	OCI-AML6	adult	M4	MITOlow	adverse
+KASUMI1_3	KASUMI-1	adult	M2	MITOlow	adverse
+KASUMI1_4	KASUMI-1	adult	M2	MITOlow	adverse
+KASUMI1_5	KASUMI-1	adult	M2	MITOlow	adverse
+KASUMI1_6	KASUMI-1	adult	M2	MITOlow	adverse
+Kg1a_1	KG-1a	adult	No data	MITOlow	intermediate
+Kg1a_2	KG-1a	adult	No data	MITOlow	intermediate
+Kg1a_3	KG-1a	adult	No data	MITOlow	intermediate
+Kg1a_4	KG-1a	adult	No data	MITOlow	intermediate
+FKH1_1	FKH-1	adult	M4	MITOlow	adverse
+ME1_1	ME-1	adult	No data	MITOlow	favorable
+ME1_2	ME-1	adult	No data	MITOlow	favorable
+ME1_4	ME-1	adult	No data	MITOlow	favorable
+ME1_5	ME-1	adult	No data	MITOlow	favorable
+ME1_6	ME-1	adult	No data	MITOlow	favorable
+MOLM13_1	MOLM-13	adult	M5	MITOhigh	adverse
+MOLM13_4	MOLM-13	adult	M5	MITOhigh	adverse
+MOLM13_6	MOLM-13	adult	M5	MITOhigh	adverse
+MOLM16_1	MOLM-16	adult	M0	MITOlow	adverse
+MOLM16_2	MOLM-16	adult	M0	MITOlow	adverse
+MOLM16_3	MOLM-16	adult	M0	MITOlow	adverse
+MOLM16_4	MOLM-16	adult	M0	MITOlow	adverse
+MOLM16_5	MOLM-16	adult	M0	MITOlow	adverse
+MOLM16_6	MOLM-16	adult	M0	MITOlow	adverse
+MONOMAC6_1	MONO-MAC-6	adult	M5	MITOlow	adverse
+MONOMAC6_2	MONO-MAC-6	adult	M5	MITOlow	adverse
+MONOMAC6_3	MONO-MAC-6	adult	M5	MITOlow	adverse
+MONOMAC6_4	MONO-MAC-6	adult	M5	MITOlow	adverse
+MONOMAC6_5	MONO-MAC-6	adult	M5	MITOlow	adverse
+MONOMAC6_6	MONO-MAC-6	adult	M5	MITOlow	adverse
+MUTZ3_1	MUTZ-3	adult	M4	MITOhigh	adverse
+MUTZ3_2	MUTZ-3	adult	M4	MITOhigh	adverse
+MUTZ3_3	MUTZ-3	adult	M4	MITOhigh	adverse
+MUTZ3_4	MUTZ-3	adult	M4	MITOhigh	adverse
+MUTZ3_5	MUTZ-3	adult	M4	MITOhigh	adverse
+MUTZ3_6	MUTZ-3	adult	M4	MITOhigh	adverse
+MV411_1	MV4-11	pediatric	M5	MITOhigh	adverse
+MV411_2	MV4-11	pediatric	M5	MITOhigh	adverse
+MV411_3	MV4-11	pediatric	M5	MITOhigh	adverse
+MV411_4	MV4-11	pediatric	M5	MITOhigh	adverse
+MV411_5	MV4-11	pediatric	M5	MITOhigh	adverse
+MV411_6	MV4-11	pediatric	M5	MITOhigh	adverse
+OCIAML3_1	OCI-AML3	adult	M4	MITOhigh	favorable
+OCIAML3_2	OCI-AML3	adult	M4	MITOhigh	favorable
+OCIAML3_3	OCI-AML3	adult	M4	MITOhigh	favorable
+OCIAML3_4	OCI-AML3	adult	M4	MITOhigh	favorable
+OCIAML3_5	OCI-AML3	adult	M4	MITOhigh	favorable
+OCIAML3_6	OCI-AML3	adult	M4	MITOhigh	favorable
+OCIAML5_1	OCI-AML5	adult	M4	MITOhigh	adverse
+OCIAML5_3	OCI-AML5	adult	M4	MITOhigh	adverse
+OCIAML5_5	OCI-AML5	adult	M4	MITOhigh	adverse
+OCIAML5_6	OCI-AML5	adult	M4	MITOhigh	adverse
+OCIAML6_1	OCI-AML6	adult	M4	MITOlow	adverse
+OCIAML6_2	OCI-AML6	adult	M4	MITOlow	adverse
+OCIAML6_3	OCI-AML6	adult	M4	MITOlow	adverse
+OCIAML6_4	OCI-AML6	adult	M4	MITOlow	adverse
+OCIAML6_6	OCI-AML6	adult	M4	MITOlow	adverse
+OCIM1_1	OCI-M1	adult	M6	MITOlow	intermediate
+OCIM1_3	OCI-M1	adult	M6	MITOlow	intermediate
+OCIM1_4	OCI-M1	adult	M6	MITOlow	intermediate
+OCIM1_6	OCI-M1	adult	M6	MITOlow	intermediate
+SHI1_1	SHI-1	adult	M5	MITOlow	adverse
+SHI1_2	SHI-1	adult	M5	MITOlow	adverse
+SHI1_3	SHI-1	adult	M5	MITOlow	adverse
+SHI1_4	SHI-1	adult	M5	MITOlow	adverse
+SHI1_5	SHI-1	adult	M5	MITOlow	adverse
+KASUMI1_2	KASUMI-1	adult	M2	MITOlow	adverse
+SKM1_1	SKM-1	adult	M5	MITOlow	adverse
+SKM1_2	SKM-1	adult	M5	MITOlow	adverse
+SKM1_3	SKM-1	adult	M5	MITOlow	adverse
+SKM1_4	SKM-1	adult	M5	MITOlow	adverse
+SKM1_5	SKM-1	adult	M5	MITOlow	adverse
+SKM1_6	SKM-1	adult	M5	MITOlow	adverse
+THP1_1	THP-1	pediatric	M5	MITOhigh	adverse
+THP1_2	THP-1	pediatric	M5	MITOhigh	adverse
+THP1_4	THP-1	pediatric	M5	MITOhigh	adverse
+THP1_5	THP-1	pediatric	M5	MITOhigh	adverse
+THP1_6	THP-1	pediatric	M5	MITOhigh	adverse
+UCSDAML1_1	USCD-AML1	adult	No data	MITOlow	adverse
+UCSDAML1_2	USCD-AML1	adult	No data	MITOlow	adverse
+UCSDAML1_3	USCD-AML1	adult	No data	MITOlow	adverse
+UCSDAML1_4	USCD-AML1	adult	No data	MITOlow	adverse
+UCSDAML1_5	USCD-AML1	adult	No data	MITOlow	adverse
+UCSDAML1_6	USCD-AML1	adult	No data	MITOlow	adverse

@@ -1,0 +1,11 @@
+# Python bytecode
+__pycache__/
+*.pyc
+
+# PBS / job scheduler output
+*.o[0-9]*
+*.e[0-9]*
+
+# Local virtualenvs
+venv/
+venv_*/

@@ -163,97 +163,103 @@ class GEMRetriever(DatabaseRetriever):
         pattern = re.compile(regex_pattern)
         return [element for element in lst if pattern.match(element)]
     
-    def get_genes_for_chebi(self, chebi_id: str) -> List[str]:
+    def _get_gene_reaction_map(self, chebi_id: str) -> Dict[str, set]:
         """
-        Get genes within pathway distance from a metabolite.
-        
+        Core lookup: return {gene_symbol: {reaction_names}} for a ChEBI ID.
+
         Parameters:
         -----------
-        chebi_id : str
+        chebi_id : str or numeric
             ChEBI ID (numeric only, without 'CHEBI:' prefix)
-        
+
         Returns:
         --------
-        list of str
-            Gene symbols within specified distance
+        dict mapping gene symbol -> set of reaction names
         """
-        # Ensure graph is initialized
         self._initialize_graph()
-        
+
         if pd.isna(chebi_id):
-            return []
-        
-        # Convert to string
+            return {}
+
         try:
             chebi_id = str(int(float(chebi_id)))
         except (ValueError, TypeError):
-            return []
-        
-        # Check if ChEBI is in model
+            return {}
+
         if chebi_id not in self.chebi_to_name:
-            return []
-        
+            return {}
+
         metabolite = self.chebi_to_name[chebi_id]
-        
-        # Find metabolite variants with compartment suffixes
         metabolites = self._find_metabolites_with_regex(self.metabolites_full_name, metabolite)
-        
+
         if not metabolites:
-            return []
-        
-        # Collect genes from all compartment variants
-        genes = set()
-        
+            return {}
+
+        gene_reactions: Dict[str, set] = {}
+
         for node in metabolites:
             if node not in self.graph:
                 continue
-            
+
             try:
-                # Create ego graph (subgraph within distance)
                 ego_graph = nx.ego_graph(self.graph, node, radius=self.distance, undirected=True)
-                
-                # Collect all reactions in ego graph
+
                 reactions_within_distance = {
                     data['reaction']
                     for u, v, data in ego_graph.edges(data=True)
                     if 'reaction' in data
                 }
-                
-                # Get genes for these reactions
+
                 for reaction in reactions_within_distance:
                     if reaction not in self.reaction_to_genes:
                         continue
-                    
+
                     gene_str = self.reaction_to_genes[reaction]
                     if not gene_str:
                         continue
-                    
-                    # Parse genes from reaction association
+
                     for gene in gene_str.split():
                         if gene in self.ensembl_mappings:
-                            genes.add(self.ensembl_mappings[gene])
-            
+                            symbol = self.ensembl_mappings[gene]
+                            gene_reactions.setdefault(symbol, set()).add(reaction)
+
             except (nx.NetworkXError, nx.NodeNotFound):
                 continue
             except Exception as e:
                 self.logger.warning(f"Unexpected error for ChEBI {chebi_id}, node {node}: {e}")
                 continue
-        
-        return list(genes)
+
+        return gene_reactions
+
+    def get_genes_for_chebi(self, chebi_id: str) -> List[str]:
+        """
+        Get gene symbols within pathway distance from a metabolite.
+
+        Parameters:
+        -----------
+        chebi_id : str
+            ChEBI ID (numeric only, without 'CHEBI:' prefix)
+
+        Returns:
+        --------
+        list of str
+            Gene symbols within specified distance
+        """
+        return list(self._get_gene_reaction_map(chebi_id).keys())
     
     def get_interactions(self, metabolites: List[Dict]) -> pd.DataFrame:
         """
         Get GEM interactions for metabolites.
-        
+
         Parameters:
         -----------
         metabolites : list of dict
             Metabolite records with 'HMDB_ID' and 'ChEBI'
-        
+
         Returns:
         --------
         pd.DataFrame
-            Columns: ['HMDB_ID', 'Gene', 'Source']
+            Columns: ['HMDB_ID', 'Gene', 'Source', 'url', 'reaction_id']
         """
         # Try cache first
         cached = self.load_cache()
@@ -272,21 +278,20 @@ class GEMRetriever(DatabaseRetriever):
         for metabolite in metabolites:
             hmdb_id = metabolite.get('HMDB_ID')
             chebi_id = metabolite.get('ChEBI')
-            
-            if pd.isna(chebi_id):
-                continue
-            
-            genes = self.get_genes_for_chebi(chebi_id)
-            
-            if genes:
+
+            gene_rxn_map = self._get_gene_reaction_map(chebi_id)
+
+            if gene_rxn_map:
                 metabolites_with_genes += 1
-                for gene in genes:
+                for gene, reactions in gene_rxn_map.items():
                     interactions.append({
                         'HMDB_ID': hmdb_id,
                         'Gene': gene,
-                        'Source': self.db_name
+                        'Source': self.db_name,
+                        'url': config.GEM_PAPER_URL,
+                        'reaction_id': ';'.join(sorted(reactions))
                     })
-        
+
         df = pd.DataFrame(interactions)
         df = df.drop_duplicates(subset=['HMDB_ID', 'Gene'])
         

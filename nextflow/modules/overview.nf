@@ -125,6 +125,7 @@ process MODULE_OVERVIEW_INTERACTIVE {
     # Always pass n_clusters for canonical MegaGO top_30 clustering
     args="\$args --n_clusters ${n_clusters}"
     args="\$args --organism ${organism}"
+    args="\$args --run_id '${run_id}'"
     echo "Functional clustering: canonical MegaGO top_30, n_clusters=${n_clusters}"
     
     # Add PKN file for edge categorization if available
@@ -178,7 +179,7 @@ process MODULE_OVERVIEW_INTERACTIVE {
     mkdir -p Module_Overview
     mkdir -p Module_Overview/top_30
     touch Module_Overview/Module_Overview.csv
-    touch Module_Overview/interactive_module_network.html
+    touch Module_Overview/Module_Overview.xlsx
     touch Module_Overview/interactive_module_network_movable.html
     touch Module_Overview/module_network_edges.txt
     touch Module_Overview/module_network_node_attributes.txt

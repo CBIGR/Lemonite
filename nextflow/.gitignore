@@ -1,4 +1,6 @@
 *.sif
 .singularity/
-.nextflow/cache/
-.nextflow/log.*
+.nextflow*
+.work/*
+test_dataset/results/
+*.sandbox/

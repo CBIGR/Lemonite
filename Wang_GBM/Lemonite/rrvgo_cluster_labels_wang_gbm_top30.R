@@ -1,6 +1,6 @@
 source("/home/borisvdm/repo/LemonIte/Wang_GBM/Lemonite/rrvgo_cluster_labels.R")
 
-enrichment_path <- "/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum/Enrichment/Modules_enrichr/Enrichr_all_enriched_pathways_up_per_module.csv"
+enrichment_path <- "/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum/Enrichment/Modules_gsea/module_members/Gsea_all_enriched_pathways_up_per_module.csv"
 cluster_path <- "/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum/Networks/megaGO_exploration/cluster_assignments_comparison.csv"
 output_dir <- "/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum/Networks/megaGO_exploration/top_30"
 

@@ -725,6 +725,26 @@ def main():
         print(f"Loaded {len(ppis)} PPI interactions")
     else:
         print("No PPI interactions loaded - visualization will skip PPI connections")
+
+    # Load HumanNet functional interactions
+    humannet_ints, humannet_metadata = load_ppi_interactions(viewer_files_dir, 'HumanNet_interactions.mvf')
+    if not humannet_ints.empty:
+        print(f"Loaded {len(humannet_ints)} HumanNet functional interactions")
+    else:
+        print("No HumanNet interactions file found or file is empty")
+
+    # Load phospho interactions (optional; same mvf format as metabolite KG). Guarded so
+    # normal runs without a phospho mvf are unaffected.
+    phospho_ints = pd.DataFrame(columns=['Module', 'Genes', 'Phosphosite'])
+    phospho_metadata = {}
+    _phospho_mvf = os.path.join(viewer_files_dir, 'phospho_LemoniteKG_interactions.mvf')
+    if os.path.exists(_phospho_mvf):
+        _pf, phospho_metadata = load_metabolite_interactions(viewer_files_dir, 'phospho_LemoniteKG_interactions.mvf')
+        if not _pf.empty:
+            phospho_ints = _pf.rename(columns={'Metabolite': 'Phosphosite'})
+            print(f"Loaded {len(phospho_ints)} phospho-gene interaction rows")
+    else:
+        print("No phospho interactions mvf found - phospho panel will be skipped")
     
     # Process each module
     modules_processed = 0
@@ -830,72 +850,94 @@ def main():
                                  fontsize=optimal_fontsize, fontweight='bold')
                 ax.set_title(title, fontsize=14, fontweight='bold', pad=8)
                 
-                # Add PPI interactions for expression data (on the left side)
-                if title == "Expression Data" and not ppis.empty:
-                    module_ppis = ppis[ppis['Module'] == str(module_number)]
-                    
-                    if len(module_ppis) > 0:
-                        # Get the position of the main heatmap
-                        pos = ax.get_position()
-                        
-                        # Create a new axis on the left side for PPI connections
-                        ppi_width = 0.03  # Width of the PPI connection area
-                        ax_ppi = fig.add_axes([
-                            pos.x0 - ppi_width - 0.01,  # Position to the left of heatmap
-                            pos.y0,
-                            ppi_width,
-                            pos.height
-                        ])
-                        
-                        ax_ppi.set_xlim(0, 1)
-                        ax_ppi.set_ylim(0, len(labels))
-                        ax_ppi.axis('off')
-                        
-                        # Get PPI color from metadata (default is blue)
-                        ppi_color = ppi_metadata.get('COLOR', 'blue').lower()
-                        
-                        # Draw lines connecting genes that have PPIs
-                        ppi_count = 0
+                # Add PPI and HumanNet arc interactions for expression data (on the left side)
+                if title == "Expression Data":
+                    import matplotlib.path as mpath
+                    import matplotlib.patches as mpatches
+                    pos = ax.get_position()
+
+                    # Collect PPI pairs
+                    valid_ppi_pairs = []
+                    if not ppis.empty:
+                        module_ppis = ppis[ppis['Module'] == str(module_number)]
                         for _, ppi_row in module_ppis.iterrows():
                             gene_pair = ppi_row['GenePair'].split('|')
                             if len(gene_pair) == 2:
-                                gene1, gene2 = gene_pair[0].strip(), gene_pair[1].strip()
-                                
-                                # Find positions of genes in the labels
+                                g1, g2 = gene_pair[0].strip(), gene_pair[1].strip()
                                 try:
-                                    idx1 = list(labels).index(gene1)
-                                    idx2 = list(labels).index(gene2)
-                                    
-                                    # Draw a curved line connecting the two genes
-                                    # Y coordinates are centered on each row (0.5 offset)
-                                    y1 = len(labels) - idx1 - 0.5
-                                    y2 = len(labels) - idx2 - 0.5
-                                    
-                                    # Draw the connection line
-                                    ax_ppi.plot([0.2, 0.8], [y1, y2], 
-                                              color=ppi_color, 
-                                              linewidth=1.5, 
-                                              alpha=0.7,
-                                              solid_capstyle='round')
-                                    
-                                    # Add small dots at connection points
-                                    ax_ppi.plot([0.2], [y1], 'o', 
-                                              color=ppi_color, 
-                                              markersize=3, 
-                                              alpha=0.8)
-                                    ax_ppi.plot([0.8], [y2], 'o', 
-                                              color=ppi_color, 
-                                              markersize=3, 
-                                              alpha=0.8)
-                                    
-                                    ppi_count += 1
-                                    
+                                    i1 = list(labels).index(g1)
+                                    i2 = list(labels).index(g2)
+                                    valid_ppi_pairs.append((g1, g2, i1, i2))
                                 except ValueError:
-                                    # Gene not found in labels (might have been filtered)
                                     continue
-                        
-                        if ppi_count > 0:
-                            print(f"  Added {ppi_count} PPI connections to visualization")
+
+                    # Collect HumanNet pairs
+                    valid_hn_pairs = []
+                    if not humannet_ints.empty:
+                        module_humannet = humannet_ints[humannet_ints['Module'] == str(module_number)]
+                        for _, hn_row in module_humannet.iterrows():
+                            gene_pair = hn_row['GenePair'].split('|')
+                            if len(gene_pair) == 2:
+                                g1, g2 = gene_pair[0].strip(), gene_pair[1].strip()
+                                try:
+                                    i1 = list(labels).index(g1)
+                                    i2 = list(labels).index(g2)
+                                    valid_hn_pairs.append((g1, g2, i1, i2))
+                                except ValueError:
+                                    continue
+
+                    # Draw a single shared panel for both PPI and HumanNet arcs
+                    all_pairs = valid_ppi_pairs + valid_hn_pairs
+                    if all_pairs:
+                        max_distance = max(abs(p[3] - p[2]) for p in all_pairs)
+                        n_all = len(all_pairs)
+                        panel_width = max(0.06, min(0.35,
+                            0.03 + max_distance / len(labels) * 0.25 + n_all * 0.008))
+
+                        ax_arc = fig.add_axes([
+                            pos.x0 - panel_width - 0.005,
+                            pos.y0,
+                            panel_width,
+                            pos.height
+                        ])
+                        ax_arc.set_xlim(0, 1)
+                        ax_arc.set_ylim(0, len(labels))
+                        ax_arc.axis('off')
+
+                        def draw_arcs(ax_panel, pairs, color, n_total):
+                            """Draw arcs for a list of (g1, g2, i1, i2) tuples onto ax_panel."""
+                            sorted_pairs = sorted(pairs, key=lambda p: abs(p[3] - p[2]), reverse=True)
+                            for arc_idx, (g1, g2, i1, i2) in enumerate(sorted_pairs):
+                                y1 = len(labels) - i1 - 0.5
+                                y2 = len(labels) - i2 - 0.5
+                                dist = abs(i2 - i1)
+                                base_depth = dist / max(len(labels), 1)
+                                offset = arc_idx / max(n_total, 1) * 0.3
+                                ctrl_x = max(0.0, 0.95 - base_depth * 1.5 - offset)
+                                mid_y = (y1 + y2) / 2
+                                verts = [(1.0, y1), (ctrl_x, mid_y), (1.0, y2)]
+                                codes = [mpath.Path.MOVETO, mpath.Path.CURVE3, mpath.Path.CURVE3]
+                                path = mpath.Path(verts, codes)
+                                patch = mpatches.PathPatch(
+                                    path, facecolor='none', edgecolor=color,
+                                    linewidth=1.8, alpha=0.7, capstyle='round'
+                                )
+                                ax_panel.add_patch(patch)
+
+                        # Draw HumanNet first (behind), then PPIs on top
+                        if valid_hn_pairs:
+                            hn_color = humannet_metadata.get('COLOR', 'saddlebrown').lower()
+                            if hn_color in ('orange', 'darkorange'):
+                                hn_color = 'saddlebrown'
+                            draw_arcs(ax_arc, valid_hn_pairs, hn_color, len(valid_hn_pairs))
+                            print(f"  Added {len(valid_hn_pairs)} HumanNet connections to visualization")
+
+                        if valid_ppi_pairs:
+                            ppi_color = ppi_metadata.get('COLOR', 'darkgreen').lower()
+                            if ppi_color in ('blue', 'darkblue'):
+                                ppi_color = 'darkgreen'
+                            draw_arcs(ax_arc, valid_ppi_pairs, ppi_color, len(valid_ppi_pairs))
+                            print(f"  Added {len(valid_ppi_pairs)} PPI connections to visualization")
                 
                 # Add metabolite interactions for expression data
                 if title == "Expression Data" and not metabo.empty:
@@ -937,7 +979,35 @@ def main():
                             clip_on=False
                         )
                         ax_meta.set_xticklabels(metabolites, rotation=90, fontsize=10, fontweight='bold')
-            
+
+                # Add phospho interactions panel (mirror metabolite panel, offset further right)
+                if title == "Expression Data" and not phospho_ints.empty:
+                    p_module_data = phospho_ints[phospho_ints['Module'] == str(module_number)]
+                    psites = p_module_data['Phosphosite'].unique()
+                    if len(psites) > 0:
+                        p_match = np.zeros((len(labels), len(psites)))
+                        for i, gene in enumerate(labels):
+                            for j, ps in enumerate(psites):
+                                gene_lists = p_module_data[p_module_data['Phosphosite'] == ps]['Genes'].values
+                                if any(gene in gl.split('|') for gl in gene_lists):
+                                    p_match[i, j] = 1
+                        p_color = phospho_metadata.get('COLOR', 'orange').lower()
+                        pos = ax.get_position()
+                        num_cols_main = numeric_df.shape[1]
+                        cell_width_main = pos.width / num_cols_main
+                        n_metab = len(metabo[metabo['Module'] == str(module_number)]['Metabolite'].unique()) if not metabo.empty else 0
+                        phospho_panel_width = cell_width_main * len(psites)
+                        # offset: past the metabolite panel if present
+                        x_start = pos.x1 + 0.10 + (cell_width_main * n_metab) + (0.04 if n_metab else 0)
+                        ax_phos = fig.add_axes([x_start, pos.y0, phospho_panel_width, pos.height])
+                        sns.heatmap(
+                            p_match,
+                            cmap=LinearSegmentedColormap.from_list('custom_phos', ['white', p_color]),
+                            cbar=False, xticklabels=psites, yticklabels=False,
+                            linewidths=0.5, linecolor='black', ax=ax_phos, square=False, clip_on=False
+                        )
+                        ax_phos.set_xticklabels(psites, rotation=90, fontsize=8, fontweight='bold')
+
             # Annotation bars - one per metadata type
             for anno_idx, (ann_type, ann_data) in enumerate(selected_metadata.items()):
                 # Get color mapping for this annotation type

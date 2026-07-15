@@ -21,13 +21,14 @@ nextflow run main.nf \
   -profile test,singularity
 ```
 
-If you want to run the bundled test dataset without Singularity, use the existing `LemonIte` conda environment:
-
-```bash
-conda activate LemonIte
-nextflow run main.nf \
-  -profile conda,test
-```
+> **Building on HPC (e.g. UGent kyukon):** these nodes run an unprivileged
+> Apptainer without a `subuid` mapping, so `apptainer build` cannot create a
+> `.sif` (it falls back to `proot`, whose `ptrace` is blocked → `ptrace(TRACEME):
+> Operation not permitted`). Use `./build-singularity_parallel.sh` instead, which
+> builds a **sandbox directory** (`lemontree-pipeline_v1.0.0_parallel.sandbox`)
+> and runs from it. Apptainer/Nextflow execute a sandbox directory exactly like a
+> `.sif`; point `process.container` at the sandbox path. See
+> [WIKI.md](WIKI.md#building-on-hpc-sandbox-containers) for details.
 
 ### Standard Run
 
@@ -50,7 +51,6 @@ nextflow run main.nf \
 | `singularity` | Recommended default execution profile |
 | `hpc` | Cluster resource overrides, usually combined with `singularity` |
 | `local` | Local executor settings |
-| `docker` | Docker execution profile |
 | `test` | Bundled smoke-test dataset |
 | `dev` | Development bind mounts for host scripts and PKN resources |
 

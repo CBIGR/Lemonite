@@ -33,7 +33,7 @@ ANALYSIS_METHOD <- "GSEA"  # Change this to choose your analysis method
 # Options: "all_genes" (all genes in expression matrix),
 #          "module_members" (genes that are members of any module),
 #          "specific_module_genes" (genes in the specific module being analyzed)
-GSEA_SCOPE <- "all_genes"
+GSEA_SCOPE <- "module_members"
 
 # Base directory - UPDATE THIS PATH for IBD Lloyd-Price data
 base_dir <- '/home/borisvdm/Documents/PhD/Lemonite/Lloyd-Price_IBD/results/LemonTree/'
@@ -63,7 +63,7 @@ fold <- percentile  # Changed fold parameter to percentile
 n_modules_name <- '87'  # This should match the output from LemonTree_to_network.ipynb
 coherence_threshold <- 0.5
 organism <- org.Hs.eg.db
-n_threads <- 5
+n_threads <- 8
 set.seed(1234)
 
 # File paths (these should match LemonTree_to_network.ipynb outputs)
@@ -497,8 +497,8 @@ cat("- Update enrichment_up_file path to point to your chosen analysis results\n
 cat("- Update enrichment_down_file path accordingly\n")
 
 if (ANALYSIS_METHOD == "GSEA") {
-  cat("- Use: enrichment_up_file = base_dir + '/Enrichment/Modules_gsea/Gsea_top_10_enriched_pathways_up_per_module.csv'\n")
-  cat("- Use: enrichment_down_file = base_dir + '/Enrichment/Modules_gsea/Gsea_top_10_enriched_pathways_down_per_module.csv'\n")
+  cat("- Use: enrichment_up_file = base_dir + '/Enrichment/Modules_gsea/Gsea_all_enriched_pathways_up_per_module.csv'\n")
+  cat("- Use: enrichment_down_file = base_dir + '/Enrichment/Modules_gsea/Gsea_all_enriched_pathways_down_per_module.csv'\n")
 } else if (ANALYSIS_METHOD == "EnrichR") {
   cat("- Use: enrichment_up_file = base_dir + '/Enrichment/Modules_enrichr/Enrichr_all_enriched_pathways_up_per_module.csv' for top_30 or larger downstream term sets\n")
   cat("- Use: enrichment_down_file = base_dir + '/Enrichment/Modules_enrichr/Enrichr_all_enriched_pathways_down_per_module.csv'\n")

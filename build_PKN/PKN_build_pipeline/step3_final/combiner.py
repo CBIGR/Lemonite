@@ -40,20 +40,22 @@ def combine_networks() -> pd.DataFrame:
     
     logger.info(f"  Metabolite-gene PKN:")
     logger.info(f"    Interactions: {len(metabolite_gene)}")
-    logger.info(f"    Unique metabolites: {metabolite_gene['HMDB_ID'].nunique()}")
+    # Support both 'Metabolite' (new format) and 'HMDB_ID' (legacy format)
+    metabolite_col = 'Metabolite' if 'Metabolite' in metabolite_gene.columns else 'HMDB_ID'
+    logger.info(f"    Unique metabolites: {metabolite_gene[metabolite_col].nunique()}")
     logger.info(f"    Unique genes: {metabolite_gene['Gene'].nunique()}")
-    
+
     # Rename columns to standardized format
     metabolite_gene = metabolite_gene.rename(columns={
-        'HMDB_ID': 'Node1',
+        metabolite_col: 'Node1',
         'Gene': 'Node2'
     })
     metabolite_gene['Type'] = 'metabolite-gene'
-    
+
     # Load PPI network
     logger.info(f"\nLoading PPI network from: {config.PPI_NETWORK}")
     ppi = pd.read_csv(config.PPI_NETWORK, sep='\t')
-    
+
     # Rename columns to standardized format (handle both GeneA/GeneB and Node1/Node2)
     if 'GeneA' in ppi.columns and 'GeneB' in ppi.columns:
         ppi = ppi.rename(columns={'GeneA': 'Node1', 'GeneB': 'Node2'})
@@ -63,17 +65,16 @@ def combine_networks() -> pd.DataFrame:
     logger.info(f"  PPI network:")
     logger.info(f"    Interactions: {len(ppi)}")
     logger.info(f"    Unique genes: {len(set(ppi['Node1']) | set(ppi['Node2']))}")
-    # Select common columns
-    metabolite_gene_subset = metabolite_gene[['Node1', 'Node2', 'Type', 'Source']]
-    ppi_subset = ppi[['Node1', 'Node2', 'Type', 'Source']]
-    
-    # Add combined_score column if present in PPI
-    if 'combined_score' in ppi.columns:
-        metabolite_gene_subset['combined_score'] = None
-        ppi_subset = ppi[['Node1', 'Node2', 'Type', 'Source', 'combined_score']]
-    
-    # Vertically concatenate
-    combined = pd.concat([metabolite_gene_subset, ppi_subset], ignore_index=True)
+
+    # Concatenate, preserving optional columns (url, reaction_id, combined_score) with NaN fill
+    combined = pd.concat([metabolite_gene, ppi], ignore_index=True, sort=False)
+
+    # Keep only the standardized output columns
+    output_cols = ['Node1', 'Node2', 'Type', 'Source']
+    for opt_col in ['url', 'reaction_id', 'combined_score']:
+        if opt_col in combined.columns:
+            output_cols.append(opt_col)
+    combined = combined[output_cols]
     
     # Get statistics
     metabolite_nodes = set(combined[combined['Type'] == 'metabolite-gene']['Node1'])

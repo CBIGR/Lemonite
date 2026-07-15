@@ -13,14 +13,16 @@ Lemonite is a DSL2 Nextflow workflow for transcriptomics-metabolomics centered m
 
 At a high level, the published workflow is:
 
-1. Preprocessing and optional TF activity inference.
-2. Parallel LemonTree clustering runs.
-3. Post-clustering consolidation and regulator assignment.
-4. Network generation and regulator filtering.
-5. Subnetwork graph generation and PKN-based evaluation.
-6. Module heatmap generation.
-7. Enrichment analysis.
-8. Module overview assembly and top-level HTML summary report.
+1. **Parameter logging** — records the full effective parameter set to `pipeline_parameters_log.txt`.
+2. **Preprocessing and TFA** — normalises the expression matrix (DESeq2 or pre-scaled), selects the top variable features, optionally infers transcription-factor activity (TFA) via decoupleR/CollecTRI, and writes LemonTree-ready input files.
+3. **Parallel LemonTree clustering** — runs `n_clusters` independent Gibbs-sampling instances in parallel, each producing its own cluster assignment.
+4. **Post-clustering** — consolidates the parallel cluster runs into tight (high-coherence) clusters and assigns regulators (TFs, metabolites, and any other configured regulator types) to each module.
+5. **Network generation and subnetwork graphs** — filters modules by coherence threshold, selects top regulators per module, builds the regulator→target network, exports Cytoscape-compatible files, and renders PNG subnetwork graphs via pygraphviz.
+6. **PKN-based evaluation** — compares the data-driven network against the Lemonite prior-knowledge network (PKN) to categorise edges as known or novel, and generates a metabolite-gene knowledge-graph MVF file.
+7. **Module heatmaps** — generates per-module expression heatmaps for all omics layers, annotated with the selected metadata columns.
+8. **Pathway enrichment analysis** — runs EnrichR and/or GSEA on module gene sets and regulator-target sets for all configured regulator types.
+9. **Module overview** — builds the canonical MegaGO + rrvgo functional overview: BP enrichment terms are clustered into `overview_n_clusters` semantic groups and each module is labelled, producing a module-expression heatmap and CSV outputs.
+10. **Summary report** — assembles all results into a self-contained `Lemonite_Summary_Report.html` with interactive network visualisations and key statistics.
 
 ## Requirements
 
@@ -28,7 +30,7 @@ At a high level, the published workflow is:
 
 - Nextflow `>= 23.04.0`
 - Java 11+
-- Singularity runtime is the primary execution path in this repository
+- Singularity (required — the only supported execution backend)
 
 ### Hardware
 
@@ -41,12 +43,11 @@ The pipeline defines these profiles in `nextflow.config` and `conf/*.config`:
 
 | Profile | Purpose | Notes |
 | --- | --- | --- |
-| `singularity` | Recommended default | Uses `lemontree-pipeline_v1.0.0.sif` and Singularity bind mounts |
-| `docker` | Docker execution | Available, but repository scripts and examples focus on Singularity |
-| `local` | Lightweight local execution | Uses the local executor with smaller defaults |
-| `hpc` | Resource overrides for clusters | Typically combined with `singularity`, for example `-profile singularity,hpc` |
-| `test` | Bundled smoke test dataset | Sets `input_dir` to `nextflow/test_dataset` and reduces runtime |
-| `dev` | Development bind mounts | Intended for rapid iteration with host-mounted scripts and PKN files |
+| `singularity` | Required execution profile | Uses `lemontree-pipeline_v1.0.0.sif`; must be specified for every run |
+| `local` | Lightweight local execution | Uses the local executor with reduced resource defaults |
+| `hpc` | Resource overrides for clusters | Combine with `singularity`: `-profile singularity,hpc` |
+| `test` | Bundled smoke-test dataset | Sets `input_dir` to `nextflow/test_dataset` and reduces cluster count; always combine with `singularity` |
+| `dev` | Development bind mounts | Bind-mounts the host `scripts/` and `PKN/` directories so script changes are tested without rebuilding the image; combine with `singularity` |
 
 ## Installation
 
@@ -59,13 +60,66 @@ chmod +x nextflow
 sudo mv nextflow /usr/local/bin/
 ```
 
-Build the container image used by the `singularity` profile:
+Build the Singularity container image:
 
 ```bash
 ./build-singularity.sh
 ```
 
-The build script creates `lemontree-pipeline_v1.0.0.sif` in the `nextflow/` directory.
+The build script creates `lemontree-pipeline_v1.0.0.sif` in the `nextflow/` directory. All pipeline runs require this image via the `singularity` profile.
+
+### Building on HPC (sandbox containers)
+
+On many HPC systems — including UGent's kyukon/VSC clusters — `apptainer build`
+**cannot produce a `.sif` image**. These clusters run an *unprivileged* Apptainer
+(no setuid `starter-suid`) and user accounts have no `/etc/subuid` mapping, so
+`--fakeroot` falls back to `proot` for the final `squashfs` step. On the RHEL9
+worker nodes `proot`'s `ptrace` is blocked by seccomp, and the build aborts with:
+
+```
+proot error: ptrace(TRACEME): Operation not permitted
+FATAL:   While performing build: while creating squashfs: ... mksquashfs command failed
+```
+
+This affects every route through `apptainer build`'s SIF/squashfs step
+(`PROOT_NO_SECCOMP=1`, `--userns`, sandbox→sif conversion, and pointing Apptainer
+at the system `mksquashfs` all fail identically).
+
+**Workaround — build and run a sandbox directory.** A `--sandbox` build produces a
+plain root-filesystem *directory* instead of a squashfs `.sif`, so it never invokes
+`proot`. Apptainer (and therefore Nextflow) can `exec` a sandbox directory exactly
+like a `.sif`. Use the parallel build script, which does this automatically:
+
+```bash
+./build-singularity_parallel.sh
+```
+
+It:
+
+1. Builds with `apptainer build --fakeroot --fix-perms --sandbox …` on the node's
+   local `/tmp` (UGent recommends building on local disk, not scratch).
+2. Relocates the finished sandbox to the `nextflow/` directory on scratch using
+   `tar --xattrs` (a plain `mv`/`cp` fails on the fakeroot-owned `apt/.../partial`
+   directories and the `user.rootlesscontainers` ownership-faking xattrs).
+3. Produces `lemontree-pipeline_v1.0.0_parallel.sandbox/` (a ~7 GB directory) and
+   smoke-tests it (`R --version`, `python3 --version`).
+
+Point the container at the sandbox **directory path** (no `.sif` suffix):
+
+```groovy
+// conf/singularity.config or a dataset-specific config
+process.container = "/abs/path/to/nextflow/lemontree-pipeline_v1.0.0_parallel.sandbox"
+```
+
+Notes:
+
+- Run it like any other container: `nextflow run main.nf -profile singularity …`.
+- A sandbox is a directory of many small files; keep it on scratch (not `$VSC_HOME`).
+- The proper long-term fix is to ask HPC support to add `/etc/subuid` and
+  `/etc/subgid` entries for your account, which makes native `--fakeroot` `.sif`
+  builds work again.
+- `git lfs` is required to fetch the `PKN/` and `scripts/` data the build copies in
+  — on UGent HPC load it with `module load git-lfs/3.6.1` before `git lfs pull`.
 
 ## Running the Pipeline
 
@@ -76,7 +130,7 @@ nextflow run main.nf \
   -profile test,singularity
 ```
 
-This uses the bundled dataset in `test_dataset/` and a smaller cluster count from `conf/test.config`.
+This uses the bundled dataset in `test_dataset/` and a reduced cluster count (`n_clusters = 5`, `top_n_genes = 1000`) from `conf/test.config`. The `singularity` profile is mandatory; the Singularity image (`lemontree-pipeline_v1.0.0.sif`) must be built before running.
 
 ### Standard Run
 
@@ -90,7 +144,6 @@ nextflow run main.nf \
   --coherence_threshold 0.6 \
   --regulator_selection_method percentage \
   --top_n_percent_regulators 2.0 \
-  --metadata_columns diagnosis \
   -profile singularity \
   -resume
 ```
@@ -107,7 +160,7 @@ nextflow run main.nf \
   --coherence_threshold 0.6 \
   --regulator_selection_method fold_per_module \
   --regulator_fold_cutoff 2.0 \
-  --metadata_columns diagnosis,Survival,Sex \
+  --metadata_columns "diagnosis,Survival,Sex" \
   -profile singularity \
   --max_cpus 6 \
   -resume
@@ -232,6 +285,38 @@ Important behavior:
 - When `--organism mouse` is used, the preprocessing script automatically swaps the default TF file to `lovering_TF_list_mouse.txt`.
 - Discrete regulators marked with `:d` are passed through without the continuous-data transformations used for abundance matrices.
 
+### Choosing a Preprocessing Script
+
+The pipeline ships two preprocessing scripts that are selected via `--preprocessing_type`:
+
+| `preprocessing_type` | Script | Use when |
+| --- | --- | --- |
+| `rna` *(default)* | `Preprocessing_TFA_RNA.R` | Input is raw RNA-seq count data. DESeq2 is used for normalisation and variance-stabilising transformation. |
+| `proteomics` | `Preprocessing_TFA_Proteomics.R` | Input is pre-scaled continuous data (proteomics, phospho-proteomics, multi-omics). No DESeq2 is applied; top variable features are selected by variance. |
+
+Both scripts:
+
+- Select the top `--top_n_genes` most variable features.
+- Optionally run **TF Activity inference** via decoupleR/CollecTRI when `--perform_tfa true`.
+- Produce **PCA plots** (per omics layer) in `LemonTree/Preprocessing/`.
+- Write identical output files consumed by the rest of the pipeline:
+  - `LemonPreprocessed_expression.txt` — primary expression matrix for clustering
+  - `LemonPreprocessed_complete.txt` — all omics layers concatenated
+  - `TFA_consensus.txt` + `TFA/*.pdf` — TFA results (when `perform_tfa = true`)
+  - `DESeq_groups.txt`, `name_mapping.tsv`
+  - `hptms.txt`, `metabolites.txt` — regulator name lists for post-clustering
+
+**When to disable TFA** (`--perform_tfa false`): use this for proteomics or multi-omics datasets where no RNA-level TF expression is available (i.e., you cannot infer TF activity from the measured features). TFA will still run on proteomics data if transcription factors are present in the dataset.
+
+**Example** — running the proteomics mode:
+
+```bash
+nextflow run main.nf \
+  --preprocessing_type proteomics \
+  --perform_tfa false \
+  -c /path/to/your.config
+```
+
 ### Custom Prior Network for TFA
 
 There is no dedicated pipeline parameter for a prior network at the Nextflow level. The preprocessing module instead auto-detects a custom TF prior network by file name inside `data/`.
@@ -278,16 +363,19 @@ It is used for:
 
 | Parameter | Default | Notes |
 | --- | --- | --- |
+| `--preprocessing_type` | `rna` | Selects the preprocessing script: `rna` (DESeq2 + TFA, for RNA-seq counts) or `proteomics` (pre-scaled data, no DESeq2) |
 | `--top_n_genes` | `5000` | Number of highly variable genes retained |
-| `--perform_tfa` | `true` | Enables TF activity inference |
-| `--use_omics_specific_scaling` | `true` | Uses transcriptomics-specific and metabolomics-style scaling |
-| `--gene_annotation_file` | `null` | Optional offline annotation TSV for HPC/no-internet setups |
-| `--deseq_contrast1` | `diagnosis` | Main metadata grouping column |
-| `--design_formula` | `~ diagnosis` | DESeq2 design formula |
-| `--metadata_columns` | `diagnosis` | Metadata columns retained for downstream use |
-| `--heatmap_metadata_cols` | `null` | Optional override for heatmap annotations |
-| `--expression_col` | `count` | Expression value column label used by scripts |
-| `--sample_id_col` | `Sample_ID` | Sample identifier column in metadata |
+| `--perform_tfa` | `true` | Enables TF activity inference (works for both preprocessing types) |
+| `--use_omics_specific_scaling` | `true` | Pareto scaling for metabolomics/lipidomics; z-score scaling for transcriptomics. Set `false` to force z-score for all layers (legacy behaviour). |
+| `--gene_annotation_file` | `null` | Path to a pre-downloaded BioMart annotation TSV. Required on HPC nodes without internet access. |
+| `--metabolomics_labels_file` | `null` | Optional path to a metabolite name→ID mapping TSV/CSV. Overrides `data/metabolomics_name_map.csv` when provided. |
+| `--deseq_contrast1` | `diagnosis` | Main metadata grouping column, used for DESeq2 and PCA colouring |
+| `--design_formula` | `~ diagnosis` | DESeq2 design formula; adjust for confounders, e.g. `"~ batch + diagnosis"` |
+| `--metadata_columns` | `diagnosis` | Comma-separated metadata columns retained for downstream visualisations and heatmap annotations |
+| `--heatmap_metadata_cols` | `null` | Optional override specifying which metadata columns appear on heatmaps (defaults to `metadata_columns`) |
+| `--expression_col` | `count` | Column name holding expression values in the input matrix |
+| `--sample_id_col` | `Sample_ID` | Sample identifier column in the metadata file |
+| `--stop_after_network` | `false` | When `true`, the pipeline exits after network generation and subnetwork graphs (steps 1–5), skipping enrichment, heatmaps, overview, and the summary report. Useful for quick network inspection. |
 
 ### Clustering and Regulator Parameters
 
@@ -305,13 +393,14 @@ It is used for:
 
 | Parameter | Default | Notes |
 | --- | --- | --- |
-| `--enrichment_method` | `EnrichR` | Allowed values: `EnrichR`, `GSEA`, `both`, `auto` |
-| `--enrichr_libraries` | configured list | Default EnrichR libraries from `nextflow.config` |
-| `--prioritize_by_expression` | `true` | Enables module prioritization from expression differences |
-| `--overview_n_clusters` | `5` | Number of canonical MegaGO clusters in the overview |
-| `--pkn_network` | `nextflow/PKN/Lemonite_PKN.tsv` | Prior knowledge network used for edge categorization and evaluation |
+| `--enrichment_method` | `EnrichR` | Allowed values: `EnrichR`, `GSEA`, `both`. `auto` is treated as `both`. EnrichR requires internet access; use `GSEA` for offline runs. |
+| `--enrichr_libraries` | `GO_Biological_Process_2025,GO_Molecular_Function_2025,GO_Cellular_Component_2025,KEGG_2021_Human,Reactome_Pathways_2024` | Comma-separated EnrichR library names |
+| `--prioritize_by_expression` | `true` | Ranks modules by differential expression magnitude in the overview |
+| `--overview_n_clusters` | `5` | Number of canonical MegaGO functional clusters shown in the module overview |
+| `--interactive_overview` | `false` | When `true`, additionally generates interactive HTML network visualisations in `Module_Overview/` |
+| `--pkn_network` | `PKN/Lemonite_PKN.tsv` | Prior-knowledge network TSV used for edge categorisation (known vs. novel) and PKN evaluation |
 
-The overview stage now always uses one canonical workflow: select `BP` terms from a single enrichment source, keep the top `30` terms per module, cluster modules with MegaGO when available, and label each cluster with `rrvgo`. When both EnrichR and GSEA outputs are present, the overview prefers EnrichR and falls back to GSEA only when EnrichR outputs are absent.
+The overview stage uses a fixed canonical workflow: it selects `GO Biological Process` terms from a single enrichment source, retains the top 30 terms per module, clusters modules semantically with MegaGO (when available), and labels each cluster with rrvgo. When both EnrichR and GSEA outputs are present, the overview prefers EnrichR and falls back to GSEA only when EnrichR outputs are absent. Set `--interactive_overview true` to also produce interactive HTML network files.
 
 ### Advanced Cluster and Network Knobs
 
@@ -320,15 +409,17 @@ These are present in `nextflow.config` and logged by the pipeline, but are not p
 | Parameter | Default | Purpose |
 | --- | --- | --- |
 | `--use_deseq_priors` | `true` | Use DESeq2 priors during module discovery |
-| `--min_cluster_size` | `10` | Minimum cluster size |
-| `--tight_clusters_only` | `false` | Restrict to tight clusters only |
-| `--max_n_iterations` | `1000` | Maximum clustering iterations |
-| `--min_regulator_size` | `3` | Minimum regulators per module |
-| `--max_regulator_size` | `100` | Maximum regulators per module |
-| `--min_module_size` | `10` | Minimum module size for network generation |
-| `--min_targets` | `3` | Minimum targets per regulator |
-| `--min_expression_fold_threshold` | `1.5` | Threshold used in network filtering |
-| `--max_pvalue_threshold` | `0.05` | Threshold used in network filtering |
+| `--min_cluster_size` | `10` | Minimum number of genes a cluster must have |
+| `--tight_clusters_only` | `false` | Restrict all downstream analysis to tight (high co-occurrence) clusters only |
+| `--lemontree_tight_min_weight` | `0.25` | Minimum co-occurrence weight for a module to be called a tight cluster (0.0–1.0) |
+| `--max_n_iterations` | `1000` | Maximum Gibbs-sampling iterations per clustering run |
+| `--random_seed` | `42` | Base random seed; each parallel clustering run adds its index to this value |
+| `--min_regulator_size` | `3` | Minimum number of regulators a module must have to be included in the network |
+| `--max_regulator_size` | `100` | Maximum regulators per module (excess regulators are ranked and trimmed) |
+| `--min_module_size` | `10` | Minimum module size (in genes) for network generation |
+| `--min_targets` | `3` | Minimum number of targets a regulator must have to be retained in the network |
+| `--min_expression_fold_threshold` | `1.5` | Minimum expression fold-change used when filtering network edges |
+| `--max_pvalue_threshold` | `0.05` | Maximum p-value threshold for network edge inclusion |
 
 ## Output Structure
 
@@ -427,7 +518,11 @@ If you run mouse data with `--organism human`, the default TF list and enrichmen
 
 ### Development Mode
 
-`-profile singularity,dev` bind-mounts the host `scripts/` and `PKN/` directories into the container so script changes can be tested without rebuilding the image.
+`-profile singularity,dev` bind-mounts the host `scripts/` and `PKN/` directories into the container so script changes can be tested without rebuilding the image. Each module's process block already checks for host-side scripts before falling back to the container path, so changes in `scripts/` take effect immediately.
+
+### Singularity is the Only Supported Runtime
+
+Docker support has been removed from this pipeline. All runs must use `-profile singularity` (optionally combined with `hpc`, `local`, or `dev`). Build the image once with `./build-singularity.sh` and reuse it across runs.
 
 ## Citation
 

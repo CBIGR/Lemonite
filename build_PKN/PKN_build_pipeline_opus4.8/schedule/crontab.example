@@ -1,0 +1,19 @@
+# =============================================================================
+# Example crontab entries for the monthly PKN rebuild.
+# Install with:  crontab -e   (then paste the relevant line and adjust paths)
+# Inspect with:  crontab -l
+# =============================================================================
+
+# --- Option A: local / standalone server -------------------------------------
+# Run at 03:00 on the 1st of every month, logging to a rotating file.
+0 3 1 * *  /path/to/PKN_build_pipeline_opus4.8/schedule/run_monthly.sh >> /path/to/pkn_cron.log 2>&1
+
+# --- Option B: HPC (PBS/Torque, e.g. VSC Ghent) ------------------------------
+# The actual compute runs inside the PBS job; cron on the login node only
+# submits it. Run at 03:00 on the 1st of every month.
+# 0 3 1 * *  cd /path/to/PKN_build_pipeline_opus4.8 && qsub submit_pkn_hpc.sh >> /path/to/pkn_qsub.log 2>&1
+
+# Notes:
+#  * --resume (used inside run_monthly.sh) makes re-runs safe and incremental.
+#  * If a run hits the HPC walltime, the next monthly attempt — or a manual
+#    re-submit — finishes it, because completed databases are checkpointed.

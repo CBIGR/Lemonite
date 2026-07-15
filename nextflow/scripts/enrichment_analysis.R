@@ -441,7 +441,7 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
       p <- dotplot(gsea_obj, showCategory = 10, split = ".sign") + 
         facet_grid(.~.sign) + 
         theme(axis.text.y = element_text(size = 7))
-      ggsave(filename = filename, plot = p, width = 8, height = 6, dpi = 600)
+      ggsave(filename = filename, plot = p, width = 8, height = 6, dpi = 300)
     }, silent = TRUE)
   }
 
@@ -591,17 +591,6 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
   if (file.exists(down_file)) {
     cat("[OK] GSEA down results file created successfully. Size:", file.size(down_file), "bytes\n")
     cat("[OK] GSEA down results:", nrow(top_pathways_df_down), "entries\n")
-  }
-  
-  # Verify files were created
-  up_file <- file.path(output_dir, "Gsea_top_10_enriched_pathways_up_per_module.csv")
-  down_file <- file.path(output_dir, "Gsea_top_10_enriched_pathways_down_per_module.csv")
-  
-  if (file.exists(up_file)) {
-    cat("GSEA up results file created. Size:", file.size(up_file), "bytes\n")
-  }
-  if (file.exists(down_file)) {
-    cat("GSEA down results file created. Size:", file.size(down_file), "bytes\n")
   }
 
   cat("GSEA Analysis completed!\n")

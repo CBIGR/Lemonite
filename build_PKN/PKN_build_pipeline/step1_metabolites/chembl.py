@@ -37,6 +37,13 @@ class ChEMBLRetriever(APIRetriever):
         # Suppress chEMBL client logs
         logging.getLogger("chembl_webresource_client").setLevel(logging.WARNING)
     
+    def get_url_for_metabolite(self, metabolite: Dict) -> str:
+        """Return ChEMBL compound page URL."""
+        chembl_id = metabolite.get('ChEMBL_id')
+        if chembl_id and str(chembl_id).lower() not in ('none', 'na', '') and pd.notna(chembl_id):
+            return f'https://www.ebi.ac.uk/chembl/compound_report_card/{chembl_id}'
+        return ''
+
     @retry_api_call(db_name='chEMBL')
     def fetch_single(self, metabolite: Dict) -> List[str]:
         """

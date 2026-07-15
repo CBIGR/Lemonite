@@ -69,7 +69,15 @@ def load_hmdb_metabolites(xml_path: str) -> List[Dict]:
         smiles = metabolite.find('hmdb:smiles', ns)
         if smiles is not None:
             record['SMILES'] = smiles.text
-        
+
+        # ChEBI ID (needed by GEM and IntAct retrievers)
+        chebi = metabolite.find('hmdb:chebi_id', ns)
+        record['ChEBI'] = chebi.text if chebi is not None else None
+
+        # PubChem ID (needed by STITCH retriever)
+        pubchem = metabolite.find('hmdb:pubchem_compound_id', ns)
+        record['PubChem'] = pubchem.text if pubchem is not None else None
+
         if 'HMDB_ID' in record:
             metabolites.append(record)
     

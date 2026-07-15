@@ -116,7 +116,11 @@ class APIRetriever(DatabaseRetriever):
     @abstractmethod
     def fetch_single(self, metabolite: Dict) -> List[str]:
         pass
-    
+
+    def get_url_for_metabolite(self, metabolite: Dict) -> str:
+        """Return a provenance URL for a metabolite. Override in subclasses."""
+        return ''
+
     def _get_checkpoint_file(self) -> str:
         """Return path for the checkpoint file used for resume."""
         if self.cache_file:
@@ -204,11 +208,13 @@ class APIRetriever(DatabaseRetriever):
                 try:
                     genes = future.result()
                     if genes is not None:
+                        url = self.get_url_for_metabolite(metabolite)
                         for gene in genes:
                             results.append({
                                 'HMDB_ID': hmdb_id,
                                 'Gene': gene,
-                                'Source': self.db_name
+                                'Source': self.db_name,
+                                'url': url
                             })
                 except Exception as e:
                     self.logger.error(f"Failed to process {hmdb_id}: {e}")

@@ -110,9 +110,17 @@ class BioGRIDRetriever(LocalFileRetriever):
         
         # Add HMDB_ID
         df['HMDB_ID'] = df['InChIKey'].map(inchikey_to_hmdb)
-        
+
+        # Generate provenance URL
+        df['url'] = df.apply(
+            lambda row: f"https://thebiogrid.org/chemical/{row['BioGRID_ID']}/{row['Chemical_Name']}.html"
+            if pd.notna(row['BioGRID_ID']) and pd.notna(row['Chemical_Name'])
+            else '',
+            axis=1
+        )
+
         # Select final columns
-        result = df[['HMDB_ID', 'Gene', 'Source']].copy()
+        result = df[['HMDB_ID', 'Gene', 'Source', 'url']].copy()
         
         self.logger.info(f"Found {len(result)} BioGRID interactions for {result['HMDB_ID'].nunique()} metabolites")
         

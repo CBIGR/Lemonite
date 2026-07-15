@@ -21,7 +21,7 @@ params.organism = 'human'
 // Compute the final run_id - either user provided or auto-generated
 def method_suffix = params.regulator_selection_method == "percentage" ? "top${params.top_n_percent_regulators}pct" :
                     "fold${params.regulator_fold_cutoff}x"
-def auto_run_id = "${params.top_n_genes}HVG_coherence${params.coherence_threshold}_${method_suffix}_clusters${params.n_clusters}"
+def auto_run_id = "${params.top_n_genes}HVG_coherence${params.coherence_threshold}_${method_suffix}_clusters${params.n_clusters}_minW${params.lemontree_tight_min_weight}"
 params.computed_run_id = (params.run_id && params.run_id != "") ? params.run_id : auto_run_id
 
 // Input validation
@@ -161,7 +161,8 @@ workflow {
     POST_CLUSTERING(
         PREPROCESSING_TFA.out.lemontree_inputs,
         clustered_data,
-        run_id_ch
+        run_id_ch,
+        data_ch
     )
     
     // Step 3b: Network generation and filtering
@@ -177,7 +178,8 @@ workflow {
         POST_CLUSTERING.out.preprocessing_files,
         run_id_ch
     )
-    
+
+    if (!params.stop_after_network) {
     // Step 4: PKN evaluation
     PKN_EVALUATION(
         NETWORK_GENERATION.out.all_regulator_targets.mix(NETWORK_GENERATION.out.main_network).collect(),
@@ -238,6 +240,7 @@ workflow {
         run_id_ch,
         params.regulator_types
     )
+    } // end if (!params.stop_after_network)
 }
 
 workflow.onComplete {

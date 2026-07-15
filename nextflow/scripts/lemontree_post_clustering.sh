@@ -9,6 +9,7 @@ REGULATOR_TYPES=$1
 LEMONTREE_JAR=$2
 WORK_DIR=$3
 ORGANISM=$4         # e.g., "human", "mouse", "mmu"
+MIN_WEIGHT=${5:-0.25}  # Minimum co-occurrence weight for tight clustering (default: 0.25)
 
 cd ${WORK_DIR}
 
@@ -100,7 +101,7 @@ java -cp ${CLASSPATH} lemontree.modulenetwork.RunCli \
     -cluster_file Lemon_out/clusterfile \
     -output_file Lemon_out/tight_clusters.txt \
     -node_clustering false \
-    -min_weight 0.25 \
+    -min_weight ${MIN_WEIGHT} \
     -min_clust_size 10 \
     -min_clust_score 2
 
