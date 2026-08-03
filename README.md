@@ -82,7 +82,7 @@ sudo mv nextflow /usr/local/bin/
 
 # Build the Singularity container
 ./build-singularity.sh
-# On HPC without a subuid mapping, build a sandbox instead (see nextflow/WIKI.md):
+# On HPC without a subuid mapping, build a sandbox instead (see the wiki Installation page):
 # ./build-singularity_parallel.sh
 
 # Run pipeline

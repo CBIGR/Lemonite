@@ -2,7 +2,7 @@
 
 This directory contains the executable Nextflow pipeline for Lemonite multi-omics integration.
 
-Detailed documentation lives in [WIKI.md](WIKI.md). The repository-level overview lives in [../README.md](../README.md).
+Detailed documentation lives in the [Lemonite Wiki](https://github.com/CBIGR/Lemonite/wiki). The repository-level overview lives in [../README.md](../README.md).
 
 ## Requirements
 
@@ -27,8 +27,8 @@ nextflow run main.nf \
 > Operation not permitted`). Use `./build-singularity_parallel.sh` instead, which
 > builds a **sandbox directory** (`lemontree-pipeline_v1.0.0_parallel.sandbox`)
 > and runs from it. Apptainer/Nextflow execute a sandbox directory exactly like a
-> `.sif`; point `process.container` at the sandbox path. See
-> [WIKI.md](WIKI.md#building-on-hpc-sandbox-containers) for details.
+> `.sif`; point `process.container` at the sandbox path. See the
+> [wiki Installation page](https://github.com/CBIGR/Lemonite/wiki/Installation) for details.
 
 ### Standard Run
 
@@ -76,5 +76,5 @@ Top-level run outputs include:
 
 ## More Documentation
 
-- [WIKI.md](WIKI.md) for the detailed parameter and output reference
+- [Lemonite Wiki](https://github.com/CBIGR/Lemonite/wiki) for the detailed parameter and output reference
 - [../README.md](../README.md) for the repository-level overview and citation
