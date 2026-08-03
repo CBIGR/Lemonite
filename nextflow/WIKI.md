@@ -21,7 +21,7 @@ At a high level, the published workflow is:
 6. **PKN-based evaluation** — compares the data-driven network against the Lemonite prior-knowledge network (PKN) to categorise edges as known or novel, and generates a metabolite-gene knowledge-graph MVF file.
 7. **Module heatmaps** — generates per-module expression heatmaps for all omics layers, annotated with the selected metadata columns.
 8. **Pathway enrichment analysis** — runs EnrichR and/or GSEA on module gene sets and regulator-target sets for all configured regulator types.
-9. **Module overview** — builds the canonical MegaGO + rrvgo functional overview: BP enrichment terms are clustered into `overview_n_clusters` semantic groups and each module is labelled, producing a module-expression heatmap and CSV outputs.
+9. **Module overview** — builds the canonical MegaGO + rrvgo functional overview: the top 30 GO Biological Process enrichment terms per module are clustered into `overview_n_clusters` semantic groups and each module is labelled, producing a module-expression heatmap and CSV outputs.
 10. **Summary report** — assembles all results into a self-contained `Lemonite_Summary_Report.html` with interactive network visualisations and key statistics.
 
 ## Requirements
@@ -195,13 +195,13 @@ Two related defaults matter:
 If you do not provide `--run_id`, the pipeline auto-generates one using:
 
 ```text
-{top_n_genes}HVG_coherence{coherence_threshold}_{method_suffix}_clusters{n_clusters}
+{top_n_genes}HVG_coherence{coherence_threshold}_{method_suffix}_clusters{n_clusters}_minW{lemontree_tight_min_weight}
 ```
 
 Examples:
 
-- `5000HVG_coherence0.6_top2.0pct_clusters100`
-- `2000HVG_coherence0.6_fold2.0x_clusters5`
+- `5000HVG_coherence0.6_top2.0pct_clusters100_minW0.25`
+- `2000HVG_coherence0.6_fold2.0x_clusters5_minW0.25`
 
 ## Input Directory Layout
 
@@ -375,7 +375,7 @@ It is used for:
 | `--heatmap_metadata_cols` | `null` | Optional override specifying which metadata columns appear on heatmaps (defaults to `metadata_columns`) |
 | `--expression_col` | `count` | Column name holding expression values in the input matrix |
 | `--sample_id_col` | `Sample_ID` | Sample identifier column in the metadata file |
-| `--stop_after_network` | `false` | When `true`, the pipeline exits after network generation and subnetwork graphs (steps 1–5), skipping enrichment, heatmaps, overview, and the summary report. Useful for quick network inspection. |
+| `--stop_after_network` | `false` | When `true`, the pipeline exits after network generation and subnetwork graphs (steps 1–5), skipping PKN evaluation, enrichment, heatmaps, overview, and the summary report. Useful for quick network inspection. |
 
 ### Clustering and Regulator Parameters
 

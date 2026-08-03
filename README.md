@@ -2,8 +2,7 @@
 
 **Lemonite: identification of regulatory metabolites through data-driven, interpretable integration of transcriptomics and metabolomics data**
 
-[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A525.04.0-brightgreen.svg)](https://www.nextflow.io/)
-[![Docker](https://img.shields.io/badge/docker-available-blue.svg)](https://www.docker.com/)
+[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A523.04.0-brightgreen.svg)](https://www.nextflow.io/)
 [![Singularity](https://img.shields.io/badge/singularity-available-blue.svg)](https://sylabs.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
@@ -36,7 +35,7 @@ Lemonite/
 │   ├── scripts/          # Pipeline scripts
 │   ├── LemonTree/        # Source code for the LemonTree algorithm
 │   ├── PKN/              # Lemonite prior knowledge graph
-│   ├── conf/             # Configuration profiles (Docker, Singularity, HPC)
+│   ├── conf/             # Configuration profiles (Singularity, HPC, local, test)
 │
 ├── build_PKN/            # Prior Knowledge Network construction
 │   ├── build_PKN/        # pipeline implementation to build the PKN - UNDER DEVELOPMENT!!!
@@ -61,13 +60,13 @@ Lemonite/
 ### Prerequisites
 
 - **For Nextflow Pipeline:**
-  - Nextflow ≥ 25.04.0
-  - Docker **OR** Singularity
+  - Nextflow ≥ 23.04.0
+  - Singularity
   - Minimum 16 GB RAM, 4 CPUs
 
 - **For R/Python Scripts:**
   - R ≥ 4.0 with Bioconductor packages
-  - Python ≥ 3.8 with scanpy, pandas, numpy etc (see docker file for complete list of R packages and python modules)
+  - Python ≥ 3.8 with scanpy, pandas, numpy etc (see `Singularity.def` for the complete list of R packages and python modules)
 
 ### Nextflow Pipeline quick start
 
@@ -81,17 +80,18 @@ cd nextflow
 curl -s https://get.nextflow.io | bash # install nextflow if necessary
 sudo mv nextflow /usr/local/bin/
 
-# Build container (Docker or Singularity)
-./build-docker.sh      # For Docker
-# OR
-./build-singularity.sh # For Singularity/HPC
+# Build the Singularity container
+./build-singularity.sh
+# On HPC without a subuid mapping, build a sandbox instead (see nextflow/WIKI.md):
+# ./build-singularity_parallel.sh
 
 # Run pipeline
 nextflow run main.nf \
   --input_dir /path/to/data \
   --regulator_types "TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt" \ # You can add other omics to assign as regulators here
   --n_clusters 100 \
-  -profile docker # or singularity
+  -profile singularity \
+  -resume
 ```
 
 #### 🔄 Pipeline Workflow
