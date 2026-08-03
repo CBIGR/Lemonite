@@ -3,3 +3,6 @@ web_app/data/AML/Enrichment/PCC_protein_protein/PCC_protein_protein_correlation_
 # OmniPathR log files
 omnipathr-log/
 nextflow/PKN/cache/
+# Claude Code local docs — keep out of the public repo
+CLAUDE.md
+.claude/
