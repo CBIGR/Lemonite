@@ -100,7 +100,7 @@ java -cp ${CLASSPATH} lemontree.modulenetwork.RunCli \
     -data_file Preprocessing/LemonPreprocessed_expression.txt \
     -cluster_file Lemon_out/clusterfile \
     -output_file Lemon_out/tight_clusters.txt \
-    -node_clustering false \
+    -node_clustering true \
     -min_weight ${MIN_WEIGHT} \
     -min_clust_size 10 \
     -min_clust_score 2
