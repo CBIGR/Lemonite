@@ -198,7 +198,8 @@ REOF
         'RColorBrewer', \
         'devtools', \
         'Hmisc', \
-        'foreach' \
+        'foreach', \
+        'circlize' \
     ), repos='https://cran.rstudio.com', dependencies=TRUE, force=TRUE)"
     
     # Install igraph first (needed by many packages)
@@ -226,7 +227,8 @@ REOF
         'GO.db', \
         'limma', \
         'edgeR', \
-        'GSVA' \
+        'GSVA', \
+        'ComplexHeatmap' \
     ), ask=FALSE, force=TRUE)"
     
     # Install WGCNA separately (it has special dependencies)
@@ -328,7 +330,8 @@ REOF
         'WGCNA', 'GOSemSim', 'qvalue', 'DOSE', 'dorothea', \
         'treeio', 'ggtree', 'enrichplot', 'ReactomePA', 'clusterProfiler', \
         'igraph', 'pheatmap', 'enrichR', 'optparse', 'data.table', \
-        'tidyverse', 'ggrepel', 'RColorBrewer', 'plotly', 'htmlwidgets', 'DT' \
+        'tidyverse', 'ggrepel', 'RColorBrewer', 'plotly', 'htmlwidgets', 'DT', \
+        'ComplexHeatmap', 'circlize' \
       ); \
       missing <- character(); \
       for (p in required) { \

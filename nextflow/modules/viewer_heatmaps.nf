@@ -112,15 +112,15 @@ process MODULE_VIEWER_HEATMAPS {
     
     # Run module viewer using the staged ModuleViewer_files (current working directory)
     # Check host script first (allows updates without rebuilding container)
-    if [ -f "${projectDir}/scripts/module_viewer.py" ]; then
-        SCRIPT_PATH="${projectDir}/scripts/module_viewer.py"
-    elif [ -f "/app/scripts/module_viewer.py" ]; then
-        SCRIPT_PATH="/app/scripts/module_viewer.py"
+    if [ -f "${projectDir}/scripts/module_viewer.R" ]; then
+        SCRIPT_PATH="${projectDir}/scripts/module_viewer.R"
+    elif [ -f "/app/scripts/module_viewer.R" ]; then
+        SCRIPT_PATH="/app/scripts/module_viewer.R"
     else
-        echo "Error: module_viewer.py not found"
+        echo "Error: module_viewer.R not found"
         exit 1
     fi
-    PYTHONNOUSERSITE=1 python3 \$SCRIPT_PATH \\
+    Rscript \$SCRIPT_PATH \\
         --input_dir . \\
         --output_dir heatmaps \\
         --regulator_files "\$regulator_files_arg" \\

@@ -1,5 +1,7 @@
 *.sif
+*.sif.bak*
 .singularity/
+.singularity_build_tmp/
 .nextflow*
 .work/*
 test_dataset/results/
