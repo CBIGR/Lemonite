@@ -1,9 +1,0 @@
-Node	Label	Type
-2_hydroxyglutaric_acid	2_hydroxyglutaric_acid	metabolite
-glycerol_3_phosphate	glycerol_3_phosphate	metabolite
-ZNF248	ZNF248	TF
-SLC25A1	SLC25A1	bridge_node
-MYRF	MYRF	TF
-ENPP6	ENPP6	bridge_node
-SOX10	SOX10	TF
-AKR1A1	AKR1A1	bridge_node

@@ -1,9 +1,0 @@
-Node	Label	Type
-2_hydroxyglutaric_acid	2_hydroxyglutaric_acid	metabolite
-ALDH1L1	ALDH1L1	module_gene
-SLC1A2	SLC1A2	module_gene
-GABPA	GABPA	TF
-ALOX12B	ALOX12B	bridge_node
-NFIX	NFIX	TF
-SLC1A3	SLC1A3	bridge_node
-NFIA	NFIA	TF

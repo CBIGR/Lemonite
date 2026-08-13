@@ -1,8 +1,0 @@
-Node1	Node2	Source	Type	Category
-2_hydroxyglutaric_acid	SLC25A1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-glycerol_3_phosphate	ENPP6	Human1_GEM_dist1	metabolite-gene	Metabolic_pathway
-glycerol_3_phosphate	AKR1A1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-ZNF248	SLC25A1	STRING	PPI	PPI
-MYRF	ENPP6	STRING	PPI	PPI
-MYRF	SOX10	STRING	PPI	PPI
-SOX10	AKR1A1	STRING	PPI	PPI

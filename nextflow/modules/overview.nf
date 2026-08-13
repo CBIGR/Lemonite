@@ -30,7 +30,8 @@ process MODULE_OVERVIEW_INTERACTIVE {
                            enrichment_input.toLowerCase() == 'gsea' ? 'GSEA' : 
                            enrichment_input
     def prioritize_by_expression = params.prioritize_by_expression
-    
+    def skip_megago = params.skip_megago ?: false
+
     """
     # Create working directory
     workdir=\$(pwd)
@@ -115,6 +116,10 @@ process MODULE_OVERVIEW_INTERACTIVE {
     args="\$args --enrichment_method ${enrichment_method}"
     args="\$args --coherence_threshold ${coherence_threshold}"
     args="\$args --group_column ${group_column}"
+    if [ "${skip_megago}" = "true" ]; then
+        args="\$args --skip_megago"
+        echo "MegaGO clustering: skipped (--skip_megago)"
+    fi
     if [ -n "\$REGULATOR_FILES" ]; then
         args="\$args --regulator_files \$REGULATOR_FILES"
     fi

@@ -1,9 +1,0 @@
-Node	Label	Type
-2_hydroxyglutaric_acid	2_hydroxyglutaric_acid	metabolite
-CYP1B1	CYP1B1	module_gene
-FOXS1	FOXS1	TF
-P4HA1	P4HA1	bridge_node
-NFIB	NFIB	TF
-SLC1A3	SLC1A3	bridge_node
-TCF7L2	TCF7L2	TF
-D2HGDH	D2HGDH	bridge_node

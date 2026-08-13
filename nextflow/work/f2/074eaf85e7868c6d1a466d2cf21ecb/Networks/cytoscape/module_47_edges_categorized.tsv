@@ -1,8 +1,0 @@
-Node1	Node2	Source	Type	Category
-creatinine	SLC4A10	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-creatinine	PXDN	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-creatinine	AOC3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-D_mannose	GCK	MetalinksDB	metabolite-gene	Ambiguous
-MYT1L	PXDN	STRING	PPI	PPI
-BCL6	AOC3	STRING	PPI	PPI
-ZNF512	GCK	STRING	PPI	PPI

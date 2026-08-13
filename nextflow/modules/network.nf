@@ -307,10 +307,25 @@ process SUBNETWORK_GRAPHS {
         echo "Using name mapping file for original name restoration: \${NAME_MAPPING_FILE}"
     fi
     
+    # PKN files - try bind-mounted path first (development mode), then container path
+    pkn_file=""
+    for candidate in "${projectDir}/PKN/Lemonite_PKN.tsv" "/opt/PKN/Lemonite_PKN.tsv"; do
+        if [ -f "\$candidate" ]; then
+            pkn_file="\$candidate"
+            echo "Found PKN file: \$pkn_file"
+            break
+        fi
+    done
+
+    PKN_ARG=""
+    if [ -n "\$pkn_file" ]; then
+        PKN_ARG="--pkn \$pkn_file"
+    fi
+
     python3 \$SCRIPT_PATH \
         --regulator_files "\$REGULATOR_FILES" \
         --clusters ./Lemon_out/clusters_list.txt \
-        --pkn "${params.pkn_network}" \
+        \$PKN_ARG \
         \$METABOLITE_ARG \
         \$NAME_MAPPING_ARG \
         --output_dir ./Networks/subnetworks

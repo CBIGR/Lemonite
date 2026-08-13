@@ -5,4 +5,6 @@
 .nextflow*
 .work/*
 test_dataset/results/
+test_dataset/work/
 *.sandbox/
+BIO_PROTOCOL_MANUSCRIPT.md

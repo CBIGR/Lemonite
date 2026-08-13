@@ -1,9 +1,0 @@
-Node1	Node2	Source	Type	Category
-fructose	RBAK	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-fructose	SLC4A5	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-fructose	ACE2	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-RBAK	ZSCAN21	STRING	PPI	PPI
-ZKSCAN5	SLC4A5	STRING	PPI	PPI
-ZKSCAN5	ZSCAN21	BioGRID_genes	PPI	PPI
-SLC4A5	ACE2	BioGRID_genes	PPI	PPI
-GTF2I	ACE2	BioGRID_genes	PPI	PPI

@@ -1,9 +1,0 @@
-Node	Label	Type
-heptadecanoic_acid	heptadecanoic_acid	metabolite
-HAS2	HAS2	module_gene
-GLIS3	GLIS3	TF
-CPA1	CPA1	bridge_node
-STAT3	STAT3	TF
-ABCA1	ABCA1	bridge_node
-MAFB	MAFB	TF
-RPL36A	RPL36A	bridge_node

@@ -1,5 +1,0 @@
-Node1	Node2	Source	Type	Category
-L_serine	ACSL4	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-L_serine	ASS1	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-FOXJ1	ACSL4	BioGRID_genes	PPI	PPI
-ZNF169	ASS1	STRING	PPI	PPI

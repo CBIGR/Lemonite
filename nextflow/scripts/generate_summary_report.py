@@ -17,6 +17,8 @@ import json
 import glob
 import re
 import gc
+import base64
+import html as html_lib
 from datetime import datetime
 from collections import defaultdict, OrderedDict
 import warnings
@@ -212,14 +214,15 @@ def collect_input_statistics(input_dir, regulator_configs, output_dir='.'):
         print(f"[DEBUG] Expression file found: {expr_file}", file=sys.stderr)
         print(f"[DEBUG] Columns: {len(cols)}, id-cols: {n_id_cols}, Genes: {n_genes}, Samples: {stats['samples']}", file=sys.stderr)
     
-    # Find metadata file - include DESeq_groups.txt from preprocessing
+    # Find metadata file. Prefer the user's own metadata file over the DESeq_groups.txt
+    # that preprocessing derives from it, so the report names a file the user supplied;
+    # fall back to DESeq_groups.txt when the input dir is not reachable.
     meta_patterns = [
-        'DESeq_groups.txt',  # Staged from preprocessing (highest priority)
         '*metadata*.txt', '*Metadata*.txt', 'metadata.txt', '*metadata*.tsv'
     ]
     meta_file = None
     for pattern in meta_patterns:
-        for search_dir in search_dirs:
+        for search_dir in input_data_dirs:
             if not os.path.exists(search_dir):
                 continue
             matches = glob.glob(os.path.join(search_dir, pattern))
@@ -228,15 +231,27 @@ def collect_input_statistics(input_dir, regulator_configs, output_dir='.'):
                 break
         if meta_file:
             break
-    
+    if not meta_file:
+        for search_dir in search_dirs:
+            candidate = os.path.join(search_dir, 'DESeq_groups.txt')
+            if os.path.exists(candidate):
+                meta_file = candidate
+                break
+
     if meta_file:
         stats['files_found'].append(('Metadata', os.path.basename(meta_file)))
-        
+
         df = safe_read_file(meta_file)
         if df is not None:
             stats['metadata_columns'] = list(df.columns)
             if stats['samples'] == 0:
                 stats['samples'] = len(df)
+            # The "Features" column is meaningless for metadata; report the number of
+            # annotated samples instead of a bare N/A.
+            stats['features_per_type']['Metadata (samples)'] = {
+                'input': len(df),
+                'file': os.path.basename(meta_file)
+            }
     
     # Find regulator data files
     for config in regulator_configs:
@@ -286,23 +301,35 @@ def collect_input_statistics(input_dir, regulator_configs, output_dir='.'):
             stats['data_types'].append(prefix)
             stats['files_found'].append((prefix, data_file))
             
-            # Fallback: try to count features from preprocessed file in staged Preprocessing dir
-            # Preprocessing creates LemonPreprocessed_{prefix_lower}.txt for each omics type
-            preproc_fallback_name = f'LemonPreprocessed_{prefix.lower()}.txt'
+            # Fallback: count features from the preprocessed file in the staged
+            # Preprocessing dir. Preprocessing names that file after the *data file*
+            # stem, not the regulator prefix (Metabolomics.txt ->
+            # LemonPreprocessed_metabolomics.txt for prefix "Metabolites"), so try the
+            # data-file stem as well as the prefix.
+            data_stem = os.path.splitext(os.path.basename(data_file))[0].lower()
+            preproc_candidates = [
+                f'LemonPreprocessed_{data_stem}.txt',
+                f'LemonPreprocessed_{prefix.lower()}.txt',
+            ]
             preproc_search_dirs = [
                 os.path.join(output_dir, 'LemonTree', 'Preprocessing'),
                 os.path.join('.', 'LemonTree', 'Preprocessing')
             ]
+            found = False
             for pdir in preproc_search_dirs:
-                preproc_path = os.path.join(pdir, preproc_fallback_name)
-                if os.path.exists(preproc_path):
-                    df = safe_read_file(preproc_path)
-                    if df is not None:
-                        stats['features_per_type'][f'{prefix} (features)'] = {
-                            'input': len(df),
-                            'file': data_file
-                        }
-                        print(f"[DEBUG] Fallback: counted {len(df)} features for {prefix} from {preproc_path}", file=sys.stderr)
+                for cand in preproc_candidates:
+                    preproc_path = os.path.join(pdir, cand)
+                    if os.path.exists(preproc_path):
+                        df = safe_read_file(preproc_path)
+                        if df is not None:
+                            stats['features_per_type'][f'{prefix} (features)'] = {
+                                'input': len(df),
+                                'file': data_file
+                            }
+                            print(f"[DEBUG] Fallback: counted {len(df)} features for {prefix} from {preproc_path}", file=sys.stderr)
+                        found = True
+                        break
+                if found:
                     break
     
     return stats
@@ -689,6 +716,41 @@ def collect_network_statistics(output_dir, run_id, regulator_configs):
     return stats
 
 
+def parse_pkn_evaluation_summary(eval_file):
+    """Parse the 'Label: value' lines of evaluate_against_PKN.py's evaluation summary.
+
+    Returns an ordered {label: value} dict; numeric values are converted so they can be
+    formatted, everything else is kept as the original string.
+    """
+    metrics = {}
+    try:
+        with open(eval_file) as fh:
+            for line in fh:
+                line = line.strip()
+                if not line or ':' not in line or line.startswith('='):
+                    continue
+                label, _, value = line.partition(':')
+                label, value = label.strip(), value.strip()
+                if not label or not value:
+                    continue
+                # Skip the file-path lines - they point into the Nextflow work dir and
+                # are meaningless to a reader of the published report.
+                if os.path.sep in value and ('file created' in label.lower()
+                                             or 'directory' in label.lower()
+                                             or label.lower().endswith('file')):
+                    continue
+                try:
+                    metrics[label] = int(value.replace(',', ''))
+                except ValueError:
+                    try:
+                        metrics[label] = float(value)
+                    except ValueError:
+                        metrics[label] = value
+    except Exception as e:
+        print(f"Warning: Could not parse PKN evaluation summary {eval_file}: {e}")
+    return metrics
+
+
 def collect_pkn_evaluation_statistics(output_dir, run_id):
     """Collect statistics from PKN evaluation"""
     stats = {
@@ -717,22 +779,28 @@ def collect_pkn_evaluation_statistics(output_dir, run_id):
             pkn_dir = path
             break
     
-    if pkn_dir and os.path.exists(pkn_dir):
-        eval_files = glob.glob(os.path.join(pkn_dir, '*evaluation*.txt'))
-        if eval_files:
-            stats['pkn_evaluation_performed'] = True
-            
-            # Try to parse evaluation metrics
-            for eval_file in eval_files:
-                df = safe_read_file(eval_file)
-                if df is not None:
-                    stats['evaluation_file'] = os.path.basename(eval_file)
-                    # Store basic stats
-                    if 'precision' in df.columns.str.lower():
-                        stats['metrics']['precision'] = df['precision'].mean() if 'precision' in df.columns else None
-                    if 'recall' in df.columns.str.lower():
-                        stats['metrics']['recall'] = df['recall'].mean() if 'recall' in df.columns else None
-    
+    # evaluate_against_PKN.py writes evaluation_summary.txt alongside the .mvf files it
+    # produces, so it is published under ModuleViewer_files rather than PKN_Evaluation.
+    # Search both so the metrics are picked up wherever the process staged them.
+    if run_id == '.':
+        pkn_paths.append(os.path.join(output_dir, 'LemonTree', 'ModuleViewer_files'))
+        pkn_paths.append(os.path.join(output_dir, 'ModuleViewer_files'))
+    else:
+        pkn_paths.append(os.path.join(output_dir, run_id, 'LemonTree', 'ModuleViewer_files'))
+        pkn_paths.append(os.path.join(output_dir, 'LemonTree', 'ModuleViewer_files'))
+
+    eval_files = []
+    for path in pkn_paths:
+        if os.path.exists(path):
+            if pkn_dir is None:
+                pkn_dir = path
+            eval_files.extend(glob.glob(os.path.join(path, '*evaluation*.txt')))
+
+    if eval_files:
+        stats['pkn_evaluation_performed'] = True
+        stats['evaluation_file'] = os.path.basename(eval_files[0])
+        stats['metrics'] = parse_pkn_evaluation_summary(eval_files[0])
+
     # Also check for enrichment results in ModuleViewer_files as indicator of PKN evaluation
     if not stats['pkn_evaluation_performed']:
         if run_id == '.':
@@ -1228,7 +1296,7 @@ def generate_regulator_ranking_section(regulator_rankings, name_lookup=None):
                 f'<tr><td>{rank}</td>'
                 f'<td>{name_lookup.get(item.get("Regulator", "N/A"), item.get("Regulator", "N/A")) if name_lookup else item.get("Regulator", "N/A")}</td>'
                 f'<td>Module {item.get("Module", "N/A")}</td>'
-                f'<td style="{score_style}">{score:.0f}</td>'
+                f'<td style="{score_style}">{score:.4f}</td>'
                 f'<td>{overall_rank}</td></tr>'
             )
         
@@ -1251,7 +1319,7 @@ def generate_regulator_ranking_section(regulator_rankings, name_lookup=None):
             parts.append(
                 f'<tr><td>{rank}</td>'
                 f'<td>{name_lookup.get(item.get("Regulator", "N/A"), item.get("Regulator", "N/A")) if name_lookup else item.get("Regulator", "N/A")}</td>'
-                f'<td style="{score_style}">{total_score:.0f}</td>'
+                f'<td style="{score_style}">{total_score:.4f}</td>'
                 f'<td>{item.get("N_Modules", 0)}</td>'
                 f'<td style="font-size:0.9em;max-width:400px;word-wrap:break-word;">{item.get("Target_Modules", "")}</td></tr>'
             )
@@ -1264,7 +1332,11 @@ def generate_regulator_ranking_section(regulator_rankings, name_lookup=None):
 
 def generate_html_report(all_stats, output_path):
     """Generate the comprehensive HTML report"""
-    
+
+    # Directory the report is written into; all relative links and any embedded
+    # images are resolved against it.
+    _report_dir = os.path.dirname(os.path.abspath(output_path))
+
     html_template = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1697,7 +1769,7 @@ def generate_html_report(all_stats, output_path):
     </div>
     
     <div class="footer">
-        <p>🍋🌳 <strong>Lemonite Pipeline</strong> | Developed by Boris Vandemoortele, CBIGR Lab @ Ghent University</p>
+        <p><strong>Lemonite Pipeline</strong> | Developed by Boris Vandemoortele, CBIGR Lab @ Ghent University</p>
         <p>Report generated on {timestamp}</p>
     </div>
     
@@ -1745,11 +1817,11 @@ def generate_html_report(all_stats, output_path):
     rankings = all_stats.get('rankings', {})
     enrich_stats = all_stats.get('enrichment', {})
     
-    # Count all omics data types including regulators (TFs, Metabolites, Proteins)
-    omics_types = list(input_stats.get('data_types', []))  # Start with transcriptomics/metadata
+    # Omics layers are the measured data types that were vertically integrated. TFs are
+    # NOT one of them: they are regulators inferred from the transcriptome by TFA, so
+    # counting them here contradicted the "Omics Data Types" card further down.
+    omics_types = list(input_stats.get('data_types', []))
     input_features = preproc_stats.get('input_features', {})
-    if 'TFs' in input_features:
-        omics_types.append('TFs')
     if 'Metabolites' in input_features:
         omics_types.append('Metabolites')
     if 'Proteins' in input_features:
@@ -1900,9 +1972,10 @@ def generate_html_report(all_stats, output_path):
         </div>
         
         {generate_group_counts_section(preproc_stats)}
+        {generate_qc_plots_section(_report_dir)}
     </section>
     """)
-    
+
     # === PARAMETERS SECTION ===
     params = all_stats.get('parameters', {})
     content_parts.append(f"""
@@ -2000,7 +2073,6 @@ def generate_html_report(all_stats, output_path):
 
     # Module-overview HTML links: only offer files that were actually produced
     # (the interactive_module_network / comprehensive variants are optional).
-    _report_dir = os.path.dirname(os.path.abspath(output_path))
     _mo_dir = os.path.join(_report_dir, 'LemonTree', 'Module_Overview')
     def _mo_exists(fn):
         return os.path.exists(os.path.join(_mo_dir, fn))
@@ -2010,22 +2082,40 @@ def generate_html_report(all_stats, output_path):
         return (f'<a href="LemonTree/Module_Overview/{fn}" target="_blank" '
                 f'style="display:inline-block; padding:0.6rem 1.2rem; background:{color}; color:white; '
                 f'border-radius:6px; text-decoration:none; font-weight:600;">{label}</a>')
+    # Only reference files module_overview_interactive.py actually writes. It does not
+    # produce a standalone interactive_module_network.html, and the comprehensive report
+    # helper (create_comprehensive_html_report) is currently never invoked, so listing
+    # either produced dead links whenever a stale staging dir made _mo_exists say yes.
     mo_buttons_html = "\n                ".join(b for b in [
-        _mo_button('Module_Overview_Comprehensive.html', '#2E7D32', '📊 Open Comprehensive Report'),
-        _mo_button('interactive_module_network.html', '#1565C0', '🌐 Open Network Visualization'),
-        _mo_button('interactive_module_network_movable.html', '#6A1B9A', '🖱️ Open Draggable Network'),
+        _mo_button('interactive_module_network_movable.html', '#6A1B9A', 'Open Draggable Network'),
+        _mo_button('regulator_rankings.html', '#1565C0', 'Open Regulator Rankings'),
     ] if b) or '<em>No interactive module-overview files were produced for this run.</em>'
     _mo_file_defs = [
-        ('Module_Overview_Comprehensive.html', '📊 Combined report: interactive network + regulator rankings'),
-        ('interactive_module_network.html', '🌐 Interactive module-regulator network (standalone)'),
-        ('interactive_module_network_movable.html', '🖱️ Draggable network visualization'),
-        ('regulator_rankings.html', '📋 Regulator rankings table'),
+        ('interactive_module_network_movable.html', 'Draggable module-regulator network visualization'),
+        ('regulator_rankings.html', 'Regulator rankings table'),
     ]
     mo_files_rows_html = "\n                ".join(
         f'<tr><td><span class="badge badge-success">Overview</span></td>'
         f'<td><a href="LemonTree/Module_Overview/{fn}" target="_blank">LemonTree/Module_Overview/{fn}</a></td>'
         f'<td>{desc}</td></tr>'
         for fn, desc in _mo_file_defs if _mo_exists(fn)
+    )
+
+    # PKN evaluation outputs: evaluate_against_PKN.py writes its summary and .mvf files
+    # into ModuleViewer_files, so PKN_Evaluation/ is often empty and must not be
+    # advertised as an output directory that does not exist.
+    _pkn_row_defs = [
+        ('LemonTree/PKN_Evaluation/', 'Validation against prior knowledge network'),
+        ('LemonTree/ModuleViewer_files/evaluation_summary.txt', 'PKN evaluation summary statistics'),
+        ('LemonTree/ModuleViewer_files/metabolite_LemoniteKG_interactions.mvf',
+         'PKN-supported metabolite-gene interactions'),
+        ('LemonTree/ModuleViewer_files/PPI_interactions.mvf', 'Protein-protein interactions within modules'),
+    ]
+    pkn_files_rows_html = "\n                ".join(
+        f'<tr><td><span class="badge badge-info">PKN</span></td>'
+        f'<td>{rel}</td><td>{desc}</td></tr>'
+        for rel, desc in _pkn_row_defs
+        if os.path.exists(os.path.join(_report_dir, rel))
     )
 
     content_parts.append(f"""
@@ -2176,7 +2266,7 @@ def generate_html_report(all_stats, output_path):
                 <tr><td><span class="badge badge-warning">Viewer</span></td><td>LemonTree/ModuleViewer_files/</td><td>Module-gene and module-regulator mappings</td></tr>
                 <tr><td><span class="badge badge-warning">Heatmaps</span></td><td>LemonTree/module_heatmaps/</td><td>Per-module expression heatmaps</td></tr>
                 <tr><td><span class="badge badge-info">Enrichment</span></td><td>LemonTree/Enrichment/</td><td>Pathway enrichment results (GO, KEGG, Reactome)</td></tr>
-                <tr><td><span class="badge badge-info">PKN</span></td><td>LemonTree/PKN_Evaluation/</td><td>Validation against prior knowledge network</td></tr>
+                {pkn_files_rows_html}
                 <tr><td><span class="badge badge-success">Overview</span></td><td>LemonTree/Module_Overview/</td><td>Interactive module overview and summary tables</td></tr>
                 {mo_files_rows_html}
                 <tr><td><span class="badge badge-success">Report</span></td><td>Lemonite_Summary_Report.html</td><td>This summary report</td></tr>
@@ -2289,13 +2379,75 @@ def generate_input_files_table(input_stats):
     
     for data_type, file_name in input_stats.get('files_found', []):
         # Try multiple key formats: (features), (genes), (regulators)
-        feature_info = (features.get(f'{data_type} (features)') or 
-                       features.get(f'{data_type} (genes)') or 
-                       features.get(f'{data_type} (regulators)') or {})
+        feature_info = (features.get(f'{data_type} (features)') or
+                       features.get(f'{data_type} (genes)') or
+                       features.get(f'{data_type} (regulators)') or
+                       features.get(f'{data_type} (samples)') or {})
         count = feature_info.get('input', 'N/A') if isinstance(feature_info, dict) else 'N/A'
+        if data_type == 'Metadata' and count != 'N/A':
+            count = f'{count} samples'
         rows.append(f'<tr><td><span class="badge badge-info">{data_type}</span></td><td>{file_name}</td><td>{count}</td></tr>')
     
     return '\n'.join(rows) if rows else '<tr><td colspan="3">No input files found</td></tr>'
+
+
+def generate_qc_plots_section(report_dir):
+    """Embed the preprocessing QC plots (PCA per omics layer, variance histogram).
+
+    The plots are embedded as base64 data URIs so the report stays a single portable
+    file. PNG copies are written next to the PDFs by the preprocessing R script; if only
+    the PDF exists (e.g. an older run) the plot is linked instead of embedded.
+    """
+    preproc_dir = os.path.join(report_dir, 'LemonTree', 'Preprocessing')
+    if not os.path.isdir(preproc_dir):
+        return ''
+
+    plot_defs = [
+        ('PCA_transcriptomics', 'PCA - Transcriptomics'),
+        ('PCA_metabolites', 'PCA - Metabolites'),
+        ('PCA_lipidomics', 'PCA - Lipidomics'),
+        ('PCA_proteins', 'PCA - Proteins'),
+        ('expression_variance_histogram', 'Expression Variance Distribution'),
+        ('Normalized_metabolites', 'Metabolite Normalization'),
+    ]
+
+    cards = []
+    for stem, title in plot_defs:
+        png_path = os.path.join(preproc_dir, f'{stem}.png')
+        pdf_rel = f'LemonTree/Preprocessing/{stem}.pdf'
+        pdf_exists = os.path.exists(os.path.join(preproc_dir, f'{stem}.pdf'))
+
+        if os.path.exists(png_path):
+            try:
+                with open(png_path, 'rb') as fh:
+                    encoded = base64.b64encode(fh.read()).decode('ascii')
+            except Exception as e:
+                print(f"Warning: Could not embed QC plot {png_path}: {e}")
+                continue
+            link = (f'<div style="margin-top:0.4rem;font-size:0.85em;">'
+                    f'<a href="{pdf_rel}" target="_blank">PDF version</a></div>') if pdf_exists else ''
+            cards.append(
+                f'<div style="flex:1 1 380px;min-width:300px;">'
+                f'<h4 style="margin:0 0 0.5rem 0;font-size:1em;">{html_lib.escape(title)}</h4>'
+                f'<img src="data:image/png;base64,{encoded}" alt="{html_lib.escape(title)}" '
+                f'style="width:100%;height:auto;border:1px solid #ddd;border-radius:6px;">'
+                f'{link}</div>'
+            )
+        elif pdf_exists:
+            cards.append(
+                f'<div style="flex:1 1 380px;min-width:300px;">'
+                f'<h4 style="margin:0 0 0.5rem 0;font-size:1em;">{html_lib.escape(title)}</h4>'
+                f'<p><a href="{pdf_rel}" target="_blank">Open {html_lib.escape(title)} (PDF)</a></p>'
+                f'</div>'
+            )
+
+    if not cards:
+        return ''
+
+    return ('<div class="subsection"><h3>Quality Control Plots</h3>'
+            '<div style="display:flex;flex-wrap:wrap;gap:1.5rem;">'
+            + ''.join(cards) +
+            '</div></div>')
 
 
 def generate_group_counts_section(preproc_stats):
@@ -2385,19 +2537,43 @@ def generate_pkn_metrics(pkn_stats):
     metrics = pkn_stats.get('metrics', {})
     if not metrics:
         return '<p>No detailed metrics available</p>'
-    
-    return f'''
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value">{metrics.get('precision', 'N/A'):.3f if isinstance(metrics.get('precision'), (int, float)) else 'N/A'}</div>
-            <div class="stat-label">Precision</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value">{metrics.get('recall', 'N/A'):.3f if isinstance(metrics.get('recall'), (int, float)) else 'N/A'}</div>
-            <div class="stat-label">Recall</div>
-        </div>
-    </div>
-    '''
+
+    # Headline counts get stat cards; everything else goes in a table underneath.
+    headline_keys = [
+        'Total network interactions',
+        'PKN-supported interactions',
+        'Total PPIs in modules',
+        'PKN interactions loaded',
+    ]
+
+    def fmt(value):
+        if isinstance(value, int):
+            return f'{value:,}'
+        if isinstance(value, float):
+            return f'{value:.3f}'
+        return html_lib.escape(str(value))
+
+    cards = ''.join(
+        f'<div class="stat-card">'
+        f'<div class="stat-value">{fmt(metrics[key])}</div>'
+        f'<div class="stat-label">{key}</div>'
+        f'</div>'
+        for key in headline_keys if key in metrics
+    )
+
+    rows = ''.join(
+        f'<tr><td>{html_lib.escape(label)}</td><td>{fmt(value)}</td></tr>'
+        for label, value in metrics.items() if label not in headline_keys
+    )
+
+    html = ''
+    if cards:
+        html += f'<div class="stats-grid">{cards}</div>'
+    if rows:
+        html += ('<div class="table-container"><table>'
+                 '<tr><th>Metric</th><th>Value</th></tr>'
+                 f'{rows}</table></div>')
+    return html or '<p>No detailed metrics available</p>'
 
 
 def generate_top_pathways(top_pathways):
@@ -2605,6 +2781,18 @@ def main():
     
     all_stats['parameters'] = parse_parameters_file(params_file)
     gc.collect()
+
+    # The enrichment method is only guessed from the staged directory layout, which is
+    # lossy (the staged tree may not preserve the Modules_enrichr/Modules_gsea names).
+    # The parameters log records what was actually requested, so prefer it.
+    param_method = all_stats['parameters'].get('enrichment_method')
+    if param_method:
+        detected = all_stats['enrichment'].get('method')
+        if not detected or detected == 'EnrichR/GSEA':
+            normalized = {'enrichr': 'EnrichR', 'gsea': 'GSEA',
+                          'both': 'EnrichR + GSEA', 'auto': 'EnrichR + GSEA'}
+            all_stats['enrichment']['method'] = normalized.get(
+                param_method.strip().lower(), param_method.strip())
     
     # Generate HTML report
     print("Generating HTML report...")

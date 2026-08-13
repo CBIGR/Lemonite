@@ -1,1 +1,0 @@
-/home/borisvdm/repo/LemonIte/nextflow/work/d3/b590dbbbda3cc0dfb5cf51aea09eb6/Lemon_out/Metabolites.randomreg.txt

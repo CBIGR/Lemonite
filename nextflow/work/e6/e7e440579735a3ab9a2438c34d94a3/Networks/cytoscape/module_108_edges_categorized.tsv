@@ -1,7 +1,0 @@
-Node1	Node2	Source	Type	Category
-glycerol_3_phosphate	ACE	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-glycerol_3_phosphate	FUCA2	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-glycerol_3_phosphate	SCD	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-VDR	ACE	STRING	PPI	PPI
-NFIL3	FUCA2	BioGRID_genes	PPI	PPI
-BHLHE40	SCD	STRING	PPI	PPI

@@ -16,6 +16,7 @@ process PREPROCESSING_TFA {
     path "LemonTree/Preprocessing/*", emit: lemontree_inputs
     path "LemonTree/Preprocessing/*", emit: preprocessing_results, optional: true
     path "TFA/*", emit: tfa_results, optional: true
+    path "TFA/TFA_status.txt", emit: tfa_status, optional: true
 
     script:
     """
@@ -114,6 +115,7 @@ process PREPROCESSING_TFA {
             --expression "\$EXPRESSION_FILE" \\
             --metadata "\$METADATA_FILE" \\
             --output_dir . \\
+            --regulator_types "\$REGULATOR_TYPES" \\
             --top_n_genes "${params.top_n_genes}" \\
             --perform_TFA "${params.perform_tfa}" \\
             --organism "${params.organism}" \\

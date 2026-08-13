@@ -1,9 +1,0 @@
-Node	Label	Type
-creatinine	creatinine	metabolite
-PLA2G7	PLA2G7	module_gene
-KLF8	KLF8	TF
-PRDX3	PRDX3	bridge_node
-SOX10	SOX10	TF
-CNP	CNP	bridge_node
-RUNX2	RUNX2	TF
-ACP5	ACP5	bridge_node

@@ -1,7 +1,0 @@
-Node1	Node2	Source	Type	Category
-2_hydroxyglutaric_acid	ALOXE3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-creatinine	FASN	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-creatinine	LAP3	Human1_GEM_dist2	metabolite-gene	Metabolic_pathway
-TFAP4	FASN	BioGRID_genes	PPI	PPI
-ZNF76	ALOXE3	BioGRID_genes	PPI	PPI
-ZNF76	LAP3	BioGRID_genes	PPI	PPI

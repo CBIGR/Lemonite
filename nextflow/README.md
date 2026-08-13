@@ -2,7 +2,7 @@
 
 This directory contains the executable Nextflow pipeline for Lemonite multi-omics integration.
 
-Detailed documentation lives in the [Lemonite Wiki](https://github.com/CBIGR/Lemonite/wiki). The repository-level overview lives in [../README.md](../README.md).
+Detailed documentation lives in [WIKI.md](WIKI.md). The repository-level overview lives in [../README.md](../README.md).
 
 ## Requirements
 
@@ -21,14 +21,20 @@ nextflow run main.nf \
   -profile test,singularity
 ```
 
+> **MegaGO clustering:** the module overview stage (step 9) normally clusters modules
+> with MegaGO + rrvgo. This is skipped by default under `-profile test`
+> (`--skip_megago true`) since it's slow and not needed to check pipeline function —
+> pass `--skip_megago false` to exercise it on the test dataset. See
+> [WIKI.md](WIKI.md#enrichment-and-overview-parameters) for details.
+
 > **Building on HPC (e.g. UGent kyukon):** these nodes run an unprivileged
 > Apptainer without a `subuid` mapping, so `apptainer build` cannot create a
 > `.sif` (it falls back to `proot`, whose `ptrace` is blocked → `ptrace(TRACEME):
 > Operation not permitted`). Use `./build-singularity_parallel.sh` instead, which
 > builds a **sandbox directory** (`lemontree-pipeline_v1.0.0_parallel.sandbox`)
 > and runs from it. Apptainer/Nextflow execute a sandbox directory exactly like a
-> `.sif`; point `process.container` at the sandbox path. See the
-> [wiki Installation page](https://github.com/CBIGR/Lemonite/wiki/Installation) for details.
+> `.sif`; point `process.container` at the sandbox path. See
+> [WIKI.md](WIKI.md#building-on-hpc-sandbox-containers) for details.
 
 ### Standard Run
 
@@ -76,5 +82,5 @@ Top-level run outputs include:
 
 ## More Documentation
 
-- [Lemonite Wiki](https://github.com/CBIGR/Lemonite/wiki) for the detailed parameter and output reference
+- [WIKI.md](WIKI.md) for the detailed parameter and output reference
 - [../README.md](../README.md) for the repository-level overview and citation

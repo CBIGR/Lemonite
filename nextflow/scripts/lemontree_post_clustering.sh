@@ -16,7 +16,7 @@ cd ${WORK_DIR}
 # Auto-replace TF list for mouse organism
 if [[ "$ORGANISM" == "mouse" || "$ORGANISM" == "mmu" || "$ORGANISM" == "mus_musculus" ]]; then
     REGULATOR_TYPES=$(echo "$REGULATOR_TYPES" | sed -E 's/[Ll]overing_TF_list\.txt/lovering_TF_list_mouse.txt/g')
-    echo "🐭 Organism is mouse - auto-replacing TF list with mouse version"
+    echo "   Organism is mouse - auto-replacing TF list with mouse version"
     echo "   Updated regulator_types: $REGULATOR_TYPES"
 fi
 
@@ -71,13 +71,17 @@ if [ -d "Lemon_results" ]; then
     done
 fi
 
-# Also check in Lemon_out/Lemon_results if copied there
-if [ -d "Lemon_out/Lemon_results" ]; then
+# Also check in Lemon_out/Lemon_results if copied there. Cluster file paths
+# in Lemon_out/clusterfile are resolved by LemonTree relative to the current
+# working directory (not relative to the clusterfile itself), so write the
+# real Lemon_out/Lemon_results/... path here rather than stripping the
+# Lemon_out/ prefix (that stripped form only resolves correctly when a
+# top-level Lemon_results/ symlink/copy also exists next to Lemon_out/,
+# which is not guaranteed -- e.g. reruns of an existing rep directory).
+if [ -d "Lemon_out/Lemon_results" ] && [ ! -f "Lemon_out/clusterfile" -o ! -s "Lemon_out/clusterfile" ]; then
     for cluster_file in Lemon_out/Lemon_results/cluster_*; do
         if [ -f "$cluster_file" ]; then
-            # Convert path to relative from Lemon_results
-            relative_path=$(echo "$cluster_file" | sed 's|Lemon_out/||')
-            echo "$relative_path" >> Lemon_out/clusterfile
+            echo "$cluster_file" >> Lemon_out/clusterfile
             cluster_count=$((cluster_count + 1))
         fi
     done

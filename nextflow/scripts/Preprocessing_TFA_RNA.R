@@ -204,10 +204,20 @@ create_pca_plot <- function(data_matrix, metadata_df, contrast_col, omics_name, 
       )
   }
   
-  # Save plot
-  output_file <- file.path(output_dir, paste0("PCA_", gsub(" ", "_", tolower(omics_name)), ".pdf"))
+  # Save plot. The PDF is the publication-quality copy; the PNG is what the HTML
+  # summary report embeds (browsers cannot inline a PDF).
+  base_name <- paste0("PCA_", gsub(" ", "_", tolower(omics_name)))
+  output_file <- file.path(output_dir, paste0(base_name, ".pdf"))
   ggsave(output_file, plot = p, width = 8, height = 6)
   cat(sprintf("[OK] Saved PCA plot: %s\n", output_file))
+
+  png_file <- file.path(output_dir, paste0(base_name, ".png"))
+  tryCatch({
+    ggsave(png_file, plot = p, width = 8, height = 6, dpi = 150)
+    cat(sprintf("[OK] Saved PCA plot: %s\n", png_file))
+  }, error = function(e) {
+    cat(sprintf("[WARNING] Failed to save PNG PCA plot for %s: %s\n", omics_name, e$message))
+  })
   
   return(invisible(pca_result))
 }
@@ -310,6 +320,10 @@ if (perform_TFA) {
   cat("============================================\n")
 } else {
   cat("\n[WARNING] TFA analysis is DISABLED (perform_TFA = FALSE)\n")
+  # perform_TFA=FALSE skips the entire block below (through end of script) that would
+  # otherwise write this file after actually attempting TFA, so record the DISABLED
+  # status here instead -- this is the only point on that code path where it's known.
+  writeLines("DISABLED: perform_TFA=FALSE was requested", "./TFA/TFA_status.txt")
 }
 
 # Validate metadata requirements for pipeline consistency
@@ -801,8 +815,37 @@ if (perform_TFA) {
     }
   }
   
+  tfa_failure_reason <- NULL
+
   # Only proceed with decouple analysis if network was loaded successfully
   if (perform_TFA && !is.null(net)) {
+    # decouple()'s default statistics = c('mlm','ulm','wsum'). MLM fits ALL sources
+    # simultaneously as covariates of one linear model per sample, so regulators whose
+    # target sets are (near-)identical after intersecting with mat's genes make that
+    # design matrix rank-deficient ("N sources ... colinear ... cannot fit a linear
+    # model"), which previously aborted the whole decouple() call incl. ulm/wsum.
+    # decoupleR ships check_corr() (see ?decoupleR::check_corr, "Check correlation
+    # (colinearity)") specifically to find these pairs beforehand -- restrict to the
+    # targets mlm will actually see (rows of mat) and drop the redundant half of each
+    # near-perfectly correlated pair so mlm can fit.
+    net_for_corr <- net[net$target %in% rownames(log_normcnt), ]
+    corr_threshold <- 0.99
+    collinear_pairs <- tryCatch({
+      decoupleR::check_corr(net_for_corr, .source = 'source', .target = 'target') %>%
+        dplyr::filter(abs(correlation) >= corr_threshold)
+    }, error = function(e) {
+      cat("[WARNING] check_corr() failed, skipping collinearity pre-filter:", e$message, "\n")
+      NULL
+    })
+    if (!is.null(collinear_pairs) && nrow(collinear_pairs) > 0) {
+      sources_to_drop <- unique(collinear_pairs$source.2)
+      cat(sprintf("[INFO] %d source(s) are collinear (|r|>=%.2f) with another regulator's target set -- dropping the redundant ones so MLM can fit: %s%s\n",
+                  length(sources_to_drop), corr_threshold,
+                  paste(head(sources_to_drop, 20), collapse=", "),
+                  if (length(sources_to_drop) > 20) ", ..." else ""))
+      net <- net[!(net$source %in% sources_to_drop), ]
+    }
+
     cat(" Running decouple analysis...\n")
     decouple_ok <- tryCatch({
       decoupled <- decouple(mat=log_normcnt, net=net, .source='source', .target='target')
@@ -811,14 +854,32 @@ if (perform_TFA) {
       cat("[OK] Consensus analysis completed\n")
       TRUE
     }, error = function(e) {
-      cat("[ERROR] Error in TFA analysis:", e$message, "\n")
-      cat("[WARNING]  Continuing without TFA...\n")
-      FALSE
+      # Collinearity screening above catches near-duplicate regulon pairs, but MLM's rank
+      # deficiency can also come from >2-way (multivariate) collinearity that a pairwise
+      # correlation check won't catch. Rather than lose TFA entirely, fall back to ULM
+      # (per-source univariate regression -- immune to collinearity between sources since
+      # each source is fit independently) + WSUM, dropping MLM from the run.
+      cat("[WARNING] decouple() with MLM failed:", e$message, "\n")
+      cat(" Retrying without MLM (ULM + WSUM only, both robust to collinear regulons)...\n")
+      tryCatch({
+        decoupled <<- decouple(mat=log_normcnt, net=net, .source='source', .target='target',
+                                statistics = c('ulm', 'wsum'), consensus_stats = c('ulm', 'norm_wsum'))
+        cat("[OK] Decouple completed without MLM, running consensus...\n")
+        consensus <<- run_consensus(decoupled)
+        cat("[OK] Consensus analysis completed\n")
+        TRUE
+      }, error = function(e2) {
+        cat("[ERROR] Error in TFA analysis even without MLM:", e2$message, "\n")
+        cat("[WARNING]  Continuing without TFA...\n")
+        tfa_failure_reason <<- e2$message
+        FALSE
+      })
     })
     if (!decouple_ok) perform_TFA <- FALSE
   } else if (perform_TFA) {
     cat("[ERROR] Cannot proceed with TFA analysis: network not loaded\n")
     cat("[WARNING]  Continuing without TFA...\n")
+    tfa_failure_reason <- "prior network could not be loaded (neither file nor CollecTRI download/fallback)"
     perform_TFA <- FALSE
   }
   
@@ -988,6 +1049,18 @@ if (perform_TFA) {
   # When TFA is disabled, use variable_genes for complete dataframe
   RNA_preprocessed <- variable_genes
 }
+
+# Record the outcome so the Nextflow wrapper/report can flag runs that silently lost TFA
+# instead of the end user only finding out by noticing TFA files are missing. (The
+# perform_TFA=FALSE-from-the-start case is recorded earlier, at the prerequisites check --
+# this whole block is skipped entirely on that path.)
+tfa_status <- if (perform_TFA) {
+  "SUCCESS"
+} else {
+  paste0("FAILED: ", if (!is.null(tfa_failure_reason)) tfa_failure_reason else "TFA analysis failed (see log above for details)")
+}
+writeLines(tfa_status, "./TFA/TFA_status.txt")
+cat("[INFO] TFA status:", tfa_status, "\n")
 
 ###########################################################################################
 #### Create RNA_preprocessed_noTFA: HVGs + Lovering TFs (NO TFA, just scaled expression)

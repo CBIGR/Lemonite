@@ -686,8 +686,27 @@ def create_cytoscape_html_network(nodes, edges, module_clusters, config_name,
 </div>
 
 <script>
+    // Cytoscape and its layout plugins are loaded from public CDNs. On an offline
+    // machine or a network that blocks them the page would otherwise render as a
+    // silent blank canvas, so fail loudly and explain what is missing.
+    if (typeof cytoscape === 'undefined') {{
+        document.addEventListener('DOMContentLoaded', function() {{
+            var target = document.getElementById('cy') || document.body;
+            target.innerHTML =
+                '<div style="padding:2rem;font-family:sans-serif;line-height:1.6;">' +
+                '<h2 style="margin-top:0;">Network could not be displayed</h2>' +
+                '<p>This page loads the Cytoscape.js library from a public CDN, and that ' +
+                'request did not succeed. The network data itself is present in this file.</p>' +
+                '<p>Open the page on a machine with internet access, or allow requests to ' +
+                '<code>cdnjs.cloudflare.com</code> and <code>cdn.jsdelivr.net</code>.</p>' +
+                '</div>';
+        }});
+        throw new Error('Cytoscape.js failed to load - see message rendered in the page.');
+    }}
+
     // Register fcose extension (cluster-grouping force layout)
-    if (typeof cytoscapeFcose !== 'undefined') {{
+    var HAS_FCOSE = (typeof cytoscapeFcose !== 'undefined');
+    if (HAS_FCOSE) {{
         cytoscape.use(cytoscapeFcose);
     }}
     // Register cytoscape-svg extension
@@ -742,6 +761,11 @@ def create_cytoscape_html_network(nodes, edges, module_clusters, config_name,
     // fcose layout. randomize:false makes it relax FROM the seeded
     // positions instead of starting over, preserving the cluster clumps.
     function fcoseOptions() {{
+        // Fall back to cytoscape's built-in cose when the fcose plugin did not load,
+        // so the graph still lays out instead of throwing on an unknown layout name.
+        if (!HAS_FCOSE) {{
+            return {{ name: 'cose', animate: true, fit: true, padding: 60 }};
+        }}
         return {{
             name: 'fcose',
             quality: 'proof',
@@ -2423,13 +2447,14 @@ def parse_single_pair_output(output_text, file1_name, file2_name):
     else:
         return None
 
-def run_megago_clustering(megago_dir):
+def run_megago_clustering(megago_dir, max_workers=8):
     """
     Run MegaGO command-line tool in parallel on all pairwise combinations
-    
+
     Parameters:
     megago_dir (str): Directory containing megaGO files
-    
+    max_workers (int): Max parallel worker threads for pairwise comparisons
+
     Returns:
     tuple: (similarity_matrix, module_ids) or (None, None) if failed
     """
@@ -2469,7 +2494,7 @@ def run_megago_clustering(megago_dir):
     successful_comparisons = 0
     failed_comparisons = 0
     
-    with ThreadPoolExecutor(max_workers=min(8, len(file_pairs))) as executor:
+    with ThreadPoolExecutor(max_workers=min(max_workers, len(file_pairs))) as executor:
         # Submit all pairwise comparisons
         future_to_pair = {
             executor.submit(run_single_megago_pair, file1, file2, megago_dir): (file1, file2)
@@ -2576,7 +2601,7 @@ def parse_megago_output(output_text, bp_files):
     
     return similarity_matrix, module_ids
 
-def megago_cluster_modules(module_pathways, bp_terms_df, n_clusters=5, output_dir='.'):
+def megago_cluster_modules(module_pathways, bp_terms_df, n_clusters=5, output_dir='.', skip_megago=False, megago_workers=8):
     """
     Cluster modules using megaGO on canonical BP top_30 terms when available,
     otherwise fall back to pathway similarity.
@@ -2608,15 +2633,19 @@ def megago_cluster_modules(module_pathways, bp_terms_df, n_clusters=5, output_di
         print("Functional clustering disabled - assigning all modules to single cluster")
         return {mod: 'Cluster_1' for mod in modules}, None
 
-    print("\nAttempting canonical MegaGO clustering...")
-    megago_binary = shutil.which('megago')
+    if skip_megago:
+        print("\nMegaGO clustering skipped (--skip_megago) - using pathway similarity fallback")
+        megago_binary = None
+    else:
+        print("\nAttempting canonical MegaGO clustering...")
+        megago_binary = shutil.which('megago')
     if megago_binary and bp_terms_df is not None and not bp_terms_df.empty:
         print(f"   Found canonical BP top_30 terms with {len(bp_terms_df)} rows")
         megago_dir = create_megago_files(bp_terms_df, output_dir)
 
         if megago_dir:
             print(f"   Created MegaGO files in: {megago_dir}")
-            similarity_matrix, megago_module_ids = run_megago_clustering(megago_dir)
+            similarity_matrix, megago_module_ids = run_megago_clustering(megago_dir, max_workers=megago_workers)
 
             if similarity_matrix is not None:
                 print("Successfully obtained MegaGO similarity matrix")
@@ -2651,7 +2680,7 @@ def megago_cluster_modules(module_pathways, bp_terms_df, n_clusters=5, output_di
             print("Could not create MegaGO files - falling back to pathway similarity")
     elif bp_terms_df is None or bp_terms_df.empty:
         print("No canonical BP top_30 terms available - falling back to pathway similarity")
-    else:
+    elif not skip_megago:
         print("MegaGO command-line tool not available - falling back to pathway similarity")
 
     # Fall back to enhanced pathway similarity clustering
@@ -3825,7 +3854,11 @@ def main():
                        help='Path to metadata file (DESeq_groups.txt)')
     parser.add_argument('--run_id', type=str, default='Lemonite',
                        help='Run identifier used as network title')
-    
+    parser.add_argument('--skip_megago', action='store_true', default=False,
+                       help='Skip MegaGO semantic-similarity clustering and use the pathway-similarity fallback instead')
+    parser.add_argument('--megago_workers', type=int, default=8,
+                       help='Max parallel worker threads for pairwise MegaGO comparisons (default: 8)')
+
     args = parser.parse_args()
     
     # Create output directory
@@ -4231,7 +4264,9 @@ def main():
         module_pathways,
         bp_terms_top30_df,
         args.n_clusters,
-        output_dir=top30_dir
+        output_dir=top30_dir,
+        skip_megago=args.skip_megago,
+        megago_workers=args.megago_workers
     )
     cluster_assignments_df, cluster_assignments_path = write_cluster_assignments(
         module_clusters,

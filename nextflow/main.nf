@@ -131,6 +131,12 @@ include { ENRICHMENT_ANALYSIS } from './modules/enrichment.nf'
 include { MODULE_OVERVIEW_INTERACTIVE } from './modules/overview.nf'
 include { SUMMARY_REPORT } from './modules/summary_report.nf'
 
+// Populated from PREPROCESSING_TFA's TFA_status.txt once that process completes (see the
+// .subscribe below); read back in workflow.onComplete to warn the user if TFA silently
+// failed/was skipped, since the modules that consume its output degrade gracefully rather
+// than erroring, so this is otherwise the only place that surfaces it.
+def tfaStatusText = null
+
 workflow {
     // Create channels for input data
     input_ch = Channel.fromPath(params.input_dir, type: 'dir')
@@ -151,7 +157,12 @@ workflow {
     
     // Step 1: Preprocessing and TFA
     PREPROCESSING_TFA(input_ch, data_ch, run_id_ch)
-    
+
+    // tfa_status is declared optional: true, so this may complete without ever emitting
+    PREPROCESSING_TFA.out.tfa_status
+        .ifEmpty(null)
+        .subscribe { f -> if (f) tfaStatusText = f.text.trim() }
+
     // Step 2: Lemonite clustering (parallel jobs)
     cluster_ids = Channel.of(1..params.n_clusters)
     CLUSTERING(PREPROCESSING_TFA.out.preprocessed_data.combine(cluster_ids), run_id_ch)
@@ -244,9 +255,40 @@ workflow {
 }
 
 workflow.onComplete {
+    // If TFA attempted and failed (as opposed to being deliberately disabled via
+    // --perform_tfa false), flag it prominently: mark the results directory with a
+    // noTFA_ prefix and warn in the completion banner, since MODULE_VIEWER_HEATMAPS,
+    // NETWORK_GENERATION etc. all treat a missing TFA layer as normal degraded input
+    // and would otherwise finish "successfully" with no other indication TFA was lost.
+    def tfaFailed = tfaStatusText && tfaStatusText.startsWith('FAILED')
+    def resultsDir = "${finalOutputDir}/${params.computed_run_id}"
+    if (workflow.success && tfaFailed) {
+        def origDir = new File(resultsDir)
+        def renamedDir = new File(origDir.parentFile, "noTFA_${params.computed_run_id}")
+        if (origDir.exists() && !renamedDir.exists()) {
+            if (origDir.renameTo(renamedDir)) {
+                resultsDir = renamedDir.toString()
+            } else {
+                log.warn "Could not rename results directory to flag missing TFA (noTFA_ prefix) -- left as: ${resultsDir}"
+            }
+        }
+    }
+    // Built separately (rather than nested inside the banner's triple-quoted string below)
+    // to avoid nesting triple-quoted GStrings, which the Groovy parser handles poorly.
+    def tfaWarningBlock = "        ║                                                                                  ║"
+    if (tfaFailed) {
+        tfaWarningBlock = "        ║                                                                                  ║\n" +
+            "        ║  ⚠️  TFA (TF activity inference) FAILED and was skipped for this run             ║\n" +
+            "        ║  ┌────────────────────────────────────────────────────────────────────────────┐  ║\n" +
+            "        ║  │  ${tfaStatusText.take(76).padRight(76)}  │  ║\n" +
+            "        ║  │  Modules/regulators below used raw expression instead of inferred activity  │  ║\n" +
+            "        ║  │  Results directory below renamed with a 'noTFA_' prefix to flag this         │  ║\n" +
+            "        ║  └────────────────────────────────────────────────────────────────────────────┘  ║"
+    }
+
     if (workflow.success) {
         log.info """\
-        
+
         ╔══════════════════════════════════════════════════════════════════════════════════╗
         ║                                                                                  ║
         ║         🎉✨ L E M O N I T E   P I P E L I N E   S U C C E S S ! ✨🎉            ║
@@ -268,8 +310,9 @@ workflow.onComplete {
         ║  │  ⏰ Start Time: ${workflow.start.toString().padRight(62)} │  ║
         ║  │  🏁 End Time: ${workflow.complete.toString().padRight(62)} │  ║
         ║  │  ⌛ Duration: ${workflow.duration.toString().padRight(62)} │  ║
-        ║  │  📁 Results: ${(params.output_dir ?: params.outdir).toString().padRight(62)} │  ║
+        ║  │  📁 Results: ${resultsDir.toString().padRight(62)} │  ║
         ║  └────────────────────────────────────────────────────────────────────────────┘  ║
+${tfaWarningBlock}
         ║                                                                                  ║
         ║  🎯 Your results include:                                                        ║
         ║  • 🧩 Gene modules with TF and metabolite regulators                             ║

@@ -20,9 +20,9 @@ Profile: ${workflow.profile}
 INPUT/OUTPUT PARAMETERS:
 ------------------------
 input_dir                     = ${params.input_dir}
-output_dir                    = ${params.output_dir}
-workDir                       = ${params.output_dir}/work
-run_id                        = ${params.run_id ?: '(auto-generated)'}
+output_dir                    = ${params.output_dir ?: (params.input_dir ? params.input_dir + '/results' : './results') + '  (default)'}
+workDir                       = ${workflow.workDir}
+run_id                        = ${params.computed_run_id ?: (params.run_id ?: '(auto-generated)')}
 
 PREPROCESSING PARAMETERS:
 -------------------------
@@ -73,7 +73,8 @@ OVERVIEW PARAMETERS:
 --------------------
 prioritize_by_expression      = ${params.prioritize_by_expression}
 overview_n_clusters           = ${params.overview_n_clusters}
-overview_labeling_workflow    = canonical MegaGO top_30 + rrvgo
+skip_megago                   = ${params.skip_megago}
+overview_labeling_workflow    = ${params.skip_megago ? 'pathway-similarity (Jaccard) top_30 + rrvgo  (MegaGO skipped)' : 'canonical MegaGO top_30 + rrvgo'}
 
 RESOURCE LIMITS:
 ----------------
