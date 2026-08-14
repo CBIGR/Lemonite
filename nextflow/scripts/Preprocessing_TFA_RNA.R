@@ -672,7 +672,12 @@ res <- data.frame(results(dds, contrast=DESeq_contrast))
 up <- res[(res$log2FoldChange >=1 & res$padj <= 0.05), ]
 down <- res[(res$log2FoldChange <=1 & res$padj <= 0.05), ]
 normcnt <- as.data.frame(counts(dds, normalized=TRUE))
-log_normcnt <- log(normcnt)
+# +1 pseudocount: the >=10-counts-in->=3-samples prefilter above doesn't guarantee a gene is
+# nonzero in EVERY sample (e.g. a gene expressed only in one condition), so log(normcnt) alone
+# can still produce -Inf for legitimately-zero entries in other samples. decoupleR::decouple()
+# refuses to run on any matrix containing NA/Inf ("Mat contains NAs or Infs"), which previously
+# aborted TFA before it ever reached the MLM/collinearity logic below.
+log_normcnt <- log(normcnt + 1)
 
 # Select for highly variable genes
 M <- log_normcnt
