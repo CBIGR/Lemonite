@@ -222,8 +222,15 @@ if (!is.null(opt$metabolomics_file) && file.exists(opt$metabolomics_file)) {
   cat("Metabolomics samples matched to proteomics:", length(common_metabo_samples), "\n")
   metabolomics <- metabolomics[, common_metabo_samples, drop=FALSE]
   
-  # Pareto scaling for metabolomics
-  metabolomics <- as.data.frame(t(pareto_scale(t(metabolomics))))
+  # Pareto scaling for metabolomics. pareto_scale() is already row-wise (per feature):
+  # row_means/row_sds are computed with rowMeans()/apply(x,1,sd), so calling it directly on
+  # metabolomics (rows=metabolites) centers/scales each metabolite across samples. Do NOT wrap
+  # in t(...(t(x))) -- that idiom is only correct for column-wise functions like scale() (see
+  # the hPTM line above), and here it inverts the axis: it would center/scale per SAMPLE
+  # (averaged across all metabolites) instead of per METABOLITE, with a different, sample-
+  # specific correction for every sample -- not a uniform offset that cancels out, and it
+  # systematically distorts which samples look high/low for any given metabolite.
+  metabolomics <- as.data.frame(pareto_scale(metabolomics))
   
   # Apply name mapping if provided
   if (!is.null(opt$metabolomics_labels) && file.exists(opt$metabolomics_labels)) {
