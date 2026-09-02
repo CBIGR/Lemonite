@@ -181,8 +181,14 @@ if (is.null(contrast_col) || !contrast_col %in% colnames(metadata)) {
 
 cat("\nReading proteomics data...\n")
 proteomics <- fread(opt$expression, header = TRUE, data.table = FALSE)
-rownames(proteomics) <- proteomics[, 1]; proteomics[, 1] <- NULL
-cat("Proteomics dimensions:", nrow(proteomics), "x", ncol(proteomics), "\n")
+# Handle potential duplicates in the identifier column (e.g., protein symbols)
+id_col <- proteomics[, 1, drop = TRUE]
+# Keep only first occurrence of each identifier
+keep_idx <- !duplicated(id_col)
+proteomics <- proteomics[keep_idx, ]
+id_col <- id_col[keep_idx]
+rownames(proteomics) <- id_col; proteomics[, 1] <- NULL
+cat("Proteomics dimensions (after dedup):", nrow(proteomics), "x", ncol(proteomics), "\n")
 
 proteomics <- proteomics[, colnames(proteomics) %in% rownames(metadata), drop = FALSE]
 ord        <- match(colnames(proteomics), rownames(metadata))

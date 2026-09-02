@@ -396,49 +396,47 @@ ensembl_servers <- c(
 ensembl <- NULL
 for (server in ensembl_servers) {
   cat(sprintf("Trying Ensembl server: %s\n", server))
-  tryCatch({
+  # `break`/`next` inside a tryCatch error handler is a closure call, not the for loop's own
+  # body -- R can't resolve it there ("no loop for break/next, jumping to top level"), and
+  # `<-` assignments made inside that closure are local to it and never reach the outer
+  # `ensembl` variable anyway. Return the connection (or NULL) from tryCatch instead, and
+  # assign/break in the loop's own body where both actually work.
+  conn <- tryCatch({
     # Set biomaRt cache directory to a writable location and disable caching
     options(biomaRt.cache = FALSE)
     Sys.setenv(BIOMART_CACHE = "FALSE")
 
-    ensembl <- useMart("ensembl", dataset = dataset_name, host = server)
+    m <- useMart("ensembl", dataset = dataset_name, host = server)
     cat(sprintf("Successfully connected to: %s\n", server))
-    break
+    m
   }, error = function(e) {
     cat(sprintf("Failed to connect to %s: %s\n", server, e$message))
-    if (server == tail(ensembl_servers, 1)) {
-      cat("All Ensembl servers failed. Trying offline mode...\n")
-
-      if (nzchar(gene_annotation_backup) && file.exists(gene_annotation_backup)) {
-        cat(sprintf("Using backup gene annotation file: %s\n", gene_annotation_backup))
-        all_genes <- read.table(gene_annotation_backup, header=TRUE, sep='\t', stringsAsFactors=FALSE)
-        break
-      }
-
-      # Create a minimal gene annotation file for protein coding genes
-      # This is a fallback when BioMart is completely unavailable
-      cat("Creating minimal gene annotation file...\n")
-      minimal_genes <- data.frame(
-        tmp_symbol = RNAseq[[gene_col]],
-        ensembl_gene_id = paste0("ENS_fallback_", seq_along(RNAseq[[gene_col]])),
-        gene_biotype = "protein_coding"
-      )
-      names(minimal_genes)[names(minimal_genes) == 'tmp_symbol'] <- symbol_attr
-      write.table(minimal_genes, file = './ensembl_mapping_fallback.txt', quote=FALSE, sep = '\t', row.names = FALSE)
-      all_genes <- minimal_genes
-      break
-    }
+    NULL
   })
+  if (!is.null(conn)) {
+    ensembl <- conn
+    break
+  }
 }
 
 # If we still don't have ensembl connection, use the fallback
 if (is.null(ensembl)) {
-  cat("Using offline fallback mode for gene annotations\n")
+  cat("All Ensembl servers failed. Using offline fallback mode for gene annotations\n")
   if (nzchar(gene_annotation_backup) && file.exists(gene_annotation_backup)) {
     cat(sprintf("Using backup gene annotation file: %s\n", gene_annotation_backup))
     all_genes <- read.table(gene_annotation_backup, header=TRUE, sep='\t', stringsAsFactors=FALSE)
   } else {
-    all_genes <- read.table('./ensembl_mapping_fallback.txt', header=TRUE, sep='\t')
+    # Create a minimal gene annotation file for protein coding genes -- last-resort fallback
+    # when BioMart is completely unavailable and no backup annotation file was supplied.
+    cat("Creating minimal gene annotation file...\n")
+    minimal_genes <- data.frame(
+      tmp_symbol = RNAseq[[gene_col]],
+      ensembl_gene_id = paste0("ENS_fallback_", seq_along(RNAseq[[gene_col]])),
+      gene_biotype = "protein_coding"
+    )
+    names(minimal_genes)[names(minimal_genes) == 'tmp_symbol'] <- symbol_attr
+    write.table(minimal_genes, file = './ensembl_mapping_fallback.txt', quote=FALSE, sep = '\t', row.names = FALSE)
+    all_genes <- minimal_genes
   }
 } else {
   # Get gene annotations from BioMart

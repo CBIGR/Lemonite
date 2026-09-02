@@ -328,10 +328,13 @@ def create_cytoscape_html_network(nodes, edges, module_clusters, config_name,
     # Cluster legend (module colours)
     cluster_legend_html = ""
     for cl_name, cl_color in cluster_color_map.items():
+        # Include MegaGO descriptive label if available
+        cl_label = cluster_label_map.get(cl_name, '')
+        display_label = f"{cl_name}: {cl_label}" if cl_label and str(cl_label).strip() not in ('', 'NA', 'nan') else cl_name
         cluster_legend_html += (
             f'        <div class="legend-item">\n'
             f'            <div class="legend-color" style="background: {cl_color};"></div>\n'
-            f'            <span class="legend-label">{cl_name}</span>\n'
+            f'            <span class="legend-label">{display_label}</span>\n'
             f'        </div>\n'
         )
     # Regulator legend (one gradient swatch per type that is actually present)
@@ -2786,7 +2789,10 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
                         regulator_modules[reg_type][reg].append(module_id)
     
     # Create regulator nodes and edges
+    regulator_count = sum(len(regs) for regs in regulator_modules.values())
+    print(f"  Found {regulator_count} regulators across {len(regulator_modules)} types: {regulator_modules.keys()}")
     for reg_type, regulators in regulator_modules.items():
+        print(f"    - {reg_type}: {len(regulators)} unique regulators")
         for regulator, target_modules in regulators.items():
             modules_str = ', '.join(sorted(target_modules))
             display_name = name_lookup.get(regulator, regulator) if name_lookup else regulator
@@ -2797,7 +2803,7 @@ def create_interactive_network_visualization(module_data, module_clusters, outpu
                 'hover_info': f"<b>{display_name}</b><br>Type: {reg_type}<br>Targets ({len(target_modules)}): M{', M'.join(target_modules)}"
             }
             nodes.append(regulator_node)
-            
+
             for module_id in target_modules:
                 edge = {
                     'source': regulator,
