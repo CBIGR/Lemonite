@@ -994,7 +994,9 @@ if (perform_TFA) {
   cat(" Expression features before merge:", nrow(variable_genes), "\n")
   
   # Filter TFA_df to only include Lovering TFs
-  TFA_df_lovering <- TFA_df[rownames(TFA_df) %in% Lovering_TF_list, , drop=FALSE]
+  # decoupleR returns samples in a different order than variable_genes, and the
+  # df[rows, ] <- df2 assignment below copies by position, so align columns by name here.
+  TFA_df_lovering <- TFA_df[rownames(TFA_df) %in% Lovering_TF_list, colnames(variable_genes), drop=FALSE]
   cat(" TFA features for Lovering TFs:", nrow(TFA_df_lovering), "\n")
   
   # Start with variable genes

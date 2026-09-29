@@ -202,9 +202,12 @@ restore_names <- function(x) {
 
 read_mat <- function(path) {
   d <- read.delim(path, check.names = FALSE)
-  if ("symbol" %in% colnames(d)) {
-    rownames(d) <- d$symbol
-    d$symbol <- NULL
+  # ID column name varies by preprocessing path: RNA-seq writes "symbol",
+  # proteomics/phospho/kinase/lipid variants write "Gene_symbol".
+  id_col <- intersect(c("symbol", "Gene_symbol", "gene_symbol"), colnames(d))
+  if (length(id_col) > 0) {
+    rownames(d) <- d[[id_col[1]]]
+    d[[id_col[1]]] <- NULL
   }
   # Drop any stray non-numeric/all-NA columns (mirrors create_subset()'s junk-column guard)
   junk <- vapply(d, function(col) !is.numeric(col) || all(is.na(col)), logical(1))
@@ -296,29 +299,35 @@ for (entry in strsplit(args$regulator_files, ",")[[1]]) {
     else cat(sprintf("Warning: score file not found for %s\n", reg_type))
   }
 
-  if (is_tf) {
+  # A regulator layer's own values (e.g. decoupleR-inferred TF/kinase activity)
+  # are only in expr_all when that layer IS the primary matrix itself (the
+  # usual TF case: TF names are gene symbols that are also directly in the
+  # expression matrix). When a dedicated LemonPreprocessed_<basename>.txt
+  # exists for this regulator type -- as for proteomics-variant TF activity,
+  # computed on a different sample/feature space than the primary matrix --
+  # prefer that file regardless of the is_tf name heuristic; only fall back to
+  # expr_all (then the complete file) when no such dedicated file exists.
+  data_basename <- regtype_to_basename[[reg_type]] %||% reg_type_lower
+  omics_filename <- sprintf("LemonPreprocessed_%s.txt", data_basename)
+  omics_path <- find_file(c(
+    file.path(viewer_dir, "..", "Preprocessing", omics_filename),
+    file.path(input_dir, omics_filename),
+    file.path(input_dir, "Preprocessing", omics_filename)
+  ))
+  if (!is.null(omics_path)) {
+    omics_data <- read_mat(omics_path)
+    cat(sprintf("Loaded omics-specific data for %s from %s\n", reg_type, omics_path))
+  } else if (is_tf) {
     omics_data <- expr_all
     cat(sprintf("Using expression data for %s regulators\n", reg_type))
   } else {
-    data_basename <- regtype_to_basename[[reg_type]] %||% reg_type_lower
-    omics_filename <- sprintf("LemonPreprocessed_%s.txt", data_basename)
-    omics_path <- find_file(c(
-      file.path(viewer_dir, "..", "Preprocessing", omics_filename),
-      file.path(input_dir, omics_filename),
-      file.path(input_dir, "Preprocessing", omics_filename)
+    cat(sprintf("Falling back to complete data for %s\n", reg_type))
+    complete_path <- find_file(c(
+      file.path(viewer_dir, "..", "Preprocessing", args$complete_file),
+      file.path(input_dir, args$complete_file),
+      file.path(input_dir, "Preprocessing", args$complete_file)
     ))
-    if (!is.null(omics_path)) {
-      omics_data <- read_mat(omics_path)
-      cat(sprintf("Loaded omics-specific data for %s from %s\n", reg_type, omics_path))
-    } else {
-      cat(sprintf("Falling back to complete data for %s\n", reg_type))
-      complete_path <- find_file(c(
-        file.path(viewer_dir, "..", "Preprocessing", args$complete_file),
-        file.path(input_dir, args$complete_file),
-        file.path(input_dir, "Preprocessing", args$complete_file)
-      ))
-      omics_data <- if (!is.null(complete_path)) read_mat(complete_path) else expr_all
-    }
+    omics_data <- if (!is.null(complete_path)) read_mat(complete_path) else expr_all
   }
 
   regulators[[length(regulators) + 1]] <- list(
@@ -344,7 +353,8 @@ hn_meta   <- parse_mvf_metadata(file.path(viewer_dir, "HumanNet_interactions.mvf
 ## ---- falling back the same way module_viewer.py did if a requested type is
 ## ---- missing from sample_mapping.mvf.
 requested_annotations <- trimws(strsplit(args$annotation_types, ",")[[1]])
-selected_metadata <- sample_mapping[names(sample_mapping) %in% requested_annotations]
+requested_present <- requested_annotations[requested_annotations %in% names(sample_mapping)]
+selected_metadata <- sample_mapping[requested_present]  # order = --annotation_types order, not mvf file order
 missing <- setdiff(requested_annotations, names(sample_mapping))
 if (length(missing) > 0) {
   cat(sprintf("Warning: requested annotation type(s) not found in sample_mapping.mvf: %s\n", paste(missing, collapse = ", ")))
@@ -373,9 +383,14 @@ cat(sprintf("%d modules to process, PPI rows=%d, HumanNet rows=%d, CORUM rows=%d
 ## ============================== Sizing helpers ==============================
 
 show_names <- function(n) n <= 150
-fontsize_for <- function(n) max(3, min(9, 200 / n))
+# Floor raised from 3pt to 7pt -- below ~5pt gene names are illegible in a
+# slide/PDF. max_total_cm raised correspondingly (56 gene rows at the old
+# 34cm cap forced fontsize_for() down to ~3.5pt; at 7pt they now need ~21cm,
+# comfortably under the new cap) so heatmaps grow taller for larger modules
+# instead of shrinking their labels into unreadable text.
+fontsize_for <- function(n) max(7, min(9, 200 / n))
 row_h_cm <- function(n) {
-  max_total_cm <- 34
+  max_total_cm <- 65
   if (show_names(n)) {
     fs <- fontsize_for(n)
     target <- (fs * 1.5) / 28.35
@@ -416,9 +431,22 @@ process_module <- function(module_id) {
   cat(sprintf("Processing module %s: %d/%d genes matched\n", module_id, nrow(expr_mat), length(genes)))
 
   if (nrow(expr_mat) < 2) {
-    eigengene <- colMeans(expr_mat)
+    eigengene <- colMeans(expr_mat, na.rm = TRUE)
   } else {
-    pca <- prcomp(t(expr_mat), scale. = FALSE, center = TRUE)
+    # prcomp/svd cannot handle missing values -- real and common in mass-spec
+    # proteomics/phosphoproteomics abundance matrices (unlike RNA-seq TPM/FPKM,
+    # which is essentially always complete). Row-mean-impute a COPY used only
+    # to compute the sample ordering; the displayed expr_mat keeps its real NAs
+    # (ComplexHeatmap renders those as its na_col, not a fabricated value).
+    pca_input <- expr_mat
+    if (anyNA(pca_input)) {
+      row_means <- rowMeans(pca_input, na.rm = TRUE)
+      for (i in seq_len(nrow(pca_input))) {
+        na_j <- is.na(pca_input[i, ])
+        if (any(na_j)) pca_input[i, na_j] <- if (is.nan(row_means[i])) 0 else row_means[i]
+      }
+    }
+    pca <- prcomp(t(pca_input), scale. = FALSE, center = TRUE)
     eigengene <- pca$x[, 1]
   }
   sorted_samples <- names(sort(eigengene))
@@ -431,7 +459,15 @@ process_module <- function(module_id) {
     if (is.null(feats)) next
     present <- feats[feats %in% rownames(reg$omics_data)]
     if (length(present) == 0) next
-    mat <- reg$omics_data[present, sorted_samples, drop = FALSE]
+    # A regulator layer may have been profiled on fewer samples than the
+    # primary matrix (e.g. lipidomics run on a subset of the proteomics
+    # cohort) -- keep every column of sorted_samples for alignment across
+    # blocks, leaving genuinely unprofiled samples as NA (ComplexHeatmap's
+    # na_col) rather than erroring or silently dropping columns.
+    avail_samples <- intersect(sorted_samples, colnames(reg$omics_data))
+    mat <- matrix(NA_real_, nrow = length(present), ncol = length(sorted_samples),
+                  dimnames = list(present, sorted_samples))
+    mat[, avail_samples] <- reg$omics_data[present, avail_samples, drop = FALSE]
     # TFA scores aren't pre-scaled in LemonPreprocessed_complete.txt -- row-wise
     # z-score them (same special case module_viewer.py applied to TF blocks).
     if (reg$is_tf) {

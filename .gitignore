@@ -6,3 +6,8 @@ nextflow/PKN/cache/
 # Claude Code local docs — keep out of the public repo
 CLAUDE.md
 .claude/
+# Not part of the public repo
+robustness_analysis/
+protein_clustering*/
+*.pptx
+*pptx*.py

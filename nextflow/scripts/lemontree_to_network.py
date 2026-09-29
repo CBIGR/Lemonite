@@ -397,8 +397,11 @@ def create_sample_mapping(DESeq_groups):
     print(f"{len(sample_ids)} samples included in the analysis.")
     
     # Define color palettes for different metadata types
-    colors_categorical = ['RED', 'BLUE', 'GREEN', 'ORANGE', 'PURPLE', 'YELLOW', 'PINK', 'CYAN', 
-                         'BROWN', 'MAGENTA', 'TEAL', 'LIME', 'NAVY', 'MAROON', 'OLIVE', 'CORAL']
+    # Validated categorical palette (fixed hue order, CVD-safe adjacent pairs;
+    # see the dataviz color-formula reference) -- replaces the old saturated
+    # named-color list, which clashed and wasn't colorblind-checked.
+    colors_categorical = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4',
+                           '#008300', '#4a3aa7', '#e34948']
     
     # Color palettes for specific known metadata types
     colors_sex = {'M': 'BLUE', 'F': 'PINK', 'Male': 'BLUE', 'Female': 'PINK', 
@@ -412,7 +415,8 @@ def create_sample_mapping(DESeq_groups):
         'batch': 'Batch',
         'biopsy_location': 'Biopsy Location',
         'tissue': 'Tissue Type',
-        'condition': 'Condition'
+        'condition': 'Condition',
+        'TMZ_RESISTANCE': 'TMZ Resistance'
     }
     
     # Process all available metadata columns
