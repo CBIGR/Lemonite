@@ -22,7 +22,7 @@ import argparse, csv, os
 import numpy as np
 import openpyxl
 
-MMC3 = "/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/data/1-s2.0-S1535610821000507-mmc3.xlsx"
+MMC3 = "/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/data/1-s2.0-S1535610821000507-mmc3.xlsx"
 SHEET = "phosphoproteome_normalized"
 
 

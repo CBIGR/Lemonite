@@ -17,7 +17,7 @@ Produces, under --out-dir:
 """
 import argparse, csv, os, shutil
 
-DATA = "/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/data"
+DATA = "/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/data"
 
 
 def build_metadata(out_dir, samples):

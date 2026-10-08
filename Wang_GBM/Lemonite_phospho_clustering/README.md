@@ -31,7 +31,7 @@ can't ingest a phospho-as-primary matrix); see `PIPELINE_ISSUES.md`.
 
 Run per variant, e.g.:
 ```bash
-RES=/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/phospho_clustering
+RES=/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/LemonTree/phospho_clustering
 PY=/home/borisvdm/Software/miniconda3/envs/LemonIte/bin/python3
 SIF=/home/borisvdm/repo/LemonIte/nextflow/lemontree-pipeline_v1.0.0.sif
 

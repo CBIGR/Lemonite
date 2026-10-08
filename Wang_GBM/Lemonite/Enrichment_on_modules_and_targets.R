@@ -46,7 +46,7 @@ ANALYSIS_METHOD <- "GSEA"  # Change this to choose your analysis method
 GSEA_SCOPE <- "module_members"
 
 # Base directory - UPDATE THIS PATH for IBD Lloyd-Price data
-base_dir <- '/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum/'
+base_dir <- '/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/LemonTree/transcriptomics_clustering/'
 
 # Parameters that should match your LemonTree_to_network.ipynb settings
 fold <- 2

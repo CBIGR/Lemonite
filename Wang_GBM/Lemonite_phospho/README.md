@@ -12,7 +12,7 @@ Everything here is kept separate from the original run:
 |---|---|
 | New scripts | `Wang_GBM/Lemonite_phospho/` (this folder) |
 | New results | `…/results/LemonTree/noProteomics_percentile2_divide_by_sum_phospho/` |
-| Base run (unmodified, read-only source of modules) | `…/results/LemonTree/noProteomics_percentile2_divide_by_sum/` |
+| Base run (unmodified, read-only source of modules) | `…/results/LemonTree/transcriptomics_clustering/` |
 
 ## What "regulator assignment" is here
 
@@ -35,7 +35,7 @@ re-clustering, existing regulators untouched.
 `phosphoproteome_normalized` sheet of the Wang 2021 CPTAC-GBM supplement:
 
 ```
-/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/data/1-s2.0-S1535610821000507-mmc3.xlsx
+/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/data/1-s2.0-S1535610821000507-mmc3.xlsx
 ```
 
 - 70,330 phosphosites (peptide level) × 109 tumour samples.
@@ -88,7 +88,7 @@ first).
 
 ```bash
 cd Wang_GBM/Lemonite_phospho
-BASE=…/results/LemonTree/noProteomics_percentile2_divide_by_sum/Lemon_out
+BASE=…/results/LemonTree/transcriptomics_clustering/Lemon_out
 RD=…/results/LemonTree/noProteomics_percentile2_divide_by_sum_phospho
 MMC3=…/Wang2021/data/1-s2.0-S1535610821000507-mmc3.xlsx
 PY=…/miniconda3/envs/LemonIte/bin/python3   # any env with numpy + openpyxl

@@ -1,7 +1,7 @@
 #!/usr/bin/Rscript 
 
-setwd('/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/MOFA_with_lipidomics')
-base_dir <- '/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/'
+setwd('/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/MOFA_with_lipidomics')
+base_dir <- '/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/'
 # BiocManager::install("MOFA2")
 library(DESeq2)
 library(data.table)

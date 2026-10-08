@@ -27,7 +27,7 @@ library(enrichplot)
 library(ggplot2)
 
 
-base_dir <- '/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree_bulk/no_controls/Variability_0.7_5817genes_old/'
+base_dir <- '/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/LemonTree_bulk/no_controls/Variability_0.7_5817genes_old/'
 setwd(paste0(base_dir, 'Enrichment/'))
 
 organism <- org.Hs.eg.db

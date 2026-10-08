@@ -10,8 +10,8 @@ library(IMIFA)
 library(ggplot2)
 
  
-setwd('/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/MixOmics')
-base_dir <- '/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/'
+setwd('/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/MixOmics')
+base_dir <- '/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/'
 
 ########################################################################################
 # Load datasets and do some exploration

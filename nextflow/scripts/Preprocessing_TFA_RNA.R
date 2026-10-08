@@ -602,6 +602,15 @@ if (contrast_column %in% colnames(metadata_df)) {
 }
 
 RNAseq <- RNAseq_coding[, colnames(RNAseq_coding) %in% metadata_df[[sample_id_col]]] # Select samples
+meta_only <- setdiff(as.character(metadata_df[[sample_id_col]]), colnames(RNAseq))
+if (ncol(RNAseq) == 0) stop(sprintf("No expression columns match the metadata '%s' values", sample_id_col))
+if (length(meta_only) > 0)
+  cat(sprintf("[WARNING] %d metadata sample(s) not found in the expression data, excluded: %s\n",
+              length(meta_only), paste(meta_only, collapse = ", ")))
+not_used <- setdiff(colnames(RNAseq_coding), colnames(RNAseq))
+if (length(not_used) > 0)
+  cat(sprintf("[INFO] Expression columns not used as samples (annotation columns, or samples absent from metadata): %s\n",
+              paste(not_used, collapse = ", ")))
 
 # Debug: Check sample matching
 cat("RNA-seq samples found:", length(colnames(RNAseq)), "\n")
@@ -1311,8 +1320,8 @@ RNA_preprocessed_noTFA_ids <- RNA_preprocessed_noTFA
 RNA_preprocessed_noTFA_ids$symbol <- row.names(RNA_preprocessed_noTFA_ids)
 RNA_preprocessed_noTFA_ids <- merge(RNA_preprocessed_noTFA_ids, id_ensembl, by.x='symbol', by.y = symbol_attr)
 RNA_preprocessed_noTFA_ids <- as.data.frame(RNA_preprocessed_noTFA_ids %>% group_by(symbol) %>% dplyr::filter(row_number()==1))
-RNA_preprocessed_noTFA_ids <- RNA_preprocessed_noTFA_ids[, c(1,ncol(RNA_preprocessed_noTFA_ids)-1,2:(ncol(RNA_preprocessed_noTFA_ids)-2))]
-names(RNA_preprocessed_noTFA_ids)[2] <- 'ensembl_gene_id'
+# select by name: the annotation table can carry extra columns (e.g. gene_biotype), so positions are not fixed
+RNA_preprocessed_noTFA_ids <- RNA_preprocessed_noTFA_ids[, c('symbol', 'ensembl_gene_id', colnames(RNA_preprocessed_noTFA))]
 write.table(RNA_preprocessed_noTFA_ids, './LemonTree/Preprocessing/LemonPreprocessed_expression.txt', sep = '\t', quote=FALSE, row.names=FALSE)
 cat("[OK] Saved: LemonPreprocessed_expression.txt (HVGs + Lovering TFs, NO TFA)\n")
 
@@ -1321,8 +1330,7 @@ RNA_preprocessed_withTFA_ids <- RNA_preprocessed
 RNA_preprocessed_withTFA_ids$symbol <- row.names(RNA_preprocessed_withTFA_ids)
 RNA_preprocessed_withTFA_ids <- merge(RNA_preprocessed_withTFA_ids, id_ensembl, by.x='symbol', by.y = symbol_attr)
 RNA_preprocessed_withTFA_ids <- as.data.frame(RNA_preprocessed_withTFA_ids %>% group_by(symbol) %>% dplyr::filter(row_number()==1))
-RNA_preprocessed_withTFA_ids <- RNA_preprocessed_withTFA_ids[, c(1,ncol(RNA_preprocessed_withTFA_ids)-1,2:(ncol(RNA_preprocessed_withTFA_ids)-2))]
-names(RNA_preprocessed_withTFA_ids)[2] <- 'ensembl_gene_id'
+RNA_preprocessed_withTFA_ids <- RNA_preprocessed_withTFA_ids[, c('symbol', 'ensembl_gene_id', colnames(RNA_preprocessed))]
 cat("[OK] Prepared RNA data with TFA for complete dataframe\n")
 
 # Collect all omics data for complete dataframe
@@ -1411,8 +1419,18 @@ if (!is.null(TF_file) && file.exists(TF_file)) {
   cat(sprintf("[WARNING]  Warning: TF file not found: %s\n", TF_file))
 }
 
-# Combine all omics datasets
-complete_df <- do.call(rbind, c(omics_datasets, list(fill=TRUE)))
+# Combine all omics datasets. Base rbind() matches data-frame columns by name (it has no fill= argument:
+# passing fill=TRUE added a constant all-1 row named "TRUE"). Require every layer to carry exactly the RNA
+# sample columns so a sample mismatch fails here instead of misaligning or dropping samples.
+ref_cols <- colnames(omics_datasets[[1]])
+for (i in seq_along(omics_datasets)) {
+  diff_cols <- union(setdiff(colnames(omics_datasets[[i]]), ref_cols), setdiff(ref_cols, colnames(omics_datasets[[i]])))
+  if (length(diff_cols) > 0)
+    stop(sprintf("LemonPreprocessed_complete: regulator layer %d does not have the same sample columns as the RNA data (differs in: %s)",
+                 i - 1, paste(diff_cols, collapse = ", ")))
+  omics_datasets[[i]] <- omics_datasets[[i]][, ref_cols]
+}
+complete_df <- do.call(rbind, omics_datasets)
 write.table(complete_df, './LemonTree/Preprocessing/LemonPreprocessed_complete.txt', sep = '\t', quote=FALSE, row.names=FALSE)
 cat("[OK] Saved: LemonPreprocessed_complete.txt\n")
 

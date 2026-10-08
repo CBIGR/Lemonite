@@ -28,8 +28,8 @@ LAST=${3:-7}
 PROJ=/home/borisvdm/repo/LemonIte/nextflow
 SIF=$PROJ/lemontree-pipeline_v1.0.0.sif
 SCR=$PROJ/scripts
-RESULTS_ROOT=/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum_phospho
-BASE=/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum
+RESULTS_ROOT=/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/LemonTree/noProteomics_percentile2_divide_by_sum_phospho
+BASE=/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/LemonTree/transcriptomics_clustering
 RUN=$RESULTS_ROOT/$VARIANT/run
 LOGDIR=$RESULTS_ROOT/$VARIANT/downstream_logs
 mkdir -p "$LOGDIR"

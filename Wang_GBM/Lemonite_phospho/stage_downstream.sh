@@ -13,9 +13,9 @@ set -euo pipefail
 
 VARIANT=${1:?"usage: stage_downstream.sh <all_phosphosites|top2000_variable>"}
 
-BASE=/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum
-RESULTS_ROOT=/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum_phospho
-DATA=/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/data
+BASE=/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/LemonTree/transcriptomics_clustering
+RESULTS_ROOT=/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/LemonTree/noProteomics_percentile2_divide_by_sum_phospho
+DATA=/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/data
 
 VDIR="$RESULTS_ROOT/$VARIANT"
 RUN="$VDIR/run"

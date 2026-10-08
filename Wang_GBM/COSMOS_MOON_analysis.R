@@ -10,7 +10,7 @@
 ####   Combined_lipidomics_weights_all_factors.txt
 ###########################################################################################
 
-base_dir    <- '/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/'
+base_dir    <- '/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/'
 weights_dir <- paste0(base_dir, 'results/MOFA_with_lipidomics/feature_weights_all_factors/')
 cosmos_dir  <- paste0(base_dir, 'results/MOFA_with_lipidomics/To_COSMOS/')
 
@@ -128,7 +128,7 @@ data("HMDB_mapper_vec")
 
 # Metabolite name → HMDB mapping table
 metab_to_hmdb_moon <- fread(
-  paste0(base_dir, 'results/LemonTree/noProteomics_percentile2_divide_by_sum/Preprocessing/name_map.csv')
+  paste0(base_dir, 'results/LemonTree/transcriptomics_clustering/Preprocessing/name_map.csv')
 )
 
 # Dorothea PKN in source/interaction/target format (reused each iteration)
@@ -221,7 +221,7 @@ for (fact in 1:n_factors) {
   metab_inputs <- weights$Metabolomics[, fact]
   
   # Read mapping table from metabolite to HMDB
-  metab_to_hmdb <- fread('/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/noProteomics_percentile2_divide_by_sum/Preprocessing/name_map.csv')
+  metab_to_hmdb <- fread('/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/LemonTree/transcriptomics_clustering/Preprocessing/name_map.csv')
   
   # Keep only metabolites present in the data
   metab_to_hmdb <- metab_to_hmdb[metab_to_hmdb$Query %in% names(metab_inputs), ]

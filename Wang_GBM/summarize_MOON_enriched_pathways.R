@@ -24,7 +24,7 @@ suppressPackageStartupMessages({
 # (Factor_N_MOON / Factor_N_COSMOS) works without further changes.
 cosmos_dir <- commandArgs(trailingOnly = TRUE)[1]
 if (is.na(cosmos_dir) || !nzchar(cosmos_dir)) {
-  cosmos_dir <- '/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/MOFA_with_lipidomics/To_COSMOS/'
+  cosmos_dir <- '/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/MOFA_with_lipidomics/To_COSMOS/'
 }
 cosmos_dir <- paste0(sub('/*$', '', cosmos_dir), '/')   # ensure single trailing slash
 if (!dir.exists(cosmos_dir)) stop("cosmos_dir does not exist: ", cosmos_dir)

@@ -603,6 +603,61 @@ if (ANALYSIS_METHOD %in% c("GSEA", "both")) {
 # EnrichR Analysis (if selected)
 ############################################################################################################################################
 
+# Enrichr queries go through Enrichr's explicit userListId API. enrichR::enrichr() instead uploads the list and
+# then fetches "the last list of this session": when the upload is rate-limited (HTTP 429) it only prints a
+# message, and the fetch returns the PREVIOUS list's results - which, in the parallel workers below, attached
+# other modules' enrichments to a module (e.g. a 14-gene module came back with immunoglobulin/complement terms
+# at p ~ 1e-18), while a rate-limited fetch raised "website unreachable" and silently left a module empty.
+# The returned table is Enrichr's own export, parsed exactly as enrichR does.
+enrichr_by_list_id <- function(genes, dbs) {
+  base <- getOption("enrichR.base.address", "https://maayanlab.cloud/Enrichr/")
+  up <- httr::POST(paste0(base, "addList"), encode = "multipart",
+                   body = list(list = paste(unique(as.character(genes)), collapse = "\n"), description = "Lemonite"))
+  if (httr::status_code(up) != 200) stop(sprintf("Enrichr addList HTTP %d", httr::status_code(up)))
+  list_id <- jsonlite::fromJSON(httr::content(up, as = "text", encoding = "UTF-8"))$userListId
+  if (is.null(list_id)) stop("Enrichr addList returned no userListId")
+  res <- list()
+  for (db in dbs) {
+    q <- httr::GET(paste0(base, "export"), query = list(userListId = list_id, filename = "enrichr", backgroundType = db))
+    if (httr::status_code(q) != 200) stop(sprintf("Enrichr export HTTP %d (%s)", httr::status_code(q), db))
+    txt <- gsub("&#39;", "'", httr::content(q, as = "text", encoding = "UTF-8"))
+    res[[db]] <- if (nzchar(trimws(txt))) {
+      read.table(text = txt, sep = "\t", header = TRUE, quote = "", comment.char = "", stringsAsFactors = FALSE)
+    } else data.frame()
+  }
+  res
+}
+
+# Safety net: every returned term's overlapping genes must belong to the submitted list.
+enrichr_result_matches <- function(res, genes) {
+  genes_up <- toupper(as.character(genes))
+  for (db in names(res)) {
+    d <- res[[db]]
+    if (is.null(d) || !is.data.frame(d) || nrow(d) == 0 || !"Genes" %in% colnames(d)) next
+    hit <- toupper(unlist(strsplit(as.character(d$Genes), ";", fixed = TRUE)))
+    if (any(!hit %in% genes_up)) return(FALSE)
+  }
+  TRUE
+}
+
+# Retry rate limits / transient HTTP failures with backoff instead of losing the module.
+safe_enrichr <- function(genes, dbs, max_tries = 6) {
+  for (i in seq_len(max_tries)) {
+    res <- tryCatch(enrichr_by_list_id(genes, dbs), error = function(e) e)
+    if (inherits(res, "error")) {
+      wait_time <- 2 ^ i + runif(1, 0, 2)
+      cat(sprintf("Enrichr query failed (%s); retry %d/%d in %.0f s\n", conditionMessage(res), i, max_tries, wait_time))
+      Sys.sleep(wait_time)
+    } else if (!enrichr_result_matches(res, genes)) {
+      cat(sprintf("[WARNING] Enrichr returned results for a different gene list (attempt %d/%d) - retrying\n", i, max_tries))
+      Sys.sleep(runif(1, 2, 6))
+    } else {
+      return(res)
+    }
+  }
+  stop("Enrichr query failed after multiple attempts")
+}
+
 if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
   cat("\n=== Running EnrichR Analysis ===\n")
   
@@ -671,7 +726,7 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
     tryCatch({
       # Run enrichment with increased delay for parallel safety
       Sys.sleep(runif(1, 1, 3))  # Random delay between 1-3 seconds
-      enrichment <- enrichr(genes_in_cluster, dbs_enrichr)
+      enrichment <- safe_enrichr(genes_in_cluster, dbs_enrichr)
       
       # Process each database
       for (db in dbs_enrichr) {
@@ -846,23 +901,6 @@ cat("\n[OK] All output files are compatible with module_overview.py downstream p
 effective_threads_regulators <- n_threads  # Use all specified threads
 cat("Using", effective_threads_regulators, "threads for regulator enrichment analysis\n")
 plan(multisession, workers = effective_threads_regulators)
-
-safe_enrichr <- function(genes, dbs, max_tries = 5) {
-  for (i in 1:max_tries) {
-    tryCatch({
-      return(do.call(enrichr, list(as.character(genes), dbs)))
-    }, error = function(e) {
-      if (grepl("429", e$message)) {
-        wait_time <- 2 ^ i
-        cat("Rate limited. Retrying in", wait_time, "seconds...\n")
-        Sys.sleep(wait_time)
-      } else {
-        stop(e)  # Other error
-      }
-    })
-  }
-  stop("Failed after multiple attempts due to rate limiting.")
-}
 
 # Function to perform enrichment analysis for a single regulator
 run_enrichment_for_regulator <- function(reg, reg2genes, dbs, outdir) {

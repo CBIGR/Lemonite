@@ -1,11 +1,11 @@
 #!/usr/bin/Rscript
 
-setwd('/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results')
-base_dir <- '/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/'
-DE_dir <- '/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/DE_analysis/'
-TFA_dir <- '/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/TFA/'
+setwd('/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results')
+base_dir <- '/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/'
+DE_dir <- '/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/DE_analysis/'
+TFA_dir <- '/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/TFA/'
 
-'/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree_bulk/no_controls/Variability_0.7_5817genes_old/'
+'/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/LemonTree_bulk/no_controls/Variability_0.7_5817genes_old/'
 
 # You will need the following (sub)directory structure:
 # ./
@@ -53,7 +53,7 @@ perform_TFA <- TRUE
 variability_threshold <- 0.7
 # HVGs <- 6000
 
-TFs <- '/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/data/lovering_TF_list.txt'
+TFs <- '/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/data/lovering_TF_list.txt'
 
 
 ###########################################################################################
@@ -306,15 +306,13 @@ write.table(RNA_preprocessed, paste0(base_dir, 'Preprocessing/LemonPreprocessed_
 
 
 
-## Replace expression data by TFA scores
-ind_a <- which(RNA_preprocessed_noTFA$symbol %in% rownames(TFA_df)) # These indices will need to be replaced by TFA
-ind_b <- which(rownames(TFA_df) %in% RNA_preprocessed_noTFA$symbol) # THese indices indicate were to find TFA values
-
-## Replace expression data by TFA scores
-matched_rows <- match(rownames(variable_genes), rownames(TFA_df))
-variable_genes[ind_a, ] <- TFA_df[ind_b, ]
+## Replace expression data by TFA scores, aligned by TF symbol (rows) and sample name (columns).
+## The previous version took its row indices from RNA_preprocessed_noTFA (a different, re-sorted table)
+## and copied sample columns by position, so TFA scores could land on the wrong gene and sample.
+shared_tfs <- intersect(rownames(variable_genes), rownames(TFA_df))
+variable_genes[shared_tfs, ] <- as.matrix(TFA_df[shared_tfs, colnames(variable_genes), drop=FALSE])
 new_genes <- setdiff(rownames(TFA_df), rownames(variable_genes))
-variable_genes <- rbind(variable_genes, TFA_df[new_genes,])
+variable_genes <- rbind(variable_genes, as.matrix(TFA_df[new_genes, colnames(variable_genes), drop=FALSE]))
 
 # # Scale the complete dataframe
 RNA_preprocessed <- as.data.frame(t(scale(t(variable_genes)))) # Variable genes contains unscaled data
@@ -435,7 +433,7 @@ write.table(abundancies, paste0(base_dir, 'Preprocessing/LemonPreprocessed_metab
 
 
 
-complete_df <- rbind(RNA_preprocessed, abundancies, lipidomics, fill=TRUE)
+complete_df <- rbind(RNA_preprocessed, abundancies, lipidomics)  # base rbind has no fill= argument (fill=TRUE added an all-1 "TRUE" row)
 # Remove the last row
 complete_df <- complete_df[-nrow(complete_df),]
 

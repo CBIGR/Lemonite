@@ -83,7 +83,7 @@ RNAseq <- fread(expression, header=TRUE, data.table=TRUE)
 
 #id_ensembl <- all_genes[all_genes$hgnc_symbol %in% RNAseq$count, ]
 
-# write.table(id_ensembl[,c(2,1)], file = '/home/boris/Documents/PhD/gut_brain/IBD/Lloyd-Price2019/results/LemonTree_CollecTri_consensus/Preprocessing/ensemble_mapping.txt', quote=FALSE, sep = '\t', row.names = FALSE)
+# write.table(id_ensembl[,c(2,1)], file = '/home/borisvdm/Documents/PhD/Lemonite/Lloyd-Price_IBD/results/LemonTree_CollecTri_consensus/Preprocessing/ensemble_mapping.txt', quote=FALSE, sep = '\t', row.names = FALSE)
 id_ensembl <- fread('/home/borisvdm/Documents/PhD/Lemonite/ensembl_mapping_jan2024.txt', header=TRUE, data.table=TRUE)
 
 
@@ -250,7 +250,9 @@ write.table(RNA_preprocessed_noTFA, './Preprocessing/LemonPreprocessed_expressio
 
 ## Create RNA_preprocessed_withTFA: HVGs + Lovering TFs (with TFA where available, else expression)
 # Filter TFA_df to only include Lovering TFs
-TFA_df_lovering <- TFA_df[rownames(TFA_df) %in% Lovering_TF_list, , drop=FALSE]
+# decoupleR returns samples in a different order than variable_genes, and the df[rows, ] <- df2
+# assignments below copy by position, so align columns by name here (same fix as nextflow, commit 09cc1ff).
+TFA_df_lovering <- TFA_df[rownames(TFA_df) %in% Lovering_TF_list, colnames(variable_genes), drop=FALSE]
 
 # Start with variable genes
 RNA_preprocessed_withTFA <- variable_genes
@@ -347,7 +349,7 @@ abundancies <- abundancies[, c(ncol(abundancies),(ncol(abundancies)-1),1:(ncol(a
 write.table(abundancies, './Preprocessing/LemonPreprocessed_metabolomics.txt', sep = '\t', quote=FALSE, row.names=FALSE)
 
 # Create complete dataframe with TFA
-complete_df <- rbind(RNA_preprocessed_withTFA_ids, abundancies, fill=TRUE)
+complete_df <- rbind(RNA_preprocessed_withTFA_ids, abundancies)  # base rbind has no fill= argument (fill=TRUE added an all-1 "TRUE" row)
 write.table(complete_df, './Preprocessing/LemonPreprocessed_complete.txt', sep = '\t', quote=FALSE, row.names=FALSE)
 write.table(rownames(abundancies), './Preprocessing/metabolites.txt', quote = FALSE, row.names = FALSE, col.names=FALSE)
 write.table(DESeq_groups, './Preprocessing/DESeq_groups.txt', quote=FALSE, sep='\t', row.names = TRUE)

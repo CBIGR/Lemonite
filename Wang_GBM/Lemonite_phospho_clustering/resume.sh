@@ -4,7 +4,7 @@
 # clustering + regulator assignment where missing. Safe to re-run: it skips finished steps.
 set -uo pipefail
 
-RES=/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/results/LemonTree/phospho_clustering
+RES=/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/results/LemonTree/phospho_clustering
 HERE=$(dirname "$(readlink -f "$0")")
 
 for V in top5000_hvg all_sites; do

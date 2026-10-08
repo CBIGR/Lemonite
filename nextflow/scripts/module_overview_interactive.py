@@ -24,6 +24,7 @@ import warnings
 import re
 import subprocess
 import glob
+import hashlib
 import shutil
 from scipy.stats import mannwhitneyu, kruskal, rankdata
 from scipy.spatial.distance import pdist, squareform
@@ -2604,7 +2605,19 @@ def parse_megago_output(output_text, bp_files):
     
     return similarity_matrix, module_ids
 
-def megago_cluster_modules(module_pathways, bp_terms_df, n_clusters=5, output_dir='.', skip_megago=False, megago_workers=8):
+def megago_input_fingerprint(megago_dir):
+    """sha256 over the BP term files MegaGO compares (names + contents), to decide whether a saved
+    similarity matrix can be reused."""
+    h = hashlib.sha256()
+    for f in sorted(glob.glob(os.path.join(megago_dir, '*_BP_terms.txt'))):
+        h.update(os.path.basename(f).encode())
+        with open(f, 'rb') as fh:
+            h.update(fh.read())
+    return h.hexdigest()
+
+
+def megago_cluster_modules(module_pathways, bp_terms_df, n_clusters=5, output_dir='.', skip_megago=False, megago_workers=8,
+                           reuse_megago=False):
     """
     Cluster modules using megaGO on canonical BP top_30 terms when available,
     otherwise fall back to pathway similarity.
@@ -2648,7 +2661,31 @@ def megago_cluster_modules(module_pathways, bp_terms_df, n_clusters=5, output_di
 
         if megago_dir:
             print(f"   Created MegaGO files in: {megago_dir}")
-            similarity_matrix, megago_module_ids = run_megago_clustering(megago_dir, max_workers=megago_workers)
+            # MegaGO only depends on the modules' GO-BP terms: with --reuse_megago, a saved similarity matrix is
+            # reused when the term files are byte-identical to the ones it was computed from (pairwise MegaGO is
+            # the slow part of this script).
+            matrix_file = os.path.join(megago_dir, '..', 'megago_similarity_matrix.csv')
+            hash_file = os.path.join(megago_dir, '..', 'megago_input.sha256')
+            fingerprint = megago_input_fingerprint(megago_dir)
+            similarity_matrix, megago_module_ids = None, None
+            if reuse_megago and os.path.exists(matrix_file) and os.path.exists(hash_file):
+                with open(hash_file) as fh:
+                    saved = fh.read().strip()
+                if saved == fingerprint:
+                    sim_df = pd.read_csv(matrix_file, index_col=0)
+                    sim_df.index = sim_df.index.astype(str)
+                    sim_df.columns = sim_df.columns.astype(str)
+                    similarity_matrix, megago_module_ids = sim_df.values, list(sim_df.index)
+                    print(f"   Reusing saved MegaGO similarity matrix ({len(megago_module_ids)} modules, inputs unchanged)")
+                else:
+                    print("   Saved MegaGO matrix was computed from different GO terms - recomputing")
+            elif reuse_megago:
+                print("   No saved MegaGO matrix with input fingerprint found - computing")
+            if similarity_matrix is None:
+                similarity_matrix, megago_module_ids = run_megago_clustering(megago_dir, max_workers=megago_workers)
+                if similarity_matrix is not None:
+                    with open(hash_file, 'w') as fh:
+                        fh.write(fingerprint + '\n')
 
             if similarity_matrix is not None:
                 print("Successfully obtained MegaGO similarity matrix")
@@ -3862,6 +3899,9 @@ def main():
                        help='Run identifier used as network title')
     parser.add_argument('--skip_megago', action='store_true', default=False,
                        help='Skip MegaGO semantic-similarity clustering and use the pathway-similarity fallback instead')
+    parser.add_argument('--reuse_megago', action='store_true', default=False,
+                       help='Reuse a saved megago_similarity_matrix.csv when the GO-BP term files are unchanged '
+                            '(checked with the fingerprint saved next to it); otherwise recompute')
     parser.add_argument('--megago_workers', type=int, default=8,
                        help='Max parallel worker threads for pairwise MegaGO comparisons (default: 8)')
 
@@ -4272,7 +4312,8 @@ def main():
         args.n_clusters,
         output_dir=top30_dir,
         skip_megago=args.skip_megago,
-        megago_workers=args.megago_workers
+        megago_workers=args.megago_workers,
+        reuse_megago=args.reuse_megago
     )
     cluster_assignments_df, cluster_assignments_path = write_cluster_assignments(
         module_clusters,

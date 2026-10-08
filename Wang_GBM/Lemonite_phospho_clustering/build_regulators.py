@@ -16,7 +16,7 @@ up each regulator's profile. Columns = the phospho clustering samples (missing v
 import argparse, csv, os
 import numpy as np
 
-DATA = "/home/borisvdm/Documents/PhD/thesis_Mirte/Wang2021/data"
+DATA = "/home/borisvdm/Documents/PhD/Lemonite/Wang_GBM/data"
 
 
 def sanitize(name):

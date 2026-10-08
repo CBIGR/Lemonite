@@ -84,7 +84,7 @@ publication_colors <- c(
 
 
 # Load the data
-setwd('/home/borisvdm/Documents/PhD/gut_brain/IBD/Lloyd-Price2019/Exp_validation')
+setwd('/home/borisvdm/Documents/PhD/Lemonite/Lloyd-Price_IBD/Exp_validation')
 # Read Excel with
 
 file <- 'Analyse_qPCR.xlsx'
