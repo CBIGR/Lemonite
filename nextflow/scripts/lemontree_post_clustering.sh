@@ -97,11 +97,26 @@ if [ ! -f "Lemon_out/clusterfile" ] || [ ! -s "Lemon_out/clusterfile" ]; then
     done
 fi
 
+# LemonTree treats every column after the first as a sample, so the ensembl_gene_id
+# annotation column (2nd) of the preprocessed matrices would be read as an extra all-missing
+# sample. Hand LemonTree copies without it.
+lemon_input() {
+    local src=$1 dst=$2
+    if [ "$(head -1 "$src" | cut -f2)" = "ensembl_gene_id" ]; then
+        cut -f1,3- "$src" > "$dst"
+    else
+        cp -L "$src" "$dst"
+    fi
+}
+mkdir -p lemontree_inputs
+lemon_input Preprocessing/LemonPreprocessed_expression.txt lemontree_inputs/expression.txt
+lemon_input Preprocessing/LemonPreprocessed_complete.txt lemontree_inputs/complete.txt
+
 # Step 1: Generate tight clusters
 echo "Generating tight clusters..."
 java -cp ${CLASSPATH} lemontree.modulenetwork.RunCli \
     -task tight_clusters \
-    -data_file Preprocessing/LemonPreprocessed_expression.txt \
+    -data_file lemontree_inputs/expression.txt \
     -cluster_file Lemon_out/clusterfile \
     -output_file Lemon_out/tight_clusters.txt \
     -node_clustering true \
@@ -177,7 +192,7 @@ for pair in "${REGULATOR_PAIRS[@]}"; do
 
         java -cp ${CLASSPATH} lemontree.modulenetwork.RunCli \
             -task regulators \
-            -data_file Preprocessing/LemonPreprocessed_complete.txt \
+            -data_file lemontree_inputs/complete.txt \
             -reg_file "$REG_LIST_FILE" \
             -cluster_file Lemon_out/tight_clusters.txt \
             -output_file Lemon_out/$PREFIX

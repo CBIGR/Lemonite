@@ -28,7 +28,7 @@ At a high level, the published workflow is:
 
 ### Software
 
-- Nextflow `>= 23.04.0`
+- Nextflow `>= 23.04.0` and `< 26` (Nextflow 26 strict config syntax is not supported yet; use `NXF_VER=25.04.6`)
 - Java 11+
 - Singularity (required — the only supported execution backend)
 
@@ -55,6 +55,7 @@ The pipeline defines these profiles in `nextflow.config` and `conf/*.config`:
 git clone https://github.com/CBIGR/Lemonite.git
 cd Lemonite/nextflow
 
+export NXF_VER=25.04.6   # Nextflow 26.x uses a strict config syntax this pipeline does not support yet
 curl -s https://get.nextflow.io | bash
 chmod +x nextflow
 sudo mv nextflow /usr/local/bin/
@@ -199,13 +200,13 @@ Two related defaults matter:
 If you do not provide `--run_id`, the pipeline auto-generates one using:
 
 ```text
-{top_n_genes}HVG_coherence{coherence_threshold}_{method_suffix}_clusters{n_clusters}
+{top_n_genes}HVG_coherence{coherence_threshold}_{method_suffix}_clusters{n_clusters}_minW{lemontree_tight_min_weight}
 ```
 
 Examples:
 
-- `5000HVG_coherence0.6_top2.0pct_clusters100`
-- `2000HVG_coherence0.6_fold2.0x_clusters5`
+- `5000HVG_coherence0.6_top2.0pct_clusters100_minW0.25`
+- `2000HVG_coherence0.6_fold2.0x_clusters5_minW0.25`
 
 ## Input Directory Layout
 
@@ -368,11 +369,11 @@ It is used for:
 | Parameter | Default | Notes |
 | --- | --- | --- |
 | `--preprocessing_type` | `rna` | Selects the preprocessing script: `rna` (DESeq2 + TFA, for RNA-seq counts) or `proteomics` (pre-scaled data, no DESeq2) |
-| `--top_n_genes` | `5000` | Number of highly variable genes retained |
+| `--top_n_genes` | `5000` | Number of highly variable genes retained. All transcription factors from the TF list are added on top of this, so the clustered matrix is larger (the test dataset clusters 2,259 features for `top_n_genes = 1000`). |
 | `--perform_tfa` | `true` | Enables TF activity inference (works for both preprocessing types) |
 | `--use_omics_specific_scaling` | `true` | Pareto scaling for metabolomics/lipidomics; z-score scaling for transcriptomics. Set `false` to force z-score for all layers (legacy behaviour). |
 | `--gene_annotation_file` | `null` | Path to a pre-downloaded BioMart annotation TSV. Required on HPC nodes without internet access. |
-| `--metabolomics_labels_file` | `null` | Optional path to a metabolite name→ID mapping TSV/CSV. Overrides `data/metabolomics_name_map.csv` when provided. |
+| `--metabolomics_labels_file` | `null` | Only used with `--preprocessing_type proteomics`. Optional path to a metabolite name→ID mapping TSV/CSV. Overrides `data/metabolomics_name_map.csv` when provided. |
 | `--deseq_contrast1` | `diagnosis` | Main metadata grouping column, used for DESeq2 and PCA colouring |
 | `--design_formula` | `~ diagnosis` | DESeq2 design formula; adjust for confounders, e.g. `"~ batch + diagnosis"` |
 | `--metadata_columns` | `diagnosis` | Comma-separated metadata columns retained for downstream visualisations and heatmap annotations |
@@ -386,7 +387,6 @@ It is used for:
 | Parameter | Default | Notes |
 | --- | --- | --- |
 | `--n_clusters` | `100` | Number of parallel LemonTree runs |
-| `--random_seed` | `42` | Base seed used across clustering runs |
 | `--coherence_threshold` | `0.6` | Module coherence cutoff used downstream |
 | `--regulator_types` | `TFs:Lovering_TF_list.txt,Metabolites:Metabolomics.txt` | Comma-separated regulator definitions |
 | `--regulator_selection_method` | `percentage` | Allowed values: `percentage`, `fold_per_module` |
@@ -398,33 +398,20 @@ It is used for:
 | Parameter | Default | Notes |
 | --- | --- | --- |
 | `--enrichment_method` | `EnrichR` | Allowed values: `EnrichR`, `GSEA`, `both`. `auto` is treated as `both`. EnrichR requires internet access; use `GSEA` for offline runs. |
-| `--enrichr_libraries` | `GO_Biological_Process_2025,GO_Molecular_Function_2025,GO_Cellular_Component_2025,KEGG_2021_Human,Reactome_Pathways_2024` | Comma-separated EnrichR library names |
 | `--prioritize_by_expression` | `true` | Ranks modules by differential expression magnitude in the overview |
 | `--overview_n_clusters` | `5` | Number of canonical MegaGO functional clusters shown in the module overview |
-| `--interactive_overview` | `false` | When `true`, additionally generates interactive HTML network visualisations in `Module_Overview/` |
 | `--skip_megago` | `false` | Skip MegaGO semantic-similarity clustering in the module overview and use the pathway-similarity (Jaccard) fallback instead. **Defaults to `true` under `-profile test`**, since the smoke-test dataset doesn't need the (slower) canonical MegaGO workflow — pass `--skip_megago false` to exercise MegaGO on the test dataset. |
 | `--pkn_network` | `PKN/Lemonite_PKN.tsv` | Prior-knowledge network TSV used for edge categorisation (known vs. novel) in the module overview. **Note:** `PKN_EVALUATION` and `SUBNETWORK_GRAPHS` do not read this parameter — they search `{projectDir}/PKN/Lemonite_PKN.tsv` first and fall back to the copy baked into the container at `/opt/PKN/Lemonite_PKN.tsv`. Pointing `--pkn_network` at a different file therefore only affects the overview stage. |
 
-The overview stage uses a fixed canonical workflow: it selects `GO Biological Process` terms from a single enrichment source, retains the top 30 terms per module, clusters modules semantically with MegaGO (when available and `--skip_megago` is not set), and labels each cluster with rrvgo. When both EnrichR and GSEA outputs are present, the overview prefers EnrichR and falls back to GSEA only when EnrichR outputs are absent. Set `--interactive_overview true` to also produce interactive HTML network files. Set `--skip_megago true` to bypass the MegaGO binary entirely (e.g. when it isn't installed, or for a faster test run) — module clustering then falls back to Jaccard pathway similarity, the same fallback used automatically when the `megago` binary isn't found on `PATH`.
+The overview stage uses a fixed canonical workflow: it selects `GO Biological Process` terms from a single enrichment source, retains the top 30 terms per module, clusters modules semantically with MegaGO (when available and `--skip_megago` is not set), and labels each cluster with rrvgo. When both EnrichR and GSEA outputs are present, the overview prefers EnrichR and falls back to GSEA only when EnrichR outputs are absent. Set `--skip_megago true` to bypass the MegaGO binary entirely (e.g. when it isn't installed, or for a faster test run) — module clustering then falls back to Jaccard pathway similarity, the same fallback used automatically when the `megago` binary isn't found on `PATH`.
 
 ### Advanced Cluster and Network Knobs
 
-These are present in `nextflow.config` and logged by the pipeline, but are not part of the minimal quick-start surface.
+These are present in `nextflow.config` and logged by the pipeline, but are not part of the minimal quick-start surface. Module-size, regulator-count and LemonTree sampling settings (including the random seed, which LemonTree's `ganesh` task does not accept) are fixed inside `scripts/` and are not configurable. The interactive overview HTML files are always produced, and the EnrichR libraries are fixed in `scripts/enrichment_analysis.R`.
 
 | Parameter | Default | Purpose |
 | --- | --- | --- |
-| `--use_deseq_priors` | `true` | Use DESeq2 priors during module discovery |
-| `--min_cluster_size` | `10` | Minimum number of genes a cluster must have |
-| `--tight_clusters_only` | `false` | Restrict all downstream analysis to tight (high co-occurrence) clusters only |
 | `--lemontree_tight_min_weight` | `0.25` | Minimum co-occurrence weight for a module to be called a tight cluster (0.0–1.0) |
-| `--max_n_iterations` | `1000` | Maximum Gibbs-sampling iterations per clustering run |
-| `--random_seed` | `42` | Base random seed; each parallel clustering run adds its index to this value |
-| `--min_regulator_size` | `3` | Minimum number of regulators a module must have to be included in the network |
-| `--max_regulator_size` | `100` | Maximum regulators per module (excess regulators are ranked and trimmed) |
-| `--min_module_size` | `10` | Minimum module size (in genes) for network generation |
-| `--min_targets` | `3` | Minimum number of targets a regulator must have to be retained in the network |
-| `--min_expression_fold_threshold` | `1.5` | Minimum expression fold-change used when filtering network edges |
-| `--max_pvalue_threshold` | `0.05` | Maximum p-value threshold for network edge inclusion |
 
 ## Output Structure
 
@@ -434,6 +421,7 @@ The published run directory is assembled through `conf/base.config` publish rule
 {output_parent}/{run_id}/
 ├── Lemonite_Summary_Report.html
 ├── pipeline_parameters_log.txt
+├── TFA/                                # TFA heatmaps, TFA_df.RData, TFA_status.txt (when TFA is enabled)
 └── LemonTree/
     ├── Preprocessing/
     │   ├── LemonPreprocessed_expression.txt
@@ -447,13 +435,14 @@ The published run directory is assembled through `conf/base.config` publish rule
     │   ├── Lemon_results/cluster_*/
     │   ├── *.allreg.txt
     │   ├── *.randomreg.txt
-    │   ├── clusters_list.txt
     │   └── tight_clusters.txt
     ├── Networks/
     │   ├── LemonNetwork_*.txt
     │   ├── *2targets*.txt
     │   ├── Cytoscape_*.txt
     │   ├── Module_coherence_scores.txt
+    │   ├── *.xlsx                      # Excel copy of each network table
+    │   ├── Network_*_ranked_regulators.txt
     │   ├── specific_modules.txt
     │   └── subnetworks_graphviz/graph_*_graphviz.{png,pdf}
     ├── ModuleViewer_files/
@@ -489,10 +478,11 @@ The published run directory is assembled through `conf/base.config` publish rule
             ├── rrvgo_module_labels_top_30.csv
             └── rrvgo_reduced_terms_top_30.csv
 
+```
+
 `PKN_Evaluation/` is created by the pipeline but `evaluate_against_PKN.py` writes its
 outputs (including `evaluation_summary.txt`) into `ModuleViewer_files/` instead, so the
 directory is normally empty and is not published.
-```
 
 Top-level notes:
 
@@ -536,7 +526,7 @@ If you run mouse data with `--organism human`, the default TF list and enrichmen
 
 ### Development Mode
 
-`-profile singularity,dev` bind-mounts the host `scripts/` and `PKN/` directories into the container so script changes can be tested without rebuilding the image. Each module's process block already checks for host-side scripts before falling back to the container path, so changes in `scripts/` take effect immediately.
+`-profile singularity,dev` bind-mounts the host `scripts/` and `PKN/` directories into the container so script changes can be tested without rebuilding the image. Every task also binds `scripts/` and `PKN/` through `containerOptions` in `conf/base.config`, and each module checks the host `scripts/` before falling back to the copy baked into the image (`/app/scripts`), so repo script changes take effect on every run. Rebuild the image when you want it to be self-contained.
 
 ### Singularity is the Only Supported Runtime
 

@@ -10,8 +10,8 @@ INPUT_FILE=$2
 OUTPUT_DIR=$3
 LEMONTREE_JAR=$4
 
-# LemonTree ganesh task does not support a seed argument.
-# We keep the cluster ID for logging and reproducibility tracking only.
+# LemonTree ganesh task does not support a seed argument; the cluster ID is only used
+# to name the output.
 
 echo "=== LemonTree Clustering Debug Info ==="
 echo "Cluster ID: ${CLUSTER_ID}"
@@ -22,6 +22,16 @@ echo "========================================"
 
 # Create output directory
 mkdir -p "${OUTPUT_DIR}/Lemon_results"
+
+# LemonTree treats every column after the first as a sample. The preprocessed matrix carries
+# an ensembl_gene_id annotation column (2nd), which would be read as an extra all-missing
+# sample, so hand LemonTree a copy without it.
+LEMON_INPUT="lemontree_input_${CLUSTER_ID}.txt"
+if [ "$(head -1 "${INPUT_FILE}" | cut -f2)" = "ensembl_gene_id" ]; then
+    cut -f1,3- "${INPUT_FILE}" > "${LEMON_INPUT}"
+else
+    cp -L "${INPUT_FILE}" "${LEMON_INPUT}"
+fi
 
 # Run LemonTree clustering
 if command -v java &> /dev/null; then
@@ -46,7 +56,7 @@ if command -v java &> /dev/null; then
     echo "Running LemonTree..."
     
     # LemonTree clustering - save to Lemon_results subdirectory
-    java -cp "${CLASSPATH}" lemontree.modulenetwork.RunCli -task ganesh -data_file "${INPUT_FILE}" -output_file "${OUTPUT_DIR}/Lemon_results/cluster_${CLUSTER_ID}"
+    java -cp "${CLASSPATH}" lemontree.modulenetwork.RunCli -task ganesh -data_file "${LEMON_INPUT}" -output_file "${OUTPUT_DIR}/Lemon_results/cluster_${CLUSTER_ID}"
     
     JAVA_EXIT_CODE=$?
     if [ "${JAVA_EXIT_CODE}" -ne 0 ]; then

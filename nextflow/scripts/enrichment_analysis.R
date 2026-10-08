@@ -722,6 +722,7 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
     module_all_results <- data.frame()
     total_enrichment_results <- 0
     total_significant_results <- 0
+    module_failed <- FALSE
     
     tryCatch({
       # Run enrichment with increased delay for parallel safety
@@ -782,9 +783,10 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
       
     }, error = function(e) {
       cat("Error processing module", cluster, ":", e$message, "\n")
+      module_failed <<- TRUE
     })
     
-    return(list(up = module_all_results, down = data.frame()))
+    return(list(up = module_all_results, down = data.frame(), failed = module_failed, module = cluster))
   }
   
   # Run enrichment analysis
@@ -796,6 +798,24 @@ if (ANALYSIS_METHOD %in% c("EnrichR", "both")) {
     enrichr_results <- lapply(names(clusters_to_genes), process_enrichr_module)
   }
   
+  # A module that errored (e.g. rate-limited) would otherwise be silently missing from the
+  # results: retry those sequentially, and stop if any is still empty.
+  for (attempt in 1:2) {
+    failed_idx <- which(vapply(enrichr_results, function(r) isTRUE(r$failed), logical(1)))
+    if (length(failed_idx) == 0) break
+    cat("Retrying", length(failed_idx), "failed EnrichR module(s), attempt", attempt, "of 2:",
+        paste(vapply(enrichr_results[failed_idx], function(r) as.character(r$module), character(1)), collapse = ", "), "\n")
+    Sys.sleep(10 * attempt)
+    for (i in failed_idx) {
+      enrichr_results[[i]] <- process_enrichr_module(enrichr_results[[i]]$module)
+    }
+  }
+  still_failed <- which(vapply(enrichr_results, function(r) isTRUE(r$failed), logical(1)))
+  if (length(still_failed) > 0) {
+    stop("EnrichR failed for module(s): ",
+         paste(vapply(enrichr_results[still_failed], function(r) as.character(r$module), character(1)), collapse = ", "))
+  }
+
   # Combine results
   for (result in enrichr_results) {
     if (nrow(result$up) > 0) {

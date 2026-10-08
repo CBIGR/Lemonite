@@ -144,4 +144,10 @@ process MODULE_VIEWER_HEATMAPS {
     echo "" >> module_viewer_summary.txt
     echo "Total heatmaps: \$(ls heatmaps/*.png 2>/dev/null | wc -l)" >> module_viewer_summary.txt
     """
+
+    stub:
+    """
+    mkdir -p heatmaps
+    touch heatmaps/Module_0_heatmap.png module_viewer_summary.txt
+    """
 }

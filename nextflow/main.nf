@@ -35,6 +35,11 @@ if (!(params.organism in valid_organisms)) {
     error "Invalid --organism '${params.organism}'. Must be one of: ${valid_organisms.join(', ')}"
 }
 
+def valid_preprocessing_types = ['rna', 'proteomics']
+if (!(params.preprocessing_type in valid_preprocessing_types)) {
+    error "Invalid --preprocessing_type '${params.preprocessing_type}'. Must be one of: ${valid_preprocessing_types.join(', ')}"
+}
+
 def valid_enrichment_methods = ['EnrichR', 'GSEA', 'both', 'auto']
 if (!(params.enrichment_method in valid_enrichment_methods)) {
     error "Invalid --enrichment_method '${params.enrichment_method}'. Must be one of: ${valid_enrichment_methods.join(', ')}"
@@ -55,7 +60,7 @@ if (params.coherence_threshold < 0 || params.coherence_threshold > 1) {
 
 // Compute output/work directories (use def variables, not params mutation)
 def finalOutputDir = params.output_dir ?: "${params.input_dir}/results"
-def finalWorkDir = params.work_dir ?: "${params.input_dir}/work"
+def finalWorkDir = workflow.workDir
 
 // Prepare display variables (computed after defaults are set)
 def displayInputDir = params.input_dir.toString()

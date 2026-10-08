@@ -30,8 +30,7 @@ process CLUSTERING {
         ${cluster_id} \
         ${preprocessed_data} \
         . \
-        "${params.lemontree_jar}" \
-        ${params.random_seed}
+        "${params.lemontree_jar}"
     """
 
     stub:

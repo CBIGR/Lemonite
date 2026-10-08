@@ -30,7 +30,9 @@ process POST_CLUSTERING {
     mkdir -p Preprocessing
     
     # Symlink data directory so regulator files (e.g. Histone_proteomics.csv) are found
-    ln -s ${data_dir} ./data 2>/dev/null || true
+    # Nextflow already stages data_dir as ./data (a symlink to the input folder); only link it
+    # when absent, otherwise ln creates data/data inside the user's input directory.
+    [ -e ./data ] || ln -s ${data_dir} ./data
     
     # List what we have available
     echo "=== Available staged files ==="
@@ -97,8 +99,9 @@ process NETWORK_GENERATION {
     path "Networks/*2targets*.txt", emit: all_regulator_targets
     path "Networks/LemonNetwork_*.txt", emit: main_network
     path "Networks/Cytoscape_*.txt", emit: network_files
-    path "Networks/*_distribution_plot_*.png", emit: distribution_plots, optional: true
-    path "Networks/Network_*_ranked_regulators_*.txt", emit: ranked_regulators, optional: true
+    path "Networks/*_distribution_plot*.png", emit: distribution_plots, optional: true
+    path "Networks/*.xlsx", emit: network_xlsx, optional: true
+    path "Networks/Network_*_ranked_regulators*.txt", emit: ranked_regulators, optional: true
     path "ModuleViewer_files/*", emit: viewer_files
     path "ModuleViewer_files/sample_mapping.mvf", emit: sample_mapping
     path "Networks/specific_modules.txt", emit: filtered_modules

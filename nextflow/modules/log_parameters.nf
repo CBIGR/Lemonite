@@ -39,10 +39,7 @@ CLUSTERING PARAMETERS:
 ----------------------
 n_clusters                    = ${params.n_clusters}
 coherence_threshold           = ${params.coherence_threshold}
-use_deseq_priors              = ${params.use_deseq_priors}
-min_cluster_size              = ${params.min_cluster_size}
-tight_clusters_only           = ${params.tight_clusters_only}
-max_n_iterations              = ${params.max_n_iterations}
+lemontree_tight_min_weight    = ${params.lemontree_tight_min_weight}
 
 REGULATOR PARAMETERS:
 ---------------------
@@ -51,15 +48,6 @@ regulator_selection_method    = ${params.regulator_selection_method}
 top_n_percent_regulators      = ${params.top_n_percent_regulators}
 regulator_fold_cutoff         = ${params.regulator_fold_cutoff}
 
-NETWORK GENERATION PARAMETERS:
-------------------------------
-min_regulator_size            = ${params.min_regulator_size}
-max_regulator_size            = ${params.max_regulator_size}
-min_module_size               = ${params.min_module_size}
-min_targets                   = ${params.min_targets}
-min_expression_fold_threshold = ${params.min_expression_fold_threshold}
-max_pvalue_threshold          = ${params.max_pvalue_threshold}
-
 PRIOR KNOWLEDGE NETWORK (PKN):
 ------------------------------
 pkn_network                   = ${params.pkn_network}
@@ -67,7 +55,6 @@ pkn_network                   = ${params.pkn_network}
 ENRICHMENT PARAMETERS:
 ----------------------
 enrichment_method             = ${params.enrichment_method}
-enrichr_libraries             = ${params.enrichr_libraries}
 
 OVERVIEW PARAMETERS:
 --------------------

@@ -77,8 +77,15 @@ process PREPROCESSING_TFA {
     # Determine which preprocessing script to use
     # "proteomics" mode: uses Preprocessing_TFA_Proteomics.R (pre-scaled, Pareto/z-score, TFA optional)
     # "rna" mode (default): uses Preprocessing_TFA_RNA.R (DESeq2 normalisation, TFA enabled)
-    if [ "${params.preprocessing_type}" = "proteomics" ] && [ -f "${projectDir}/scripts/Preprocessing_TFA_Proteomics.R" ]; then
-        SCRIPT_PATH="${projectDir}/scripts/Preprocessing_TFA_Proteomics.R"
+    if [ "${params.preprocessing_type}" = "proteomics" ]; then
+        if [ -f "${projectDir}/scripts/Preprocessing_TFA_Proteomics.R" ]; then
+            SCRIPT_PATH="${projectDir}/scripts/Preprocessing_TFA_Proteomics.R"
+        elif [ -f "/app/scripts/Preprocessing_TFA_Proteomics.R" ]; then
+            SCRIPT_PATH="/app/scripts/Preprocessing_TFA_Proteomics.R"
+        else
+            echo "Error: Preprocessing_TFA_Proteomics.R not found"
+            exit 1
+        fi
         echo "Using Preprocessing_TFA_Proteomics.R (pre-scaled proteomics mode)"
         
         # Build optional file arguments

@@ -6,7 +6,7 @@ Detailed documentation lives in [WIKI.md](WIKI.md). The repository-level overvie
 
 ## Requirements
 
-- Nextflow `>= 23.04.0`
+- Nextflow `>= 23.04.0`, `< 26` (use `NXF_VER=25.04.6`)
 - Java 11+
 - Singularity runtime is the primary execution path for this repository
 

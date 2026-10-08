@@ -45,7 +45,7 @@ Lemonite/
 
 ### Requirements
 
-- Nextflow `>= 23.04.0`
+- Nextflow `>= 23.04.0`, `< 26` (use `NXF_VER=25.04.6`)
 - Java 11+
 - Singularity (required — the only supported execution backend; use the `singularity` command)
 - Minimum 16 GB RAM and 4 CPU cores
